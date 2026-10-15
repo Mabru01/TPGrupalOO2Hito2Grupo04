@@ -10,5 +10,5 @@ import java.util.Optional;
 public interface IUnidadVentaRepository extends JpaRepository<UnidadVenta, Long> {
 
     // Método para buscar por código único
-    public abstract Optional<UnidadVenta> findById(long id);
+    public abstract Optional<UnidadVenta> findByCodigoUnico(String codigoUnico);
 }

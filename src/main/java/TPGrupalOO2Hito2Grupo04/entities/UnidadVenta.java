@@ -27,32 +27,31 @@ public abstract class UnidadVenta {
     @Column(name = "codigoUnico", nullable = false)
     protected String codigoUnico;
 
-    // many-to-one name="responsable" column="idPersonaResponsable"
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "idPersonaResponsable", nullable = true)
-    protected Persona responsable;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "idUsuario", nullable = true)
+    protected Usuario responsable;
 
     // many-to-one name="festival" column="idFestival" not-null="true"
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "idFestival", nullable = false)
     private Festival festival;
 
-    // set name="staff" order-by="idPersona asc"
-    @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "idUnidadVenta")
+    @OneToMany(mappedBy = "unidadVenta", fetch = FetchType.LAZY)
     @OrderBy("idPersona ASC")
-    private Set<Persona> staff = new HashSet<>();
+    private Set<Staff> staff = new HashSet<>();
 
+    // --- PLATOS ---
     @OneToMany(mappedBy = "unidadVenta", fetch = FetchType.LAZY)
     @OrderBy("idPlato ASC")
     private Set<Plato> platos = new HashSet<>();
 
+    // --- PEDIDOS ---
     @OneToMany(mappedBy = "unidadVenta", fetch = FetchType.LAZY)
     @OrderBy("idPedido ASC")
     private Set<Pedido> pedidos = new HashSet<>();
 
     public UnidadVenta(String nombreComercial, double superficie, String codigoUnico,
-                       Persona responsable, Festival festival) {
+                       Usuario responsable, Festival festival) {
         this.nombreComercial = nombreComercial;
         this.superficie = superficie;
         this.codigoUnico = codigoUnico;
