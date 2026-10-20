@@ -1,5 +1,6 @@
 package TPGrupalOO2Hito2Grupo04.entities;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import org.hibernate.annotations.CreationTimestamp;
@@ -24,13 +25,13 @@ public class Costo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    private double costoSuperficie;
+    private BigDecimal costoSuperficie;
 
-    private double costoMontaje;
+    private BigDecimal costoMontaje;
 
-    private double plusElectricidad;
+    private BigDecimal plusElectricidad;
 
-    private double sueldoBase;
+    private BigDecimal sueldoBase;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="festival_id", nullable=false, unique=true)
@@ -42,7 +43,7 @@ public class Costo {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
-    public Costo(double costoSuperficie, double costoMontaje, double plusElectricidad, double sueldoBase, Festival festival) {
+    public Costo(BigDecimal costoSuperficie, BigDecimal costoMontaje, BigDecimal plusElectricidad, BigDecimal sueldoBase, Festival festival) {
         this.costoSuperficie = costoSuperficie;
         this.costoMontaje = costoMontaje;
         this.plusElectricidad = plusElectricidad;
