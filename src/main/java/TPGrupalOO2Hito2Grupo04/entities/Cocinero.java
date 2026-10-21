@@ -7,7 +7,7 @@ import lombok.Setter;
 
 @Entity
 @Getter @Setter @NoArgsConstructor
-public class Cocinero extends Persona {
+public class Cocinero extends Staff {
 
     private String especialidad;
     private String plusCategoria;

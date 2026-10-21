@@ -7,7 +7,7 @@ import lombok.Setter;
 
 @Entity
 @Getter @Setter @NoArgsConstructor
-public class Cajero extends Persona {
+public class Cajero extends Staff {
 
     private String turno;
 }

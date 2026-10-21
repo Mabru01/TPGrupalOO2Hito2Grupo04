@@ -13,7 +13,7 @@ public class PuestoDesarmable extends UnidadVenta {
     private int tiempoMontaje;
 
     public PuestoDesarmable(String nombreComercial, double superficie, String codigoUnico,
-                            Persona responsable, Festival festival, int cantidad, int tiempoMontaje) {
+                            Staff responsable, Festival festival, int cantidad, int tiempoMontaje) {
         super(nombreComercial, superficie, codigoUnico, responsable, festival);
         this.cantidad = cantidad;
         this.tiempoMontaje = tiempoMontaje;

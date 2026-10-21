@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @Entity
 @Getter @Setter @NoArgsConstructor
 @Inheritance(strategy = InheritanceType.JOINED) //See more in https://www.baeldung.com/hibernate-inheritance
-public class Persona {
+public class Staff {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -44,8 +44,8 @@ public class Persona {
     //@OneToMany(fetch=FetchType.LAZY, mappedBy="person")
     //private Set<Degree> degrees = new HashSet<>();
 
-    public Persona(long dni, String nombre, String apellido, LocalDate fechaNacimiento,
-                      LocalDate fechaIngreso, float sueldoBase, LocalDate fechaEgreso) {
+    public Staff(long dni, String nombre, String apellido, LocalDate fechaNacimiento,
+                 LocalDate fechaIngreso, float sueldoBase, LocalDate fechaEgreso) {
         this.dni = dni;
         this.nombre = nombre;
         this.apellido = apellido;

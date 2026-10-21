@@ -25,22 +25,23 @@ public class UsuarioService implements UserDetailsService {
 	}
 
 	@Override
-	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		TPGrupalOO2Hito2Grupo04.entities.Usuario usuario = usuarioRepository.findByUsernameAndFetchUserRolesEagerly(username);
+	public UserDetails loadUserByUsername(String mail) throws UsernameNotFoundException {
+		TPGrupalOO2Hito2Grupo04.entities.Usuario usuario = usuarioRepository.findByMailAndFetchRolEagerly(mail);
 		return buildUsuario(usuario, buildGrantedAuthorities(usuario.getRol()));
 	}
 
-	private Usuario buildUsuario(TPGrupalOO2Hito2Grupo04.entities.Usuario usuario, List<GrantedAuthority> grantedAuthorities) {
-		return new Usuario(usuario.getMail(), usuario.getPassword(), usuario.isActivo(),
-						true, true, true, //accountNonExpired, credentialsNonExpired, accountNonLocked,
-						grantedAuthorities);
+	private UserDetails buildUsuario(TPGrupalOO2Hito2Grupo04.entities.Usuario usuario,
+									 List<GrantedAuthority> authorities) {
+		return new org.springframework.security.core.userdetails.User(
+				usuario.getMail(),
+				usuario.getPassword(),
+				true, true, true, true,
+				authorities);
 	}
 
 	private List<GrantedAuthority> buildGrantedAuthorities(Rol rol) {
-		Set<GrantedAuthority> grantedAuthorities = new HashSet<>();
-		for(Rol rol: rol) {
-			grantedAuthorities.add(new SimpleGrantedAuthority(rol.getRol()));
-		}
-		return new ArrayList<>(grantedAuthorities);
+		List<GrantedAuthority> grantedAuthorities = new ArrayList<>();
+		grantedAuthorities.add(new SimpleGrantedAuthority(rol.getRol()));
+		return grantedAuthorities;
 	}
 }

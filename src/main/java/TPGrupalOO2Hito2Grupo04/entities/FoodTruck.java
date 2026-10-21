@@ -14,7 +14,7 @@ public class FoodTruck extends UnidadVenta{
     private boolean usaLuz;
 
     public FoodTruck(String nombreComercial, double superficie, String codigoUnico,
-                     Persona responsable, Festival festival, String patente, boolean usaLuz) {
+                     Staff responsable, Festival festival, String patente, boolean usaLuz) {
         super(nombreComercial, superficie, codigoUnico, responsable, festival);
         this.patente = patente;
         this.usaLuz = usaLuz;

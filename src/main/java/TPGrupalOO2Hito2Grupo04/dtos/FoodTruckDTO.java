@@ -7,12 +7,12 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class FoodtruckDTO extends UnidadVentaDTO {
+public class FoodTruckDTO extends UnidadVentaDTO {
 
 	private String patente;
 	private boolean usaLuz;
 
-    public FoodtruckDTO(long idUnidadVenta, String nombreComercial, double superficie,
+    public FoodTruckDTO(long idUnidadVenta, String nombreComercial, double superficie,
                         String codigoUnico, int idResponsable, int idFestival,
                         String patente, boolean usaLuz) {
         super(idUnidadVenta, nombreComercial, superficie, codigoUnico, idResponsable, idFestival);
