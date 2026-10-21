@@ -25,4 +25,7 @@ public abstract class UnidadVentaDTO {
         this.passwordResponsable = passwordResponsable;
         this.idFestival = idFestival;
     }
+
+
+
 }
