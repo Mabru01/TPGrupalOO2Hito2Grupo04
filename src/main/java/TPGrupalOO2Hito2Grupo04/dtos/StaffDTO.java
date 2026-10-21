@@ -8,7 +8,7 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @NoArgsConstructor
-public class PersonaDTO {
+public class StaffDTO {
     private int idPersona;
 
     private long dni;
@@ -27,8 +27,8 @@ public class PersonaDTO {
 
     //private UnidadVenta unidadVenta;
 
-    public PersonaDTO(long dni, String nombre, String apellido, LocalDate fechaNacimiento,
-                      LocalDate fechaIngreso, float sueldoBase, LocalDate fechaEgreso) {
+    public StaffDTO(long dni, String nombre, String apellido, LocalDate fechaNacimiento,
+                    LocalDate fechaIngreso, float sueldoBase, LocalDate fechaEgreso) {
         this.setDni(dni);
         this.nombre = nombre;
         this.apellido = apellido;

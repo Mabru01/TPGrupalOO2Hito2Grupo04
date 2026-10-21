@@ -8,5 +8,4 @@ import org.springframework.stereotype.Repository;
 public interface IPuestoDesarmableRepository extends JpaRepository<PuestoDesarmable, Long> {
     // Metodos especificos
 
-
 }

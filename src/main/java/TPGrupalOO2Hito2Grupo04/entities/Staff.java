@@ -9,6 +9,8 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Getter @Setter @NoArgsConstructor
@@ -17,7 +19,7 @@ public class Staff {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int idPersona;
+    private int idStaff;
 
     private long dni;
 
@@ -33,18 +35,21 @@ public class Staff {
 
     private LocalDate fechaEgreso;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "unidad_venta_id")
-    private UnidadVenta unidadVenta;
-
     @CreationTimestamp
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
-    //@OneToMany(fetch=FetchType.LAZY, mappedBy="person")
-    //private Set<Degree> degrees = new HashSet<>();
+    //  Usuario
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "usuario_id")
+    private Usuario usuario;
+
+    //  UnidadVenta
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "unidad_venta_id")
+    private UnidadVenta unidadVenta;
 
     public Staff(long dni, String nombre, String apellido, LocalDate fechaNacimiento,
                  LocalDate fechaIngreso, float sueldoBase, LocalDate fechaEgreso) {

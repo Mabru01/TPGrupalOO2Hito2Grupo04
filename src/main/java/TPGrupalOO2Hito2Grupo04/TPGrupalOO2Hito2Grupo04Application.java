@@ -12,6 +12,4 @@ public class TPGrupalOO2Hito2Grupo04Application {
     public static void main(String[] args) {
         SpringApplication.run(TPGrupalOO2Hito2Grupo04Application.class, args);
     }
-
-
 }

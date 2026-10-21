@@ -83,10 +83,8 @@
 			<version>1.18.46</version> <!-- o la última -->
 			<scope>provided</scope>
 		</dependency>
-
 	</dependencies>
 	<build>
-
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
