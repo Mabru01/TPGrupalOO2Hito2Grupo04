@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Getter @Setter @NoArgsConstructor
-@Table(name="user_role", uniqueConstraints=@UniqueConstraint(columnNames= {"role", "user_id"}))
+@Table(name="usuario_rol", uniqueConstraints=@UniqueConstraint(columnNames= {"role", "user_id"}))
 public class Rol {
 
 	@Id
@@ -19,7 +19,7 @@ public class Rol {
 	private int idRol;
 
 	@OneToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name="usuario_id", nullable=false)
+	@JoinColumn(name="usuario_id", nullable=true)
 	private Usuario usuario;
 
 	@Column(name="rol", nullable=false, length=100)
