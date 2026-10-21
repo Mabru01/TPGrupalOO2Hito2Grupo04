@@ -36,7 +36,7 @@ public class SecurityConfiguration {
 							"/vendor/jquery/*", "/vendor/bootstrap/js/*", "/api/v1/**").permitAll();
 					auth.anyRequest().authenticated();
 				})
-				.formLogin(login -> {
+				/*.formLogin(login -> {
 					login.loginPage("/login");
 					login.loginProcessingUrl("/loginprocess");
 					login.usernameParameter("username");
@@ -44,9 +44,20 @@ public class SecurityConfiguration {
 					login.defaultSuccessUrl("/loginsuccess");
 					login.permitAll();
 				})
+*/
+				.formLogin(login -> {
+					login.permitAll();
+				})
+				/*
 				.logout(logout -> {
 					logout.logoutUrl("/logout");
 					logout.logoutSuccessUrl("/login");
+					logout.permitAll();
+				})
+
+				 */
+
+				.logout(logout -> {
 					logout.permitAll();
 				})
 				.build();

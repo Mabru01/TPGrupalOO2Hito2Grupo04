@@ -1,4 +1,4 @@
-package com.example.demo;
+package TPGrupalOO2Hito2Grupo04.controllers;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

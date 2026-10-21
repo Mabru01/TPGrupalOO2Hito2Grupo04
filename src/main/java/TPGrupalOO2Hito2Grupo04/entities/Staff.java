@@ -33,7 +33,9 @@ public class Staff {
 
     private LocalDate fechaEgreso;
 
-    //private UnidadVenta unidadVenta;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "unidad_venta_id")
+    private UnidadVenta unidadVenta;
 
     @CreationTimestamp
     private LocalDateTime createdAt;
