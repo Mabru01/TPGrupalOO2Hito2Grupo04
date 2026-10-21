@@ -29,7 +29,7 @@ public abstract class UnidadVenta {
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "idUsuario", nullable = true)
-    protected Usuario responsable;
+    protected Staff responsable;
 
     // many-to-one name="festival" column="idFestival" not-null="true"
     @ManyToOne(fetch = FetchType.LAZY)
@@ -51,7 +51,7 @@ public abstract class UnidadVenta {
     private Set<Pedido> pedidos = new HashSet<>();
 
     public UnidadVenta(String nombreComercial, double superficie, String codigoUnico,
-                       Usuario responsable, Festival festival) {
+                       Staff responsable, Festival festival) {
         this.nombreComercial = nombreComercial;
         this.superficie = superficie;
         this.codigoUnico = codigoUnico;
