@@ -12,8 +12,8 @@
                 <label for="festivalId">Festival</label>
                 <select class="form-control" id="festivalId" name="festivalId" required>
                     <option value="">Elegí un festival</option>
-                    <option th:each="f : ${festivales}" th:value="${f.id}" th:text="${f.nombre}"
-                            th:selected="${f.id == festivalId}">Festival</option>
+                    <option th:each="f : ${festivales}" th:value="${f.idFestival}" th:text="${f.nombre}"
+                            th:selected="${f.idFestival == festivalId}">Festival</option>
                 </select>
             </div>
             <div class="col-md-5 mb-2">

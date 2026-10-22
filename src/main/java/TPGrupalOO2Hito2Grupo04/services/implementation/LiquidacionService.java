@@ -42,7 +42,7 @@ public class LiquidacionService implements ILiquidacionService {
         Staff staff = staffService.findById(idStaff).orElseThrow(
                 () -> new IllegalArgumentException("ERROR: Staff not found with id: " + idStaff)
         );
-        Festival festival = festivalRepository.findById(idFestival).orElseThrow(
+        Festival festival = festivalRepository.findByIdFestival(idFestival).orElseThrow(
                 () -> new IllegalArgumentException("ERROR: Festival not found with id: " + idFestival)
         );
         Costo costo = festival.getCosto();

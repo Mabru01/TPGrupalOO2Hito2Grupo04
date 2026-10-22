@@ -23,7 +23,7 @@ INSERT INTO usuario (id, username, password, activo, rol_id, created_at, updated
 -- =========================================
 -- FESTIVAL
 -- =========================================
-INSERT INTO festival (id, nombre, temporada, fecha_inicio, fecha_fin, created_at, updated_at) VALUES
+INSERT INTO festival (id_festival, nombre, temporada, fecha_inicio, fecha_fin, created_at, updated_at) VALUES
 (1, 'Festival Uno',  'Verano',   '2026-07-20', '2026-07-30', NOW(), NOW()),
 (2, 'Festival Dos',  'Invierno', '2026-07-20', '2026-07-30', NOW(), NOW()),
 (3, 'Festival Tres', 'Otoño',    '2026-07-20', '2026-07-30', NOW(), NOW());
@@ -32,7 +32,7 @@ INSERT INTO festival (id, nombre, temporada, fecha_inicio, fecha_fin, created_at
 -- COSTO
 -- =========================================
 -- antiguedad_por_anio y plus_*: montos que usa la liquidación de sueldo (valores del enunciado)
-INSERT INTO costo (id, costo_montaje, costo_superficie, plus_electricidad, sueldo_base, antiguedad_por_anio, plus_cocinero, plus_cocinero_ayudante, plus_lavaplatos, festival_id, created_at, updated_at) VALUES
+INSERT INTO costo (id_costo, costo_montaje, costo_superficie, plus_electricidad, sueldo_base, antiguedad_por_anio, plus_cocinero, plus_cocinero_ayudante, plus_lavaplatos, festival_id, created_at, updated_at) VALUES
 (1, 28500,  84000, 61500, 1380000, 5000, 150000, 100000, 50000, 1, NOW(), NOW()),
 (2, 36200,  97500, 82300, 1620000, 5000, 150000, 100000, 50000, 2, NOW(), NOW()),
 (3, 24800, 112000, 69700, 1475000, 5000, 150000, 100000, 50000, 3, NOW(), NOW());

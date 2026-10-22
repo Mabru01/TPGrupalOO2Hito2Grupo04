@@ -31,12 +31,12 @@ public class CostoService implements ICostoService {
 
     @Override
     public Optional<Costo> findById(long id) {
-        return costoRepository.findById(id);
+        return costoRepository.findByIdCosto(id);
     }
 
     @Override
     public Costo findByFestival(long festivalId) {
-        return costoRepository.findByFestivalId(festivalId).orElseThrow(
+        return costoRepository.findByFestivalIdFestival(festivalId).orElseThrow(
                 () -> new IllegalArgumentException("ERROR: Costo not found for festival id: " + festivalId)
         );
     }

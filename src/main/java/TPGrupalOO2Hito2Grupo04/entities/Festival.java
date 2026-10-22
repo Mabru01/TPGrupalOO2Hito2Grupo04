@@ -21,7 +21,7 @@ public class Festival {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private long idFestival;
 
     @Column(name="nombre", unique=true, nullable=false, length=100)
     private String nombre;
@@ -44,8 +44,8 @@ public class Festival {
     @OneToOne(fetch=FetchType.LAZY, mappedBy="festival")
     private Costo costo;
 
-    public Festival(long id, String nombre, String temporada, LocalDate fechaInicio, LocalDate fechaFin) {
-        this.id = id;
+    public Festival(long idFestival, String nombre, String temporada, LocalDate fechaInicio, LocalDate fechaFin) {
+        this.idFestival = idFestival;
         this.nombre = nombre;
         this.temporada = temporada;
         this.fechaInicio = fechaInicio;
