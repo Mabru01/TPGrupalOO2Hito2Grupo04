@@ -31,7 +31,10 @@
                     </li>
                 </ul>
 
-                <!-- Sin sesión, el registro y el inicio de sesión están en la página de inicio -->
+                <!-- Sin sesión: iniciar sesión (el registro está en la página de inicio) -->
+                <div class="form-inline" sec:authorize="isAnonymous()">
+                    <a class="btn btn-epicentro" th:href="@{/login}">Iniciar sesión</a>
+                </div>
 
                 <!-- Con sesión: usuario y cerrar sesión -->
                 <ul class="navbar-nav" sec:authorize="isAuthenticated()">
