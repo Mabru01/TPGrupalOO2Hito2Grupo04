@@ -1,60 +1,95 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
+<!--/*@thymesVar id="unidadVentaDTO" type="TPGrupalOO2Hito2Grupo04.dtos.UnidadVentaDTO"*/-->
+<!--/*@thymesVar id="accion" type="java.lang.String"*/-->
+<!--/*@thymesVar id="tipoUnidad" type="java.lang.String"*/-->
 <head th:replace="~{layout :: head}"></head>
 <body>
 <nav th:replace="~{layout :: navbar}"></nav>
 
 <main class="container py-4">
   <div class="page-header mb-4">
-    <h2>Nueva Unidad de Venta</h2>
+    <h2>Nueva Unidad de Venta: <span th:text="${tipoUnidad}"></span></h2>
   </div>
 
   <div class="card form-card">
     <div class="card-body">
-      <!-- Mapeado al endpoint de guardado y al objeto DTO -->
-      <form th:action="@{/unidades-venta/guardar}" th:object="${unidadVentaDTO}" method="post">
 
-        <!-- SECCIÓN: Datos de la Unidad de Venta -->
+      <form th:action="@{${accion}}"
+            th:object="${unidadVentaDTO}"
+            method="post">
+
         <h5 class="text-secondary border-bottom pb-2 mb-3">Datos de la Unidad</h5>
 
         <div class="mb-3">
           <label for="nombreComercial" class="col-form-label">Nombre Comercial</label>
-          <input type="text" class="form-control" id="nombreComercial" th:field="*{nombreComercial}" required placeholder="Ej: FoodTruck Las Empanadas"/>
+          <input type="text" class="form-control" id="nombreComercial"
+                 th:field="*{nombreComercial}" required
+                 placeholder="Ej: FoodTruck Las Empanadas"/>
         </div>
 
         <div class="mb-3">
           <label for="codigoUnico" class="col-form-label">Código Único</label>
-          <input type="text" class="form-control" id="codigoUnico" th:field="*{codigoUnico}" required placeholder="Ej: UV-001"/>
+          <input type="text" class="form-control" id="codigoUnico"
+                 th:field="*{codigoUnico}" required placeholder="Ej: UV-001"/>
         </div>
 
         <div class="mb-3">
-          <label for="superficie" class="col-form-label">Superficie (m²)</label>
-          <input type="number" step="0.01" class="form-control" id="superficie" th:field="*{superficie}" required placeholder="Ej: 15.5"/>
+          <label for="superficie" class="col-form-label">Superficie</label>
+          <input type="number" step="0.01" class="form-control" id="superficie"
+                 th:field="*{superficie}" required placeholder="Ej: 15.5"/>
         </div>
 
-        <div class="mb-3">
-          <label for="idFestival" class="col-form-label">ID del Festival</label>
-          <input type="number" class="form-control" id="idFestival" th:field="*{idFestival}" required placeholder="Ej: 1"/>
+        <!-- Campos propios del Food Truck -->
+        <div th:if="${tipoUnidad == 'Food Truck'}">
+          <div class="mb-3">
+            <label for="patente" class="col-form-label">Patente</label>
+            <input type="text" class="form-control" id="patente"
+                   th:field="*{patente}" required/>
+          </div>
+          <div class="form-check mb-3">
+            <input type="checkbox" class="form-check-input" id="usaLuz"
+                   th:field="*{usaLuz}"/>
+            <label for="usaLuz" class="form-check-label">Usa luz</label>
+          </div>
         </div>
 
-        <!-- SECCIÓN: Datos del Responsable (Usuario) -->
+        <!-- Campos propios del Puesto Desarmable -->
+        <div th:if="${tipoUnidad == 'Puesto Desarmable'}">
+          <div class="mb-3">
+            <label for="cantidad" class="col-form-label">Cantidad</label>
+            <input type="number" class="form-control" id="cantidad"
+                   th:field="*{cantidad}" required/>
+          </div>
+          <div class="mb-3">
+            <label for="tiempoMontaje" class="col-form-label">Tiempo de montaje</label>
+            <input type="number" class="form-control" id="tiempoMontaje"
+                   th:field="*{tiempoMontaje}" required/>
+          </div>
+        </div>
+
         <h5 class="text-secondary border-bottom pb-2 mb-3 mt-4">Datos del Responsable</h5>
 
         <div class="mb-3">
-          <label for="emailResponsable" class="col-form-label">Correo Electrónico del Responsable</label>
-          <input type="email" class="form-control" id="emailResponsable" th:field="*{emailResponsable}" required placeholder="ejemplo@correo.com"/>
+          <label for="emailResponsable" class="col-form-label">
+          </label>
+          <input type="email" class="form-control" id="emailResponsable"
+                 th:field="*{emailResponsable}" required
+                 placeholder="ejemplo@correo.com"/>
         </div>
 
         <div class="mb-3">
           <label for="passwordResponsable" class="col-form-label">Contraseña Inicial</label>
-          <input type="password" class="form-control" id="passwordResponsable" th:field="*{passwordResponsable}" required placeholder="Ingrese una clave para el usuario"/>
+          <input type="password" class="form-control" id="passwordResponsable"
+                 th:field="*{passwordResponsable}" required
+                 placeholder="Ingrese una clave para el usuario"/>
         </div>
 
-        <!-- Botones de Acción -->
         <div class="d-flex mt-4">
           <button type="submit" class="btn btn-success me-2">Registrar</button>
-          <a th:href="@{/unidades-venta}" class="btn btn-outline-secondary">Cancelar</a>
+          <a th:href="@{/unidadVenta}" class="btn btn-outline-secondary">Cancelar</a>
         </div>
+
       </form>
     </div>
   </div>
