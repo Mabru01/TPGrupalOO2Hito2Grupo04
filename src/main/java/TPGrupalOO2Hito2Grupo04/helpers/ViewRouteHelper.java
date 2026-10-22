@@ -15,8 +15,17 @@ public class ViewRouteHelper {
     // Liquidacion
     public final static String LIQUIDACION_INDEX = "liquidacion/index";
 
-  
+    //STAFF
+    public final static String STAFF_INDEX = "staff/index";
+    public final static String STAFF_NEW = "staff/new";
+    public final static String STAFF_UPDATE = "staff/update";
+    public final static String STAFF_PARTIAL_VIEW = "staff/partialPersonView";
+
+    //USER
+    public final static String USER_LOGIN = "user/login";
+    public final static String USER_LOGOUT = "user/logout";
   /**** Redirects ****/
     public final static String UnidadVenta_ROOT = "/unidadVenta";
+    public final static String STAFF_ROOT = "/staff";
 
 }
