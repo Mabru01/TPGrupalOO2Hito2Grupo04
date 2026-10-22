@@ -5,70 +5,85 @@
     <nav th:replace="~{layout :: navbar}"></nav>
 
     <main class="container py-4">
-        <section class="portada text-center">
+        <section class="bienvenida">
             <h1>Epicentro Gourmet</h1>
-            <p class="lead text-muted mb-4">Festivales temáticos del centro de convenciones y predio ferial.</p>
-
-            <!-- Las dos acciones de la página de inicio, solo para quien no inició sesión -->
-            <div sec:authorize="isAnonymous()">
-                <div class="dropdown d-inline-block mr-2 mb-2">
-                    <button class="btn btn-epicentro btn-lg dropdown-toggle" type="button" data-toggle="dropdown">
-                        Registrar unidad de venta
-                    </button>
-                    <div class="dropdown-menu">
-                        <a class="dropdown-item" th:href="@{/unidadVenta/nuevo/food-truck}">Food Truck</a>
-                        <a class="dropdown-item" th:href="@{/unidadVenta/nuevo/puesto-desarmable}">Puesto desarmable</a>
-                    </div>
-                </div>
-                <a class="btn btn-outline-dark btn-lg mb-2" th:href="@{/login}">Iniciar sesión</a>
-            </div>
-
-            <p sec:authorize="isAuthenticated()" class="mb-0">
+            <p class="text-muted mb-0">Festivales temáticos del centro de convenciones y predio ferial.</p>
+            <p sec:authorize="isAuthenticated()" class="mt-2 mb-0">
                 Sesión iniciada como <strong sec:authentication="name">usuario</strong>.
             </p>
         </section>
 
-        <h2 class="mb-3">Festivales</h2>
+        <!-- Las dos acciones de la página de inicio (solo sin sesión) -->
+        <div class="row" sec:authorize="isAnonymous()">
+            <div class="col-md-6 mb-4">
+                <div class="card accion h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">¿Tenés un food truck o un puesto?</h5>
+                        <p class="card-text text-muted">Registrá tu unidad de venta. Quedás como responsable y se te genera un usuario.</p>
+                        <a class="btn btn-epicentro mr-2 mb-1" th:href="@{/unidadVenta/nuevo/food-truck}">Registrar food truck</a>
+                        <a class="btn btn-outline-secondary mb-1" th:href="@{/unidadVenta/nuevo/puesto-desarmable}">Registrar puesto</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-4">
+                <div class="card accion h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">¿Ya tenés cuenta?</h5>
+                        <p class="card-text text-muted">Administradores, responsables y empleados ingresan con su usuario.</p>
+                        <a class="btn btn-epicentro" th:href="@{/login}">Iniciar sesión</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <h2 class="h4 mb-3">Festivales</h2>
 
         <div th:if="${#lists.isEmpty(festivales)}" class="alert alert-info">
             Todavía no hay festivales cargados.
         </div>
 
-        <div class="card festival mb-4" th:each="f : ${festivales}">
-            <div class="card-header d-flex flex-wrap justify-content-between align-items-center">
-                <div>
-                    <h4 class="mb-0" th:text="${f.nombre}">Festival</h4>
-                    <span class="fechas">
-                        <span th:text="${f.temporada}">Primavera</span> ·
-                        del <span th:text="${#temporals.format(f.fechaInicio, 'dd/MM/yyyy')}">01/10/2026</span>
-                        al <span th:text="${#temporals.format(f.fechaFin, 'dd/MM/yyyy')}">15/11/2026</span>
-                    </span>
-                </div>
-                <span th:if="${f.fechaInicio.isAfter(hoy)}" class="badge badge-warning">Próximo</span>
-                <span th:if="${f.fechaFin.isBefore(hoy)}" class="badge badge-secondary">Finalizado</span>
-                <span th:unless="${f.fechaInicio.isAfter(hoy) or f.fechaFin.isBefore(hoy)}" class="badge badge-success">En curso</span>
+        <div class="card tabla-festivales" th:unless="${#lists.isEmpty(festivales)}">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>Festival</th>
+                            <th>Temporada</th>
+                            <th>Fechas</th>
+                            <th class="text-center">Duración</th>
+                            <th>Unidades de venta</th>
+                            <th class="text-center">Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="f : ${festivales}">
+                            <td class="font-weight-bold" th:text="${f.nombre}">Festival</td>
+                            <td th:text="${f.temporada}">Primavera</td>
+                            <td>
+                                <span th:text="${#temporals.format(f.fechaInicio, 'dd/MM/yyyy')}">01/10/2026</span>
+                                <span class="text-muted">al</span>
+                                <span th:text="${#temporals.format(f.fechaFin, 'dd/MM/yyyy')}">15/11/2026</span>
+                            </td>
+                            <td class="text-center" th:text="${f.duracionEnDias + ' días'}">46 días</td>
+                            <td>
+                                <span th:if="${f.unidadesVenta.isEmpty()}" class="text-muted">Sin unidades</span>
+                                <span th:each="u : ${f.unidadesVenta}"
+                                      th:class="${u.class.simpleName.startsWith('FoodTruck') ? 'unidad unidad-ft' : 'unidad unidad-pd'}"
+                                      th:title="${u.class.simpleName.startsWith('FoodTruck') ? 'Food truck' : 'Puesto desarmable'}"
+                                      th:text="${u.nombreComercial}">Unidad</span>
+                            </td>
+                            <td class="text-center">
+                                <span th:if="${f.fechaInicio.isAfter(hoy)}" class="estado estado-proximo">Próximo</span>
+                                <span th:if="${f.fechaFin.isBefore(hoy)}" class="estado estado-finalizado">Finalizado</span>
+                                <span th:unless="${f.fechaInicio.isAfter(hoy) or f.fechaFin.isBefore(hoy)}" class="estado estado-curso">En curso</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
-            <div class="card-body">
-                <h6 class="text-uppercase text-muted mb-3">Unidades de venta</h6>
-                <p class="text-muted mb-0" th:if="${f.unidadesVenta.isEmpty()}">Todavía no hay unidades registradas.</p>
-                <div class="table-responsive" th:unless="${f.unidadesVenta.isEmpty()}">
-                    <table class="table table-sm table-hover mb-0">
-                        <thead>
-                            <tr>
-                                <th>Nombre comercial</th>
-                                <th>Tipo</th>
-                                <th>Superficie</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr th:each="u : ${f.unidadesVenta}">
-                                <td th:text="${u.nombreComercial}">Unidad</td>
-                                <td th:text="${u.class.simpleName.startsWith('FoodTruck') ? 'Food Truck' : 'Puesto desarmable'}">Tipo</td>
-                                <td th:text="${u.superficie + ' m²'}">0 m²</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+            <div class="card-footer referencias">
+                <span class="unidad unidad-ft">Food truck</span>
+                <span class="unidad unidad-pd">Puesto desarmable</span>
             </div>
         </div>
     </main>

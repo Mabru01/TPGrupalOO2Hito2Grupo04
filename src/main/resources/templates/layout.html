@@ -31,17 +31,8 @@
                     </li>
                 </ul>
 
-                <!-- Sin sesión: registrar una unidad o iniciar sesión -->
+                <!-- Sin sesión: iniciar sesión (el registro está en la página de inicio) -->
                 <div class="form-inline" sec:authorize="isAnonymous()">
-                    <div class="dropdown mr-2">
-                        <button class="btn btn-outline-light dropdown-toggle" type="button" data-toggle="dropdown">
-                            Registrar unidad de venta
-                        </button>
-                        <div class="dropdown-menu dropdown-menu-right">
-                            <a class="dropdown-item" th:href="@{/unidadVenta/nuevo/food-truck}">Food Truck</a>
-                            <a class="dropdown-item" th:href="@{/unidadVenta/nuevo/puesto-desarmable}">Puesto desarmable</a>
-                        </div>
-                    </div>
                     <a class="btn btn-epicentro" th:href="@{/login}">Iniciar sesión</a>
                 </div>
 
