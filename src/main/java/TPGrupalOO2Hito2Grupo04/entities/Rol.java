@@ -11,14 +11,16 @@ import java.time.LocalDateTime;
 
 @Entity
 @Getter @Setter @NoArgsConstructor
-@Table(name="usuario_rol", uniqueConstraints=@UniqueConstraint(columnNames= {"role", "user_id"}))
+@Table(name="user_role")
+
 public class Rol {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int idRol;
 
-	@Column(name="rol", nullable=false, length=100)
+	@Column(name="rol", unique=true, nullable=false, length=100)
+
 	private String rol;
 
 	@CreationTimestamp
@@ -27,7 +29,7 @@ public class Rol {
 	@UpdateTimestamp
 	private LocalDateTime updatedAt;
 
-	public Rol(int id, String role) {
+  public Rol(int idRol, String rol) {
 		this.idRol = idRol;
 		this.rol = rol;
 	}

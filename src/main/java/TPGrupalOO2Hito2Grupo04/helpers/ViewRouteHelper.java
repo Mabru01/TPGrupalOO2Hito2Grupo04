@@ -1,7 +1,11 @@
 package TPGrupalOO2Hito2Grupo04.helpers;
 
 public class ViewRouteHelper {
+    public final static String INDEX = "home/index";
+    public final static String LIQUIDACION_INDEX = "liquidacion/index";
 
+    // Redirects
+    public final static String ROUTE_INDEX = "/index";
   
     //Unidad de venta
     public final static String UnidadVenta_INDEX = "unidadVenta/index";

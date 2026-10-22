@@ -1,107 +1,85 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head th:replace="~{layout :: head}"></head>
 <body>
     <nav th:replace="~{layout :: navbar}"></nav>
 
     <main class="container py-4">
-        <!-- Hero Section -->
-        <div class="hero-section text-center">
-            <div class="container">
-                <h1>Bienvenido al TFI</h1>
-                <p class="mb-4">Sistema de gestion de personas y titulos - Universidad Nacional de Lanus</p>
-            </div>
-        </div>
+        <section class="bienvenida">
+            <h1>Epicentro Gourmet</h1>
+            <p class="text-muted mb-0">Sistema de gestión de festivales</p>
+            <p sec:authorize="isAuthenticated()" class="mt-2 mb-0">
+                Sesión iniciada como <strong sec:authentication="name">usuario</strong>.
+            </p>
+        </section>
 
-        <!-- Access Cards -->
-        <div class="row mb-4">
-            <div class="col-md-4">
-                <div class="card access-card">
-                    <div class="card-body">
-                        <div class="icon">&#128100;</div>
-                        <h5 class="card-title">Personas</h5>
-                        <p class="card-text text-muted">Gestionar el registro de personas del sistema.</p>
-                        <a th:href="@{/person}" class="btn btn-primary">Acceder</a>
-                    </div>
+        <!-- Registro de unidad de venta (solo sin sesión; iniciar sesión está en el navbar) -->
+        <div class="card accion mb-4" sec:authorize="isAnonymous()">
+            <div class="card-body d-md-flex justify-content-between align-items-center">
+                <div class="mb-3 mb-md-0">
+                    <h5 class="card-title mb-1">¿Tenés una unidad de venta?</h5>
+                    <p class="card-text text-muted mb-0">Registrá tu food truck o puesto desarmable.</p>
                 </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card access-card">
-                    <div class="card-body">
-                        <div class="icon">&#127891;</div>
-                        <h5 class="card-title">Titulos</h5>
-                        <p class="card-text text-muted">Administrar los titulos y formacion academica.</p>
-                        <a th:href="@{/degrees/}" class="btn btn-primary">Acceder</a>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card access-card">
-                    <div class="card-body">
-                        <div class="icon">&#128269;</div>
-                        <h5 class="card-title">Buscar Persona</h5>
-                        <p class="card-text text-muted">Buscar personas por nombre.</p>
-                        <select id="selectPerson" class="form-control mt-2">
-                            <option value="">-- Seleccionar persona --</option>
-                            <option th:each="person : ${persons}" th:value="${person.id}" th:text="${person.name}"></option>
-                        </select>
-                    </div>
+                <div>
+                    <a class="btn btn-epicentro mr-2 mb-1" th:href="@{/unidadVenta/nuevo/food-truck}">Registrar food truck</a>
+                    <a class="btn btn-outline-secondary mb-1" th:href="@{/unidadVenta/nuevo/puesto-desarmable}">Registrar puesto</a>
                 </div>
             </div>
         </div>
 
-        <!-- Resultado busqueda AJAX -->
-        <div id="div-select-person" class="row"></div>
+        <h2 class="h4 mb-3">Festivales</h2>
 
-        <!-- Personas recientes -->
-        <div class="card" th:if="${persons != null and !persons.isEmpty()}">
-            <div class="card-header bg-dark text-white">
-                <h5 class="mb-0">Personas registradas</h5>
+        <div th:if="${#lists.isEmpty(festivales)}" class="alert alert-info">
+            Todavía no hay festivales cargados.
+        </div>
+
+        <div class="card tabla-festivales" th:unless="${#lists.isEmpty(festivales)}">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>Festival</th>
+                            <th>Temporada</th>
+                            <th>Fechas</th>
+                            <th class="text-center">Duración</th>
+                            <th>Unidades de venta</th>
+                            <th class="text-center">Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="f : ${festivales}">
+                            <td class="font-weight-bold" th:text="${f.nombre}">Festival</td>
+                            <td th:text="${f.temporada}">Primavera</td>
+                            <td>
+                                <span th:text="${#temporals.format(f.fechaInicio, 'dd/MM/yyyy')}">01/10/2026</span>
+                                <span class="text-muted">al</span>
+                                <span th:text="${#temporals.format(f.fechaFin, 'dd/MM/yyyy')}">15/11/2026</span>
+                            </td>
+                            <td class="text-center" th:text="${f.duracionEnDias + ' días'}">46 días</td>
+                            <td>
+                                <span th:if="${f.unidadesVenta.isEmpty()}" class="text-muted">Sin unidades</span>
+                                <span th:each="u : ${f.unidadesVenta}"
+                                      th:class="${u.class.simpleName.startsWith('FoodTruck') ? 'unidad unidad-ft' : 'unidad unidad-pd'}"
+                                      th:title="${u.class.simpleName.startsWith('FoodTruck') ? 'Food truck' : 'Puesto desarmable'}"
+                                      th:text="${u.nombreComercial}">Unidad</span>
+                            </td>
+                            <td class="text-center">
+                                <span th:if="${f.fechaInicio.isAfter(hoy)}" class="estado estado-proximo">Próximo</span>
+                                <span th:if="${f.fechaFin.isBefore(hoy)}" class="estado estado-finalizado">Finalizado</span>
+                                <span th:unless="${f.fechaInicio.isAfter(hoy) or f.fechaFin.isBefore(hoy)}" class="estado estado-curso">En curso</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-striped table-hover mb-0">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Nombre</th>
-                                <th>Ver</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr th:each="person : ${persons}">
-                                <td th:text="${person.id}"></td>
-                                <td th:text="${person.name}"></td>
-                                <td>
-                                    <a th:href="@{/person/{id}(id=${person.id})}" class="btn btn-sm btn-outline-primary">Ver</a>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+            <div class="card-footer referencias">
+                <span class="unidad unidad-ft">Food truck</span>
+                <span class="unidad unidad-pd">Puesto desarmable</span>
             </div>
         </div>
     </main>
 
     <footer th:replace="~{layout :: footer}"></footer>
     <div th:replace="~{layout :: scripts}"></div>
-
-    <script>
-        $(document).ready(function() {
-            $('#selectPerson').on('change', function() {
-                var personId = $(this).val();
-                if (personId) {
-                    $.ajax({
-                        url: '/person/partial/' + personId,
-                        success: function(response) {
-                            $('#div-select-person').html(response);
-                        }
-                    });
-                } else {
-                    $('#div-select-person').html('');
-                }
-            });
-        });
-    </script>
 </body>
 </html>

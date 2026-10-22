@@ -30,6 +30,11 @@ public class FestivalService implements IFestivalService {
     }
 
     @Override
+    public List<Festival> getAllWithUnidades() {
+        return festivalRepository.findAllAndFetchUnidadesEagerly();
+    }
+
+    @Override
     public Optional<Festival> findById(long id) {
         return festivalRepository.findByIdFestival(id);
     }

@@ -1,0 +1,101 @@
+/* Estilos propios de Epicentro Gourmet (se suman a bootstrap y modern-business) */
+:root {
+    --eg-oscuro: #3b1f2b;
+    --eg-acento: #c0392b;
+    --eg-acento-hover: #a93226;
+    --eg-crema: #fbf6f0;
+}
+
+.navbar-epicentro {
+    background-color: var(--eg-oscuro);
+}
+
+.navbar-epicentro .navbar-brand {
+    font-weight: 700;
+    letter-spacing: 0.02em;
+}
+
+.btn-epicentro {
+    background-color: var(--eg-acento);
+    border-color: var(--eg-acento);
+    color: #fff;
+}
+
+.btn-epicentro:hover,
+.btn-epicentro:focus {
+    background-color: var(--eg-acento-hover);
+    border-color: var(--eg-acento-hover);
+    color: #fff;
+}
+
+.bienvenida {
+    border-left: 6px solid var(--eg-acento);
+    padding: 0.5rem 0 0.5rem 1.25rem;
+    margin: 1rem 0 2rem;
+}
+
+.accion {
+    background-color: var(--eg-crema);
+    border: 0;
+    border-radius: 12px;
+}
+
+.tabla-festivales {
+    border: 0;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 12px rgba(59, 31, 43, 0.08);
+}
+
+.tabla-festivales thead th {
+    background-color: var(--eg-oscuro);
+    color: #fff;
+    border: 0;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.tabla-festivales td {
+    vertical-align: middle;
+}
+
+.tabla-festivales tbody tr:hover {
+    background-color: var(--eg-crema);
+}
+
+.estado {
+    display: inline-block;
+    min-width: 92px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    border-radius: 999px;
+    padding: 0.2rem 0.7rem;
+}
+
+.estado-curso { background-color: #dff3e6; color: #1e7a45; }
+.estado-proximo { background-color: #fff1d6; color: #8a5a00; }
+.estado-finalizado { background-color: #ececec; color: #6b6b6b; }
+
+.footer-epicentro {
+    background-color: var(--eg-oscuro);
+}
+
+.unidad {
+    display: inline-block;
+    font-size: 0.78rem;
+    font-weight: 600;
+    border-radius: 999px;
+    padding: 0.15rem 0.6rem;
+    margin: 0.1rem 0.2rem 0.1rem 0;
+}
+
+.unidad-ft { background-color: #fde8e4; color: #a93226; }
+.unidad-pd { background-color: #e7eef6; color: #2c4a6b; }
+
+.referencias {
+    background-color: #fff;
+    font-size: 0.85rem;
+}
+
