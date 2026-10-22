@@ -1,6 +1,6 @@
 package TPGrupalOO2Hito2Grupo04.configuration;
 
-import TPGrupalOO2Hito2Grupo04.services.UsuarioService;
+import TPGrupalOO2Hito2Grupo04.services.implementation.UsuarioService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -34,6 +34,8 @@ public class SecurityConfiguration {
 				.authorizeHttpRequests(auth -> {
 					auth.requestMatchers("/css/*", "/imgs/*", "/js/*", "/vendor/bootstrap/css/*",
 							"/vendor/jquery/*", "/vendor/bootstrap/js/*", "/api/v1/**").permitAll();
+					// Página de inicio pública (el enunciado pide verla sin iniciar sesión)
+					auth.requestMatchers("/", "/index").permitAll();
 					auth.anyRequest().authenticated();
 				})
 				/*.formLogin(login -> {

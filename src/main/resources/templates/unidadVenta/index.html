@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: head}"></head>
+<body>
+<nav th:replace="~{layout :: navbar}"></nav>
+
+<main class="container py-4">
+    <div class="page-header mb-4 d-flex justify-content-between align-items-center">
+        <h2>Unidades de Venta</h2>
+        <div>
+            <a th:href="@{/unidadVenta/nuevo/food-truck}" class="btn btn-success me-2">Nuevo Food Truck</a>
+            <a th:href="@{/unidadVenta/nuevo/puesto-desarmable}" class="btn btn-success">Nuevo Puesto Desarmable</a>
+        </div>
+    </div>
+
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>Nombre comercial</th>
+            <th>Código único</th>
+            <th>Superficie</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="u : ${unidadVentas}">
+            <td th:text="${u.nombreComercial}"></td>
+            <td th:text="${u.codigoUnico}"></td>
+            <td th:text="${u.superficie}"></td>
+        </tr>
+        </tbody>
+    </table>
+</main>
+
+<footer th:replace="~{layout :: footer}"></footer>
+<div th:replace="~{layout :: scripts}"></div>
+</body>
+</html>

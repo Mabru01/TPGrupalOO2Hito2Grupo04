@@ -2,12 +2,11 @@
 -- ROL
 -- =========================================
 
-INSERT INTO rol (id_rol, rol, usuario_id, created_at, updated_at) VALUES
-(1, 'ADMIN',       1, NOW(), NOW()),
-(2, 'RESPONSABLE', 2, NOW(), NOW()),
-(3, 'EMPLEADO',    3, NOW(), NOW()),
-(4, 'EMPLEADO',    4, NOW(), NOW()),
-(5, 'EMPLEADO',    5, NOW(), NOW());
+-- Catálogo de roles: cada usuario apunta a uno con rol_id
+INSERT INTO user_role (id_rol, rol, created_at, updated_at) VALUES
+(1, 'ADMIN',       NOW(), NOW()),
+(2, 'RESPONSABLE', NOW(), NOW()),
+(3, 'EMPLEADO',    NOW(), NOW());
 
 -- =========================================
 -- USUARIO 
@@ -17,8 +16,8 @@ INSERT INTO usuario (id, username, password, activo, rol_id, created_at, updated
 (1, 'jperez@gmail.com',    '$2a$10$IRKTCM.l2RLdAL7ewu/zU.nifS/LgGnKgYdA7BfYfO51zGiG0fenG', TRUE, 1, NOW(), NOW()),
 (2, 'cdiaz@gmail.com',     '$2a$10$IRKTCM.l2RLdAL7ewu/zU.nifS/LgGnKgYdA7BfYfO51zGiG0fenG', TRUE, 2, NOW(), NOW()),
 (3, 'pvance@gmail.com',    '$2a$10$IRKTCM.l2RLdAL7ewu/zU.nifS/LgGnKgYdA7BfYfO51zGiG0fenG', TRUE, 3, NOW(), NOW()),
-(4, 'tvazquez@gmail.com',  '$2a$10$IRKTCM.l2RLdAL7ewu/zU.nifS/LgGnKgYdA7BfYfO51zGiG0fenG', TRUE, 4, NOW(), NOW()),
-(5, 'rgonzalez@gmail.com', '$2a$10$IRKTCM.l2RLdAL7ewu/zU.nifS/LgGnKgYdA7BfYfO51zGiG0fenG', TRUE, 5, NOW(), NOW());
+(4, 'tvazquez@gmail.com',  '$2a$10$IRKTCM.l2RLdAL7ewu/zU.nifS/LgGnKgYdA7BfYfO51zGiG0fenG', TRUE, 3, NOW(), NOW()),
+(5, 'rgonzalez@gmail.com', '$2a$10$IRKTCM.l2RLdAL7ewu/zU.nifS/LgGnKgYdA7BfYfO51zGiG0fenG', TRUE, 3, NOW(), NOW());
 
 -- =========================================
 -- FESTIVAL
@@ -36,6 +35,18 @@ INSERT INTO costo (id_costo, costo_montaje, costo_superficie, plus_electricidad,
 (1, 28500,  84000, 61500, 1380000, 5000, 150000, 100000, 50000, 1, NOW(), NOW()),
 (2, 36200,  97500, 82300, 1620000, 5000, 150000, 100000, 50000, 2, NOW(), NOW()),
 (3, 24800, 112000, 69700, 1475000, 5000, 150000, 100000, 50000, 3, NOW(), NOW());
+
+-- =========================================
+-- STAFF
+-- =========================================
+-- Va antes que las unidades porque unidad_venta.id_usuario (responsable) apunta a staff.
+-- La unidad de cada empleado se asigna más abajo, después de crear las unidades.
+INSERT INTO staff (id_staff, dni, nombre, apellido, fecha_nacimiento, fecha_ingreso, sueldo_base, fecha_egreso, unidad_venta_id, usuario_id, created_at, updated_at) VALUES
+(1, 11111111, 'Juan', 'Perez', '1990-05-10', '2024-01-01', 500000, '2024-08-05', NULL, 1, NOW(), NOW()),
+(2, 22222222, 'Carlos', 'Diaz', '1992-06-15', '2023-03-02', 1500000, '2025-07-10', NULL, 2, NOW(), NOW()),
+(3, 33333333, 'Pepe', 'Vance', '1994-07-20', '2022-05-03', 2500000, '2026-06-15', NULL, 3, NOW(), NOW()),
+(4, 44444444, 'Tito', 'Vazquez', '1996-08-25', '2021-07-04', 3500000, '2027-05-20', NULL, 4, NOW(), NOW()),
+(5, 55555555, 'Roberto', 'Gonzalez', '1998-05-30', '2020-09-05', 3500000, '2028-04-30', NULL, 5, NOW(), NOW());
 
 -- =========================================
 -- UNIDAD VENTA
@@ -62,15 +73,12 @@ INSERT INTO food_truck (id_unidad_venta, patente, usa_luz) VALUES
 (3, 'FT001',  TRUE),
 (4, 'FT002',  FALSE);
 
--- =========================================
--- STAFF
--- =========================================
-INSERT INTO staff (id_staff, dni, nombre, apellido, fecha_nacimiento, fecha_ingreso, sueldo_base, fecha_egreso, unidad_venta_id, usuario_id, created_at, updated_at) VALUES
-(1, 11111111, 'Juan',    'Perez',    '1990-05-10', '2024-01-01',  500000, '2024-08-05', 1, 1, NOW(), NOW()),
-(2, 22222222, 'Carlos',  'Diaz',     '1992-06-15', '2023-03-02', 1500000, '2025-07-10', 1, 2, NOW(), NOW()),
-(3, 33333333, 'Pepe',    'Vance',    '1994-07-20', '2022-05-03', 2500000, '2026-06-15', 5, 3, NOW(), NOW()),
-(4, 44444444, 'Tito',    'Vazquez',  '1996-08-25', '2021-07-04', 3500000, '2027-05-20', 1, 4, NOW(), NOW()),
-(5, 55555555, 'Roberto', 'Gonzalez', '1998-05-30', '2020-09-05', 3500000, '2028-04-30', 1, 5, NOW(), NOW());
+-- Unidad en la que trabaja cada empleado
+UPDATE staff SET unidad_venta_id = 1 WHERE id_staff = 1;
+UPDATE staff SET unidad_venta_id = 1 WHERE id_staff = 2;
+UPDATE staff SET unidad_venta_id = 5 WHERE id_staff = 3;
+UPDATE staff SET unidad_venta_id = 1 WHERE id_staff = 4;
+UPDATE staff SET unidad_venta_id = 1 WHERE id_staff = 5;
 
 -- =========================================
 -- CAJERO

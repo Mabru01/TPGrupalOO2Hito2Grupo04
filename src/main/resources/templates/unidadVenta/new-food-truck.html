@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<!--/*@thymesVar id="unidadVentaDTO" type="TPGrupalOO2Hito2Grupo04.dtos.FoodTruckDTO"*/-->
+<head th:replace="~{layout :: head}"></head>
+<body>
+<nav th:replace="~{layout :: navbar}"></nav>
+
+<main class="container py-4">
+    <div class="page-header mb-4">
+        <h2>Nueva Unidad de Venta: Food Truck</h2>
+    </div>
+
+    <div class="card form-card">
+        <div class="card-body">
+            <form th:action="@{/unidadVenta/guardar/food-truck}"
+                  th:object="${unidadVentaDTO}" method="post">
+
+                <h5 class="text-secondary border-bottom pb-2 mb-3">Datos de la Unidad</h5>
+
+                <div class="mb-3">
+                    <label for="nombreComercial" class="col-form-label">Nombre Comercial</label>
+                    <input type="text" class="form-control" id="nombreComercial"
+                           th:field="*{nombreComercial}" required placeholder="Ej: FoodTruck Las Empanadas"/>
+                </div>
+                <div class="mb-3">
+                    <label for="codigoUnico" class="col-form-label">Código Único</label>
+                    <input type="text" class="form-control" id="codigoUnico"
+                           th:field="*{codigoUnico}" required placeholder="Ej: UV-001"/>
+                </div>
+                <div class="mb-3">
+                    <label for="superficie" class="col-form-label">Superficie</label>
+                    <input type="number" step="0.01" class="form-control" id="superficie"
+                           th:field="*{superficie}" required placeholder="Ej: 15.5"/>
+                </div>
+                <div class="mb-3">
+                    <label for="patente" class="col-form-label">Patente</label>
+                    <input type="text" class="form-control" id="patente" th:field="*{patente}" required/>
+                </div>
+                <div class="form-check mb-3">
+                    <input type="checkbox" class="form-check-input" id="usaLuz" th:field="*{usaLuz}"/>
+                    <label for="usaLuz" class="form-check-label">Usa luz</label>
+                </div>
+
+                <h5 class="text-secondary border-bottom pb-2 mb-3 mt-4">Datos del Responsable</h5>
+
+                <div class="mb-3">
+                    <label for="emailResponsable" class="col-form-label">Correo Electrónico del Responsable</label>
+                    <input type="email" class="form-control" id="emailResponsable"
+                           th:field="*{emailResponsable}" required placeholder="ejemplo@correo.com"/>
+                </div>
+                <div class="mb-3">
+                    <label for="passwordResponsable" class="col-form-label">Contraseña Inicial</label>
+                    <input type="password" class="form-control" id="passwordResponsable"
+                           th:field="*{passwordResponsable}" required placeholder="Ingrese una clave para el usuario"/>
+                </div>
+
+                <div class="d-flex mt-4">
+                    <button type="submit" class="btn btn-success me-2">Registrar</button>
+                    <a th:href="@{/unidadVenta}" class="btn btn-outline-secondary">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{layout :: footer}"></footer>
+<div th:replace="~{layout :: scripts}"></div>
+</body>
+</html>

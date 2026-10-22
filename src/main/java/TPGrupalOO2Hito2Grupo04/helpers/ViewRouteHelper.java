@@ -1,25 +1,22 @@
 package TPGrupalOO2Hito2Grupo04.helpers;
 
 public class ViewRouteHelper {
-	/**** Views ****/
-	//HOME
-	public final static String INDEX = "home/index";
-	public final static String HELLO = "home/hello";
+    public final static String INDEX = "home/index";
 
-	//STAFF
-	public final static String STAFF_INDEX = "staff/index";
-	public final static String STAFF_NEW = "staff/new";
-	public final static String STAFF_UPDATE = "staff/update";
-	public final static String STAFF_PARTIAL_VIEW = "staff/partialPersonView";
+    // Redirects
+    public final static String ROUTE_INDEX = "/index";
+  
+    //Unidad de venta
+    public final static String UnidadVenta_INDEX = "unidadVenta/index";
+    public final static String UnidadVenta_NEW_FOOD_TRUCK = "unidadVenta/new-food-truck";
+    public final static String UnidadVenta_NEW_PUESTO = "unidadVenta/new-puesto-desarmable";  
+    public final static String UnidadVenta_UPDATE = "unidadVenta/update";
+    public final static String UnidadVenta_PARTIAL_VIEW = "unidadVenta/partialPersonView";
+    // Liquidacion
+    public final static String LIQUIDACION_INDEX = "liquidacion/index";
 
-	//USER
-	public final static String USER_LOGIN = "user/login";
-	public final static String USER_LOGOUT = "user/logout";
+  
+  /**** Redirects ****/
+    public final static String UnidadVenta_ROOT = "/unidadVenta";
 
-	// Views
-	public final static String LIQUIDACION_INDEX = "liquidacion/index";
-
-	/**** Redirects ****/
-	public final static String ROUTE = "/index";
-	public final static String STAFF_ROOT = "/person";
 }

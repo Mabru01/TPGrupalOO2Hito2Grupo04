@@ -1,7 +1,6 @@
-package TPGrupalOO2Hito2Grupo04.services;
+package TPGrupalOO2Hito2Grupo04.services.implementation;
 
 import TPGrupalOO2Hito2Grupo04.entities.Rol;
-import TPGrupalOO2Hito2Grupo04.entities.Usuario;
 import TPGrupalOO2Hito2Grupo04.repositories.IUsuarioRepository;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -11,9 +10,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Service("usuarioService")
 public class UsuarioService implements UserDetailsService {
@@ -27,9 +24,13 @@ public class UsuarioService implements UserDetailsService {
 	@Override
 	public UserDetails loadUserByUsername(String mail) throws UsernameNotFoundException {
 		TPGrupalOO2Hito2Grupo04.entities.Usuario usuario = usuarioRepository.findByMailAndFetchRolEagerly(mail);
+
+		if (usuario == null) {
+			throw new UsernameNotFoundException("Usuario no encontrado con el mail: " + mail);
+		}
+
 		return buildUsuario(usuario, buildGrantedAuthorities(usuario.getRol()));
 	}
-
 	private UserDetails buildUsuario(TPGrupalOO2Hito2Grupo04.entities.Usuario usuario,
 									 List<GrantedAuthority> authorities) {
 		return new org.springframework.security.core.userdetails.User(

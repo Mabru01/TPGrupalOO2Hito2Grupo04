@@ -19,7 +19,7 @@ public class Usuario {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(name="username", unique=true, nullable=false, length=45)
+    @Column(name="mail", unique=true, nullable=false, length=45)
     private String mail;
 
     @Column(name="password", nullable=false, length=60)
