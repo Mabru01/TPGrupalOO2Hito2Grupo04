@@ -13,11 +13,11 @@ import TPGrupalOO2Hito2Grupo04.entities.Festival;
 @Repository("festivalRepository")
 public interface IFestivalRepository extends JpaRepository<Festival, Serializable> {
 
-    public abstract Optional<Festival> findById(long id);
+    public abstract Optional<Festival> findByIdFestival(long idFestival);
 
     public abstract Optional<Festival> findByNombre(String nombre);
 
     // Festival con sus unidades de venta cargadas
-    @Query("SELECT f FROM Festival f LEFT JOIN FETCH f.unidadesVenta WHERE f.id = (:id)")
+    @Query("SELECT f FROM Festival f LEFT JOIN FETCH f.unidadesVenta WHERE f.idFestival = (:id)")
     public abstract Optional<Festival> findByIdAndFetchUnidadesEagerly(@Param("id") long id);
 }

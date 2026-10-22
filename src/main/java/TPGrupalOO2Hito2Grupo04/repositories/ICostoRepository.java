@@ -11,7 +11,7 @@ import TPGrupalOO2Hito2Grupo04.entities.Costo;
 @Repository("costoRepository")
 public interface ICostoRepository extends JpaRepository<Costo, Serializable> {
 
-    public abstract Optional<Costo> findById(long id);
+    public abstract Optional<Costo> findByIdCosto(long idCosto);
 
-    public abstract Optional<Costo> findByFestivalId(long festivalId);
+    public abstract Optional<Costo> findByFestivalIdFestival(long idFestival);
 }
