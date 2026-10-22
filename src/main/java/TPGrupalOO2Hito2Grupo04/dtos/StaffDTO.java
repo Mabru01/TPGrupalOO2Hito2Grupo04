@@ -9,7 +9,7 @@ import java.time.LocalDate;
 @Setter
 @NoArgsConstructor
 public class StaffDTO {
-    private int idPersona;
+    private int idStaff;
 
     private long dni;
 

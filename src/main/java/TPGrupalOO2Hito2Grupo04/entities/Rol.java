@@ -11,16 +11,12 @@ import java.time.LocalDateTime;
 
 @Entity
 @Getter @Setter @NoArgsConstructor
-@Table(name="user_role", uniqueConstraints=@UniqueConstraint(columnNames= {"role", "user_id"}))
+@Table(name="rol", uniqueConstraints=@UniqueConstraint(columnNames= {"role", "user_id"}))
 public class Rol {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int idRol;
-
-	@OneToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name="usuario_id", nullable=false)
-	private Usuario usuario;
 
 	@Column(name="rol", nullable=false, length=100)
 	private String rol;
@@ -31,9 +27,8 @@ public class Rol {
 	@UpdateTimestamp
 	private LocalDateTime updatedAt;
 
-	public Rol(int id, Usuario usuario, String role) {
+	public Rol(int idRol, Usuario usuario, String rol) {
 		this.idRol = idRol;
-		this.usuario = usuario;
 		this.rol = rol;
 	}
 }

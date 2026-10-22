@@ -28,7 +28,7 @@ public abstract class UnidadVenta {
     protected String codigoUnico;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "idUsuario", nullable = true)
+    @JoinColumn(name = "idUsuario", nullable = false)
     protected Staff responsable;
 
     // many-to-one name="festival" column="idFestival" not-null="true"
@@ -37,7 +37,7 @@ public abstract class UnidadVenta {
     private Festival festival;
 
     @OneToMany(mappedBy = "unidadVenta", fetch = FetchType.LAZY)
-    @OrderBy("idPersona ASC")
+    @OrderBy("idStaff ASC")
     private Set<Staff> staff = new HashSet<>();
 
     // --- PLATOS ---
