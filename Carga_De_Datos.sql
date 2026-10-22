@@ -31,10 +31,11 @@ INSERT INTO festival (id, nombre, temporada, fecha_inicio, fecha_fin, created_at
 -- =========================================
 -- COSTO
 -- =========================================
-INSERT INTO costo (id, costo_montaje, costo_superficie, plus_electricidad, sueldo_base, festival_id, created_at, updated_at) VALUES
-(1, 28500,  84000, 61500, 1380000, 1, NOW(), NOW()),
-(2, 36200,  97500, 82300, 1620000, 2, NOW(), NOW()),
-(3, 24800, 112000, 69700, 1475000, 3, NOW(), NOW());
+-- antiguedad_por_anio y plus_*: montos que usa la liquidación de sueldo (valores del enunciado)
+INSERT INTO costo (id, costo_montaje, costo_superficie, plus_electricidad, sueldo_base, antiguedad_por_anio, plus_cocinero, plus_cocinero_ayudante, plus_lavaplatos, festival_id, created_at, updated_at) VALUES
+(1, 28500,  84000, 61500, 1380000, 5000, 150000, 100000, 50000, 1, NOW(), NOW()),
+(2, 36200,  97500, 82300, 1620000, 5000, 150000, 100000, 50000, 2, NOW(), NOW()),
+(3, 24800, 112000, 69700, 1475000, 5000, 150000, 100000, 50000, 3, NOW(), NOW());
 
 -- =========================================
 -- UNIDAD VENTA
@@ -82,9 +83,11 @@ INSERT INTO cajero (id_staff, turno) VALUES
 -- =========================================
 -- COCINERO
 -- =========================================
+-- plus_categoria guarda la categoría (COCINERO, COCINERO_AYUDANTE o LAVAPLATOS);
+-- el monto del plus se toma del costo del festival
 INSERT INTO cocinero (id_staff, especialidad, plus_categoria) VALUES
-(4, 'Parilla', 400000),
-(5, 'Pastas',  350000);
+(4, 'Parilla', 'COCINERO'),
+(5, 'Pastas',  'COCINERO_AYUDANTE');
 
 -- =========================================
 -- PLATO
