@@ -89,7 +89,7 @@ public class UnidadVentaService implements IUnidadVentaService {
                 .orElseThrow(() -> new IllegalStateException("No hay ningún festival cargado en la base"));
 
         // 3. Obtener (o crear) el rol RESPONSABLE
-        Rol rolResponsable = rolRepository.findByRol("responsable")
+        Rol rolResponsable = rolRepository.findByRol("RESPONSABLE")
                 .orElseGet(() -> {
                     Rol r = new Rol();
                     r.setRol("RESPONSABLE");

@@ -36,6 +36,8 @@ public class SecurityConfiguration {
 							"/vendor/jquery/*", "/vendor/bootstrap/js/*", "/api/v1/**").permitAll();
 					// Página de inicio pública (el enunciado pide verla sin iniciar sesión)
 					auth.requestMatchers("/", "/index").permitAll();
+					// Registro de unidad de venta con su responsable: se hace antes de tener usuario
+					auth.requestMatchers("/unidadVenta/nuevo/**", "/unidadVenta/guardar/**").permitAll();
 					auth.anyRequest().authenticated();
 				})
 				/*.formLogin(login -> {
