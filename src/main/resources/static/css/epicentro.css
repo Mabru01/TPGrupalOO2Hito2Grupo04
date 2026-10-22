@@ -1,0 +1,50 @@
+/* Estilos propios de Epicentro Gourmet (se suman a bootstrap y modern-business) */
+:root {
+    --eg-oscuro: #3b1f2b;
+    --eg-acento: #c0392b;
+    --eg-acento-hover: #a93226;
+    --eg-crema: #fbf6f0;
+}
+
+.navbar-epicentro {
+    background-color: var(--eg-oscuro);
+}
+
+.navbar-epicentro .navbar-brand {
+    font-weight: 700;
+    letter-spacing: 0.02em;
+}
+
+.btn-epicentro {
+    background-color: var(--eg-acento);
+    border-color: var(--eg-acento);
+    color: #fff;
+}
+
+.btn-epicentro:hover,
+.btn-epicentro:focus {
+    background-color: var(--eg-acento-hover);
+    border-color: var(--eg-acento-hover);
+    color: #fff;
+}
+
+.portada {
+    background-color: var(--eg-crema);
+    border-radius: 12px;
+    padding: 2.5rem 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.festival .card-header {
+    background-color: #fff;
+    border-bottom: 3px solid var(--eg-acento);
+}
+
+.festival .fechas {
+    color: #6c757d;
+    font-size: 0.95rem;
+}
+
+.footer-epicentro {
+    background-color: var(--eg-oscuro);
+}

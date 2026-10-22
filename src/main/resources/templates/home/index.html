@@ -1,36 +1,32 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head th:replace="~{layout :: head}"></head>
 <body>
-    <!-- Barra propia de la página pública: el navbar del layout es para usuarios logueados -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
-        <div class="container">
-            <a class="navbar-brand" th:href="@{/}">Epicentro Gourmet</a>
-            <div class="ml-auto">
-                <a class="btn btn-outline-light" th:href="@{/login}">Iniciar sesión</a>
-            </div>
-        </div>
-    </nav>
+    <nav th:replace="~{layout :: navbar}"></nav>
 
     <main class="container py-4">
-        <div class="text-center my-4">
+        <section class="portada text-center">
             <h1>Epicentro Gourmet</h1>
-            <p class="lead text-muted">Festivales temáticos del centro de convenciones y predio ferial.</p>
-        </div>
+            <p class="lead text-muted mb-4">Festivales temáticos del centro de convenciones y predio ferial.</p>
 
-        <!-- Acción 1: registrar una unidad de venta con su responsable -->
-        <div class="card mb-4">
-            <div class="card-body d-md-flex justify-content-between align-items-center">
-                <div class="mb-3 mb-md-0">
-                    <h5 class="card-title mb-1">¿Tenés un food truck o un puesto?</h5>
-                    <p class="card-text text-muted mb-0">Registrá tu unidad de venta y quedás como responsable, con tu usuario para ingresar.</p>
+            <!-- Las dos acciones de la página de inicio, solo para quien no inició sesión -->
+            <div sec:authorize="isAnonymous()">
+                <div class="dropdown d-inline-block mr-2 mb-2">
+                    <button class="btn btn-epicentro btn-lg dropdown-toggle" type="button" data-toggle="dropdown">
+                        Registrar unidad de venta
+                    </button>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item" th:href="@{/unidadVenta/nuevo/food-truck}">Food Truck</a>
+                        <a class="dropdown-item" th:href="@{/unidadVenta/nuevo/puesto-desarmable}">Puesto desarmable</a>
+                    </div>
                 </div>
-                <div>
-                    <a class="btn btn-primary mb-1" th:href="@{/unidadVenta/nuevo/food-truck}">Registrar Food Truck</a>
-                    <a class="btn btn-primary mb-1" th:href="@{/unidadVenta/nuevo/puesto-desarmable}">Registrar Puesto Desarmable</a>
-                </div>
+                <a class="btn btn-outline-dark btn-lg mb-2" th:href="@{/login}">Iniciar sesión</a>
             </div>
-        </div>
+
+            <p sec:authorize="isAuthenticated()" class="mb-0">
+                Sesión iniciada como <strong sec:authentication="name">usuario</strong>.
+            </p>
+        </section>
 
         <h2 class="mb-3">Festivales</h2>
 
@@ -38,20 +34,40 @@
             Todavía no hay festivales cargados.
         </div>
 
-        <div class="row">
-            <div class="col-md-6 col-lg-4 mb-4" th:each="f : ${festivales}">
-                <div class="card h-100">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0" th:text="${f.nombre}">Festival</h5>
-                        <span th:if="${f.fechaInicio.isAfter(hoy)}" class="badge badge-warning">Próximo</span>
-                        <span th:if="${f.fechaFin.isBefore(hoy)}" class="badge badge-secondary">Finalizado</span>
-                        <span th:unless="${f.fechaInicio.isAfter(hoy) or f.fechaFin.isBefore(hoy)}" class="badge badge-success">En curso</span>
-                    </div>
-                    <div class="card-body">
-                        <p class="card-text mb-1"><strong>Temporada:</strong> <span th:text="${f.temporada}">Primavera</span></p>
-                        <p class="card-text mb-1"><strong>Inicio:</strong> <span th:text="${#temporals.format(f.fechaInicio, 'dd/MM/yyyy')}">01/01/2026</span></p>
-                        <p class="card-text"><strong>Fin:</strong> <span th:text="${#temporals.format(f.fechaFin, 'dd/MM/yyyy')}">31/01/2026</span></p>
-                    </div>
+        <div class="card festival mb-4" th:each="f : ${festivales}">
+            <div class="card-header d-flex flex-wrap justify-content-between align-items-center">
+                <div>
+                    <h4 class="mb-0" th:text="${f.nombre}">Festival</h4>
+                    <span class="fechas">
+                        <span th:text="${f.temporada}">Primavera</span> ·
+                        del <span th:text="${#temporals.format(f.fechaInicio, 'dd/MM/yyyy')}">01/10/2026</span>
+                        al <span th:text="${#temporals.format(f.fechaFin, 'dd/MM/yyyy')}">15/11/2026</span>
+                    </span>
+                </div>
+                <span th:if="${f.fechaInicio.isAfter(hoy)}" class="badge badge-warning">Próximo</span>
+                <span th:if="${f.fechaFin.isBefore(hoy)}" class="badge badge-secondary">Finalizado</span>
+                <span th:unless="${f.fechaInicio.isAfter(hoy) or f.fechaFin.isBefore(hoy)}" class="badge badge-success">En curso</span>
+            </div>
+            <div class="card-body">
+                <h6 class="text-uppercase text-muted mb-3">Unidades de venta</h6>
+                <p class="text-muted mb-0" th:if="${f.unidadesVenta.isEmpty()}">Todavía no hay unidades registradas.</p>
+                <div class="table-responsive" th:unless="${f.unidadesVenta.isEmpty()}">
+                    <table class="table table-sm table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>Nombre comercial</th>
+                                <th>Tipo</th>
+                                <th>Superficie</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="u : ${f.unidadesVenta}">
+                                <td th:text="${u.nombreComercial}">Unidad</td>
+                                <td th:text="${u.class.simpleName.startsWith('FoodTruck') ? 'Food Truck' : 'Puesto desarmable'}">Tipo</td>
+                                <td th:text="${u.superficie + ' m²'}">0 m²</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>

@@ -9,6 +9,8 @@ public interface IFestivalService {
 
     List<Festival> getAll();
 
+    List<Festival> getAllWithUnidades();
+
     Optional<Festival> findById(long id);
 
     Festival findByNombre(String nombre);
