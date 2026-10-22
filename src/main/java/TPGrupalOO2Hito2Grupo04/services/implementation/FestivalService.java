@@ -31,7 +31,7 @@ public class FestivalService implements IFestivalService {
 
     @Override
     public Optional<Festival> findById(long id) {
-        return festivalRepository.findById(id);
+        return festivalRepository.findByIdFestival(id);
     }
 
     @Override

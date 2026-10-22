@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: head}"></head>
+<body>
+    <nav th:replace="~{layout :: navbar}"></nav>
+
+    <main class="container py-4">
+        <h1 class="my-4">Liquidación de sueldo</h1>
+
+        <form th:action="@{/liquidacion}" method="get" class="form-row align-items-end mb-4">
+            <div class="col-md-5 mb-2">
+                <label for="festivalId">Festival</label>
+                <select class="form-control" id="festivalId" name="festivalId" required>
+                    <option value="">Elegí un festival</option>
+                    <option th:each="f : ${festivales}" th:value="${f.idFestival}" th:text="${f.nombre}"
+                            th:selected="${f.idFestival == festivalId}">Festival</option>
+                </select>
+            </div>
+            <div class="col-md-5 mb-2">
+                <label for="staffId">Empleado</label>
+                <select class="form-control" id="staffId" name="staffId" required>
+                    <option value="">Elegí un empleado</option>
+                    <option th:each="e : ${empleados}" th:value="${e.idStaff}"
+                            th:text="${e.nombre + ' ' + e.apellido}"
+                            th:selected="${e.idStaff == staffId}">Empleado</option>
+                </select>
+            </div>
+            <div class="col-md-2 mb-2">
+                <button type="submit" class="btn btn-primary btn-block">Calcular</button>
+            </div>
+        </form>
+
+        <div th:if="${liquidacion != null}" class="card">
+            <h4 class="card-header">
+                <span th:text="${liquidacion.empleado}">Empleado</span>
+                <small class="text-muted" th:text="${'· ' + liquidacion.tipo}">· Tipo</small>
+            </h4>
+            <div class="card-body">
+                <table class="table mb-0">
+                    <tbody>
+                        <tr>
+                            <th>Festival</th>
+                            <td th:text="${liquidacion.festival + ' (' + liquidacion.diasFestival + ' días)'}">Festival</td>
+                        </tr>
+                        <tr>
+                            <th>Sueldo base</th>
+                            <td th:text="${'$ ' + #numbers.formatDecimal(liquidacion.sueldoBase, 1, 'POINT', 2, 'COMMA')}">$ 0</td>
+                        </tr>
+                        <tr>
+                            <th th:text="${liquidacion.conceptoAdicional}">Adicional</th>
+                            <td th:text="${'$ ' + #numbers.formatDecimal(liquidacion.montoAdicional, 1, 'POINT', 2, 'COMMA')}">$ 0</td>
+                        </tr>
+                        <tr>
+                            <th>Porcentaje según duración</th>
+                            <td th:text="${#numbers.formatDecimal(liquidacion.porcentaje * 100, 1, 0) + ' %'}">0 %</td>
+                        </tr>
+                        <tr class="table-active">
+                            <th>Total a cobrar</th>
+                            <td><strong th:text="${'$ ' + #numbers.formatDecimal(liquidacion.total, 1, 'POINT', 2, 'COMMA')}">$ 0</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <footer th:replace="~{layout :: footer}"></footer>
+    <div th:replace="~{layout :: scripts}"></div>
+</body>
+</html>
