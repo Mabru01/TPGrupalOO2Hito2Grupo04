@@ -33,6 +33,14 @@ public class Costo {
 
     private BigDecimal sueldoBase;
 
+    private BigDecimal antiguedadPorAnio;
+
+    private BigDecimal plusCocinero;
+
+    private BigDecimal plusCocineroAyudante;
+
+    private BigDecimal plusLavaplatos;
+
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="festival_id", nullable=false, unique=true)
     private Festival festival;
@@ -49,5 +57,18 @@ public class Costo {
         this.plusElectricidad = plusElectricidad;
         this.sueldoBase = sueldoBase;
         this.festival = festival;
+    }
+
+    // Recibe la categoría guardada en Cocinero.plusCategoria
+    public BigDecimal getPlusCategoria(String categoria) {
+        if (categoria == null) {
+            return BigDecimal.ZERO;
+        }
+        return switch (categoria.trim().toUpperCase()) {
+            case "COCINERO" -> plusCocinero;
+            case "COCINERO_AYUDANTE", "COCINERO AYUDANTE", "AYUDANTE" -> plusCocineroAyudante;
+            case "LAVAPLATOS" -> plusLavaplatos;
+            default -> BigDecimal.ZERO;
+        };
     }
 }
