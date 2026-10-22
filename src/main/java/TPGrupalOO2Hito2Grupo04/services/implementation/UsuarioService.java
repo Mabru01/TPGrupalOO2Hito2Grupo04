@@ -24,9 +24,13 @@ public class UsuarioService implements UserDetailsService {
 	@Override
 	public UserDetails loadUserByUsername(String mail) throws UsernameNotFoundException {
 		TPGrupalOO2Hito2Grupo04.entities.Usuario usuario = usuarioRepository.findByMailAndFetchRolEagerly(mail);
+
+		if (usuario == null) {
+			throw new UsernameNotFoundException("Usuario no encontrado con el mail: " + mail);
+		}
+
 		return buildUsuario(usuario, buildGrantedAuthorities(usuario.getRol()));
 	}
-
 	private UserDetails buildUsuario(TPGrupalOO2Hito2Grupo04.entities.Usuario usuario,
 									 List<GrantedAuthority> authorities) {
 		return new org.springframework.security.core.userdetails.User(
