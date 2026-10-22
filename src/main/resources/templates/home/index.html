@@ -7,7 +7,7 @@
     <main class="container py-4">
         <section class="bienvenida">
             <h1>Epicentro Gourmet</h1>
-            <p class="text-muted mb-0">Festivales temáticos del centro de convenciones y predio ferial.</p>
+            <p class="text-muted mb-0">Sistema de gestión de festivales</p>
             <p sec:authorize="isAuthenticated()" class="mt-2 mb-0">
                 Sesión iniciada como <strong sec:authentication="name">usuario</strong>.
             </p>
@@ -18,8 +18,8 @@
             <div class="col-md-6 mb-4">
                 <div class="card accion h-100">
                     <div class="card-body">
-                        <h5 class="card-title">¿Tenés un food truck o un puesto?</h5>
-                        <p class="card-text text-muted">Registrá tu unidad de venta. Quedás como responsable y se te genera un usuario.</p>
+                        <h5 class="card-title">Registrar unidad de venta</h5>
+                        <p class="card-text text-muted">Registrá tu food truck o puesto desarmable.</p>
                         <a class="btn btn-epicentro mr-2 mb-1" th:href="@{/unidadVenta/nuevo/food-truck}">Registrar food truck</a>
                         <a class="btn btn-outline-secondary mb-1" th:href="@{/unidadVenta/nuevo/puesto-desarmable}">Registrar puesto</a>
                     </div>
@@ -28,8 +28,8 @@
             <div class="col-md-6 mb-4">
                 <div class="card accion h-100">
                     <div class="card-body">
-                        <h5 class="card-title">¿Ya tenés cuenta?</h5>
-                        <p class="card-text text-muted">Administradores, responsables y empleados ingresan con su usuario.</p>
+                        <h5 class="card-title">Iniciar sesión</h5>
+                        <p class="card-text text-muted">Si ya tenés usuario, ingresá desde acá.</p>
                         <a class="btn btn-epicentro" th:href="@{/login}">Iniciar sesión</a>
                     </div>
                 </div>
