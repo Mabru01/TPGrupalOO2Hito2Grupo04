@@ -34,19 +34,15 @@ public class UnidadVentaController {
 
     @GetMapping("/nuevo/food-truck")
     public ModelAndView nuevoFoodTruck() {
-        ModelAndView mAV = new ModelAndView(ViewRouteHelper.UnidadVenta_NEW);
+        ModelAndView mAV = new ModelAndView(ViewRouteHelper.UnidadVenta_NEW_FOOD_TRUCK);
         mAV.addObject(UNIDAD_VENTA_ATTR, new FoodTruckDTO());
-        mAV.addObject("tipoUnidad", "Food Truck");
-        mAV.addObject("accion", "/unidadVenta/guardar/food-truck");
         return mAV;
     }
 
     @GetMapping("/nuevo/puesto-desarmable")
     public ModelAndView nuevoPuestoDesarmable() {
-        ModelAndView mAV = new ModelAndView(ViewRouteHelper.UnidadVenta_NEW);
+        ModelAndView mAV = new ModelAndView(ViewRouteHelper.UnidadVenta_NEW_PUESTO);
         mAV.addObject(UNIDAD_VENTA_ATTR, new PuestoDesarmableDTO());
-        mAV.addObject("tipoUnidad", "Puesto Desarmable");
-        mAV.addObject("accion", "/unidadVenta/guardar/puesto-desarmable");
         return mAV;
     }
 

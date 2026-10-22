@@ -18,10 +18,6 @@ public class Rol {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int idRol;
 
-	@OneToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name="usuario_id", nullable=true)
-	private Usuario usuario;
-
 	@Column(name="rol", nullable=false, length=100)
 	private String rol;
 
@@ -31,9 +27,8 @@ public class Rol {
 	@UpdateTimestamp
 	private LocalDateTime updatedAt;
 
-	public Rol(int id, Usuario usuario, String role) {
+	public Rol(int id, String role) {
 		this.idRol = idRol;
-		this.usuario = usuario;
 		this.rol = rol;
 	}
 }

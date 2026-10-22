@@ -17,6 +17,7 @@ import TPGrupalOO2Hito2Grupo04.entities.*;
 import TPGrupalOO2Hito2Grupo04.dtos.*;
 import TPGrupalOO2Hito2Grupo04.repositories.*;
 import TPGrupalOO2Hito2Grupo04.services.IUnidadVentaService;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Service("unidadVentaService")
 public class UnidadVentaService implements IUnidadVentaService {
@@ -27,13 +28,15 @@ public class UnidadVentaService implements IUnidadVentaService {
     private final IFestivalRepository festivalRepository;
     private final IRolRepository rolRepository;
     private final ModelMapper modelMapper;
+    private final PasswordEncoder passwordEncoder;
 
-    public UnidadVentaService(IUnidadVentaRepository unidadVentaRepository, IUsuarioRepository usuarioRepository, IFestivalRepository festivalRepository, IRolRepository rolRepository, ModelMapper modelMapper) {
+    public UnidadVentaService(IUnidadVentaRepository unidadVentaRepository, IUsuarioRepository usuarioRepository, IFestivalRepository festivalRepository, IRolRepository rolRepository, ModelMapper modelMapper, PasswordEncoder passwordEncoder) {
         this.unidadVentaRepository = unidadVentaRepository;
         this.usuarioRepository = usuarioRepository;
         this.festivalRepository = festivalRepository;
         this.rolRepository = rolRepository;
         this.modelMapper = modelMapper;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -73,41 +76,42 @@ public class UnidadVentaService implements IUnidadVentaService {
         }
     }
     @Override
-    public UnidadVenta registrarUnidadVentaConResponsable(UnidadVentaDTO dto){
+    public UnidadVenta registrarUnidadVentaConResponsable(UnidadVentaDTO dto) {
 
-        // 1. validacion de email
+        // 1. Validar que el email no exista
         if (usuarioRepository.findByMail(dto.getEmailResponsable()).isPresent()) {
             throw new IllegalArgumentException("El email del responsable ya se encuentra registrado.");
         }
 
-        // 2. Buscar festival
-        Festival festival = festivalRepository.findById(dto.getIdFestival())
-                .orElseThrow(() -> new IllegalArgumentException("Festival no encontrado con ID: " + dto.getIdFestival()));
+        // 2. Buscar el único festival
+        Festival festival = festivalRepository.findAll().stream()
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("No hay ningún festival cargado en la base"));
 
-        // 3. Crear y guardar el nuevo Usuario Responsable
+        // 3. Obtener (o crear) el rol RESPONSABLE
+        Rol rolResponsable = rolRepository.findByRol("responsable")
+                .orElseGet(() -> {
+                    Rol r = new Rol();
+                    r.setRol("RESPONSABLE");
+                    return rolRepository.save(r);
+                });
+
+        // 4. Crear el usuario con ese rol y la contraseña hasheada
         Usuario nuevoUsuario = new Usuario();
         nuevoUsuario.setMail(dto.getEmailResponsable());
-        nuevoUsuario.setPassword(dto.getPasswordResponsable());
+        nuevoUsuario.setPassword(passwordEncoder.encode(dto.getPasswordResponsable()));
         nuevoUsuario.setActivo(true);
+        nuevoUsuario.setRol(rolResponsable);
 
         Usuario usuarioGuardado = usuarioRepository.save(nuevoUsuario);
 
-        Rol nuevoRol = new Rol();
-        nuevoRol.setRol("RESPONSABLE");
-        nuevoRol.setUsuario(usuarioGuardado);
-
-        rolRepository.save(nuevoRol);
-        // 4. Instanciar y mapear la entidad hija (FoodTruck o PuestoDesarmable)
+        // 5. Instanciar y mapear la entidad hija
         UnidadVenta unidadVenta;
 
-        if (dto instanceof FoodTruckDTO) {
-            FoodTruckDTO ftDto = (FoodTruckDTO) dto;
-            FoodTruck ft = modelMapper.map(ftDto, FoodTruck.class);
-            unidadVenta = ft;
-        } else if (dto instanceof PuestoDesarmableDTO) {
-            PuestoDesarmableDTO pdDto = (PuestoDesarmableDTO) dto;
-            PuestoDesarmable pd = modelMapper.map(pdDto, PuestoDesarmable.class);
-            unidadVenta = pd;
+        if (dto instanceof FoodTruckDTO ftDto) {
+            unidadVenta = modelMapper.map(ftDto, FoodTruck.class);
+        } else if (dto instanceof PuestoDesarmableDTO pdDto) {
+            unidadVenta = modelMapper.map(pdDto, PuestoDesarmable.class);
         } else {
             throw new IllegalArgumentException("Tipo de unidad de venta desconocido.");
         }
@@ -116,8 +120,7 @@ public class UnidadVentaService implements IUnidadVentaService {
         unidadVenta.setFestival(festival);
 
         return unidadVentaRepository.save(unidadVenta);
-
-    };
+    }
 
 
 }
