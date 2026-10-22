@@ -27,4 +27,5 @@ public interface IUnidadVentaService {
 
     boolean remove(long id);
 
+    UnidadVenta registrarUnidadVentaConResponsable(UnidadVentaDTO dto);
 }

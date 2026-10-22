@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 @Entity
 @Getter @Setter @NoArgsConstructor
 @Table(name="user_role")
+
 public class Rol {
 
 	@Id
@@ -19,6 +20,7 @@ public class Rol {
 	private int idRol;
 
 	@Column(name="rol", unique=true, nullable=false, length=100)
+
 	private String rol;
 
 	@CreationTimestamp
@@ -27,7 +29,7 @@ public class Rol {
 	@UpdateTimestamp
 	private LocalDateTime updatedAt;
 
-	public Rol(int idRol, String rol) {
+  public Rol(int idRol, String rol) {
 		this.idRol = idRol;
 		this.rol = rol;
 	}
