@@ -1,6 +1,6 @@
 package TPGrupalOO2Hito2Grupo04.configuration;
 
-import TPGrupalOO2Hito2Grupo04.services.UsuarioService;
+import TPGrupalOO2Hito2Grupo04.services.implementation.UsuarioService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
