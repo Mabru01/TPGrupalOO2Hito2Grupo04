@@ -13,8 +13,7 @@
 
 ## Diagrama de Clases:
 
-<img width="2534" height="2304" alt="grupo4 drawio" src="https://github.com/user-attachments/assets/f93449c6-e2ef-412f-9a92-a15e1894b225" />
-
+<img width="3563" height="1489" alt="Diagrama de Clase drawio" src="https://github.com/user-attachments/assets/d9b1fdc7-9c3b-45e5-b2c7-bd4237debbc7" />
 
 ## Responsable y Caso de uso realizado: 
 
