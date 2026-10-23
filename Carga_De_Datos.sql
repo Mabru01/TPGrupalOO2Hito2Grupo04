@@ -30,9 +30,10 @@ INSERT INTO usuario (id, mail, password, activo, rol_id, created_at, updated_at)
 -- =========================================
 -- FESTIVAL
 -- =========================================
+-- Uno: en curso · Dos: próximo · Tres: finalizado (respecto de octubre 2026)
 INSERT INTO festival (id_Festival, nombre, temporada, fecha_inicio, fecha_fin, created_at, updated_at) VALUES
-(1, 'Festival Uno',  'Verano',   '2026-07-20', '2026-07-30', NOW(), NOW()),
-(2, 'Festival Dos',  'Invierno', '2026-07-20', '2026-07-30', NOW(), NOW()),
+(1, 'Festival Uno',  'Verano',   '2026-10-10', '2026-11-15', NOW(), NOW()),
+(2, 'Festival Dos',  'Invierno', '2026-12-05', '2027-01-20', NOW(), NOW()),
 (3, 'Festival Tres', 'Otoño',    '2026-07-20', '2026-07-30', NOW(), NOW());
 
 -- =========================================
