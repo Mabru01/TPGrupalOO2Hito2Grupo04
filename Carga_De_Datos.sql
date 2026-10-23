@@ -1,8 +1,17 @@
+-- =====================================================================
+-- Carga de datos de prueba
+-- Pasos: crear la base vacía, arrancar la aplicación una vez (Hibernate
+-- crea las tablas) y después ejecutar este script.
+-- Usuarios: contraseña 1234 para todos (guardada con BCrypt).
+--   jperez@gmail.com ADMIN · cdiaz@gmail.com RESPONSABLE
+--   pvance@gmail.com, tvazquez@gmail.com, rgonzalez@gmail.com EMPLEADO
+-- =====================================================================
+
 -- =========================================
 -- ROL
 -- =========================================
 
-INSERT INTO rol (id_rol, rol, created_at, updated_at) VALUES
+INSERT INTO user_role (id_rol, rol, created_at, updated_at) VALUES
 (1, 'ADMIN', NOW(), NOW()),
 (2, 'RESPONSABLE', NOW(), NOW()),
 (3, 'EMPLEADO', NOW(), NOW());
@@ -11,7 +20,7 @@ INSERT INTO rol (id_rol, rol, created_at, updated_at) VALUES
 -- USUARIO 
 -- =========================================
 
-INSERT INTO usuario (id, username, password, activo, rol_id, created_at, updated_at) VALUES
+INSERT INTO usuario (id, mail, password, activo, rol_id, created_at, updated_at) VALUES
 (1, 'jperez@gmail.com',    '$2a$10$IRKTCM.l2RLdAL7ewu/zU.nifS/LgGnKgYdA7BfYfO51zGiG0fenG', TRUE, 1, NOW(), NOW()),
 (2, 'cdiaz@gmail.com',     '$2a$10$IRKTCM.l2RLdAL7ewu/zU.nifS/LgGnKgYdA7BfYfO51zGiG0fenG', TRUE, 2, NOW(), NOW()),
 (3, 'pvance@gmail.com',    '$2a$10$IRKTCM.l2RLdAL7ewu/zU.nifS/LgGnKgYdA7BfYfO51zGiG0fenG', TRUE, 3, NOW(), NOW()),
@@ -29,20 +38,20 @@ INSERT INTO festival (id_Festival, nombre, temporada, fecha_inicio, fecha_fin, c
 -- =========================================
 -- COSTO
 -- =========================================
-INSERT INTO costo (id_costo, costo_montaje, costo_superficie, plus_electricidad, sueldo_base, festival_id, created_at, updated_at) VALUES
-(1, 28500,  84000, 61500, 1380000, 1, NOW(), NOW()),
-(2, 36200,  97500, 82300, 1620000, 2, NOW(), NOW()),
-(3, 24800, 112000, 69700, 1475000, 3, NOW(), NOW());
+INSERT INTO costo (id_costo, costo_montaje, costo_superficie, plus_electricidad, sueldo_base, antiguedad_por_anio, plus_cocinero, plus_cocinero_ayudante, plus_lavaplatos, festival_id, created_at, updated_at) VALUES
+(1, 28500, 84000, 61500, 1380000, 5000, 150000, 100000, 50000, 1, NOW(), NOW()),
+(2, 36200, 97500, 82300, 1620000, 5000, 150000, 100000, 50000, 2, NOW(), NOW()),
+(3, 24800, 112000, 69700, 1475000, 5000, 150000, 100000, 50000, 3, NOW(), NOW());
 
 -- =========================================
 -- UNIDAD VENTA
 -- =========================================
 INSERT INTO unidad_venta (id_unidad_venta, nombre_comercial, superficie, codigo_unico, id_festival, id_usuario) VALUES
-(1, 'Pollos',       2000, '1234',  1, NULL),
-(2, 'Carnes',       3000, '5678',  2, NULL),
-(3, 'Hamburguesas', 2500, '1111',  1, NULL),
-(4, 'Pizzas',       3000, '1112',  1, NULL),
-(5, 'Refrigerios',  4000, '91011', 3, NULL);
+(1, 'Pollos',       2000, '1234',  1, 2),
+(2, 'Carnes',       3000, '5678',  2, 1),
+(3, 'Hamburguesas', 2500, '1111',  1, 3),
+(4, 'Pizzas',       3000, '1112',  1, 4),
+(5, 'Refrigerios',  4000, '91011', 3, 5);
 
 -- =========================================
 -- PUESTO DESARMABLE
@@ -81,8 +90,8 @@ INSERT INTO cajero (id_staff, turno) VALUES
 -- COCINERO
 -- =========================================
 INSERT INTO cocinero (id_staff, especialidad, plus_categoria) VALUES
-(4, 'Parilla', 400000),
-(5, 'Pastas',  350000);
+(4, 'Parilla', 'COCINERO'),
+(5, 'Pastas',  'COCINERO_AYUDANTE');
 
 -- =========================================
 -- PLATO
@@ -106,4 +115,5 @@ INSERT INTO item_pedido (id_item_pedido, id_pedido, id_plato, cantidad) VALUES
 (1, 1, 1, 2),
 (2, 2, 2, 3),
 (3, 3, 1, 5);
+
 
