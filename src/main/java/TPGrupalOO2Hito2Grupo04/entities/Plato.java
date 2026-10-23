@@ -13,7 +13,7 @@ public class Plato {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int idPlato;
+    private long idPlato;
 
     private String nombre;
 
