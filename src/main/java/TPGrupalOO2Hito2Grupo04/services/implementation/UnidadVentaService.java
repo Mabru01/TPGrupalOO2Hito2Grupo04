@@ -1,7 +1,9 @@
 package TPGrupalOO2Hito2Grupo04.services.implementation;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import TPGrupalOO2Hito2Grupo04.repositories.IFestivalRepository;
 import TPGrupalOO2Hito2Grupo04.repositories.IUsuarioRepository;
@@ -83,10 +85,10 @@ public class UnidadVentaService implements IUnidadVentaService {
             throw new IllegalArgumentException("El email del responsable ya se encuentra registrado.");
         }
 
-        // 2. Buscar el único festival
-        Festival festival = festivalRepository.findAll().stream()
-                .findFirst()
-                .orElseThrow(() -> new IllegalStateException("No hay ningún festival cargado en la base"));
+        // 2. Buscar el único festival activo
+        LocalDate hoy = LocalDate.now();
+        Festival festival = festivalRepository.findFestivalActivo(hoy)
+                .orElseThrow(() -> new RuntimeException("No hay ningún festival activo."));
 
         // 3. Obtener (o crear) el rol RESPONSABLE
         Rol rolResponsable = rolRepository.findByRol("RESPONSABLE")
@@ -118,9 +120,26 @@ public class UnidadVentaService implements IUnidadVentaService {
 
         unidadVenta.setResponsable(usuarioGuardado);
         unidadVenta.setFestival(festival);
-
+        unidadVenta.setCodigoUnico(generarCodigoUnico());
         return unidadVentaRepository.save(unidadVenta);
     }
+
+    public String generarCodigoUnico() {
+        String codigo;
+        boolean existe;
+        do {
+            // Genera un código aleatorio de 8 caracteres (por ejemplo, usando UUID o Random)
+            codigo = UUID.randomUUID().toString().substring(0, 5).toUpperCase();
+
+            // Validar si ya existe
+
+            existe = unidadVentaRepository.existsByCodigoUnico(codigo);
+        } while (existe); // Si ya existe, repite el ciclo; si es único, sale.
+
+        return codigo;
+    }
+
+
 
 
 }

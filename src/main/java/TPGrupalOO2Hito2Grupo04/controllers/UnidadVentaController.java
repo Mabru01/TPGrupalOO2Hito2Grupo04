@@ -6,6 +6,7 @@ import TPGrupalOO2Hito2Grupo04.services.IUnidadVentaService;
 import TPGrupalOO2Hito2Grupo04.helpers.ViewRouteHelper;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -47,16 +48,29 @@ public class UnidadVentaController {
     }
 
     @PostMapping("/guardar/food-truck")
-    public RedirectView guardarFoodTruck(
-            @ModelAttribute("unidadVentaDTO") FoodTruckDTO unidadVentaDTO) {
-        unidadVentaService.registrarUnidadVentaConResponsable(unidadVentaDTO);
-        return new RedirectView(ViewRouteHelper.UnidadVenta_ROOT);
+    public String guardarFoodTruck(@ModelAttribute("unidadVentaDTO") FoodTruckDTO dto, Model model) {
+        try {
+            unidadVentaService.registrarUnidadVentaConResponsable(dto);
+            return "redirect:" + ViewRouteHelper.ROUTE_INDEX;
+        } catch (Exception e) {
+            model.addAttribute("error", e.getMessage());
+            return ViewRouteHelper.UnidadVenta_NEW_FOOD_TRUCK; //
+        }
     }
 
     @PostMapping("/guardar/puesto-desarmable")
-    public RedirectView guardarPuestoDesarmable(
-            @ModelAttribute("unidadVentaDTO") PuestoDesarmableDTO unidadVentaDTO) {
-        unidadVentaService.registrarUnidadVentaConResponsable(unidadVentaDTO);
-        return new RedirectView(ViewRouteHelper.UnidadVenta_ROOT);
+    public String guardarPuestoDesarmable(
+            @ModelAttribute("unidadVentaDTO") PuestoDesarmableDTO unidadVentaDTO,
+            Model model) {
+        try {
+            unidadVentaService.registrarUnidadVentaConResponsable(unidadVentaDTO);
+            return "redirect:" + ViewRouteHelper.ROUTE_INDEX;
+        } catch (Exception e) {
+            model.addAttribute("error", e.getMessage());
+            return ViewRouteHelper.UnidadVenta_NEW_PUESTO;
+        }
     }
+
+
+
 }

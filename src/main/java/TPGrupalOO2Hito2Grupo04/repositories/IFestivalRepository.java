@@ -1,6 +1,7 @@
 package TPGrupalOO2Hito2Grupo04.repositories;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,4 +26,7 @@ public interface IFestivalRepository extends JpaRepository<Festival, Serializabl
     // Todos los festivales con sus unidades de venta cargadas, ordenados por fecha de inicio
     @Query("SELECT DISTINCT f FROM Festival f LEFT JOIN FETCH f.unidadesVenta ORDER BY f.fechaInicio")
     public abstract List<Festival> findAllAndFetchUnidadesEagerly();
+    // Festival activo fecha de hoy entre inicio y fin
+    @Query("SELECT f FROM Festival f WHERE :hoy BETWEEN f.fechaInicio AND f.fechaFin")
+    Optional<Festival> findFestivalActivo(@Param("hoy") LocalDate hoy);
 }
