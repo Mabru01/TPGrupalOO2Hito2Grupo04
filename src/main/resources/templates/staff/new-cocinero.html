@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<!--/*@thymesVar id="unidadVentaDTO" type="TPGrupalOO2Hito2Grupo04.dtos.FoodTruckDTO"*/-->
+<head th:replace="~{layout :: head}"></head>
+<body>
+<nav th:replace="~{layout :: navbar}"></nav>
+
+<main class="container py-4">
+    <div class="page-header mb-4">
+        <h2>Nuevo Cocinero</h2>
+    </div>
+
+    <!-- Alerta de error si existe -->
+    <div th:if="${error}" class="alert alert-danger text-center" role="alert">
+        <span th:text="${error}">Mensaje de error</span>
+    </div>
+
+    <div class="card form-card">
+        <div class="card-body">
+            <form th:action="@{/staff/guardar/cocinero}"
+                  th:object="${staffDTO}" method="post">
+
+                <h5 class="text-secondary border-bottom pb-2 mb-3">Datos del empleado</h5>
+
+                <div class="mb-3">
+                    <label for="idUnidadVenta" class="col-form-label">Unidad de Venta</label>
+                    <select class="form-control" id="idUnidadVenta" th:field="*{idUnidadVenta}" required>
+                        <option value="">Seleccione una unidad de venta</option>
+                        <option th:each="u : ${unidadesVenta}" th:value="${u.idUnidadVenta}" th:text="${u.nombreComercial}">Unidad</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label for="dni" class="col-form-label">DNI</label>
+                    <input type="text" class="form-control" id="dni" th:field="*{dni}" required placeholder="Ej: 43132912"/>
+                </div>
+
+                <div class="mb-3">
+                    <label for="nombre" class="col-form-label">Nombre</label>
+                    <input type="text" class="form-control" id="nombre" th:field="*{nombre}" required placeholder="Ej: Mario"/>
+                </div>
+
+                <div class="mb-3">
+                    <label for="apellido" class="col-form-label">Apellido</label>
+                    <input type="text" class="form-control" id="apellido" th:field="*{apellido}" required placeholder="Ej: Suarez"/>
+                </div>
+
+                <div class="mb-3">
+                    <label for="fechaNacimiento" class="col-form-label">Fecha de Nacimiento</label>
+                    <input type="date" class="form-control" id="fechaNacimiento" th:field="*{fechaNacimiento}" required placeholder="Ej: dd/mm/aaaa"/>
+                </div>
+
+                <div class="mb-3">
+                    <label for="fechaIngreso" class="col-form-label">Fecha de Ingreso</label>
+                    <input type="date" class="form-control" id="fechaIngreso" th:field="*{fechaIngreso}" required placeholder="Ej: dd/mm/aaaa"/>
+                </div>
+
+                <div class="mb-3">
+                    <label for="sueldoBase" class="col-form-label">Sueldo</label>
+                    <input type="number" step="0.01" class="form-control" id="sueldoBase" th:field="*{sueldoBase}" required placeholder="Ej: 1.250.000"/>
+                </div>
+
+                <div class="mb-3">
+                    <label for="categoria" class="col-form-label">Categoria</label>
+                    <input type="text" class="form-control" id="categoria" th:field="*{categoria}" required placeholder="Ej: Chef"/>
+                </div>
+
+                <div class="mb-3">
+                    <label for="especialidad" class="col-form-label">Especialidad</label>
+                    <input type="text" class="form-control" id="especialidad" th:field="*{especialidad}" required placeholder="Ej: Pescado"/>
+                </div>
+
+                <div class="d-flex justify-content-between mt-4">
+                    <button type="submit" class="btn btn-success px-4">Agregar Empleado</button>
+                    <a th:href="@{/index}" class="btn btn-outline-secondary px-4">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{layout :: footer}"></footer>
+<div th:replace="~{layout :: scripts}"></div>
+</body>
+</html>

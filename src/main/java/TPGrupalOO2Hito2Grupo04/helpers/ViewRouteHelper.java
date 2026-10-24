@@ -17,7 +17,8 @@ public class ViewRouteHelper {
 
     //STAFF
     public final static String STAFF_INDEX = "staff/index";
-    public final static String STAFF_NEW = "staff/new";
+    public final static String STAFF_NEW_COCINERO = "staff/new-cocinero";
+    public final static String STAFF_NEW_CAJERO = "staff/new-cajero";
     public final static String STAFF_UPDATE = "staff/update";
     public final static String STAFF_PARTIAL_VIEW = "staff/partialPersonView";
 

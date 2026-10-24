@@ -10,5 +10,5 @@ import lombok.Setter;
 public class Cocinero extends Staff {
 
     private String especialidad;
-    private String plusCategoria;
+    private String Categoria;
 }

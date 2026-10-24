@@ -1,4 +1,5 @@
 package TPGrupalOO2Hito2Grupo04.services;
+import TPGrupalOO2Hito2Grupo04.dtos.StaffDTO;
 import TPGrupalOO2Hito2Grupo04.entities.Staff;
 
 import java.util.List;
@@ -16,5 +17,7 @@ public interface IStaffService {
     Staff insertOrUpdate(Staff staff);
 
     boolean remove(long id);
+
+    Staff registrarStaff(StaffDTO staffDTO);
 
 }

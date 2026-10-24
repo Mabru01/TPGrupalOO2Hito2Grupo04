@@ -55,9 +55,9 @@ public class LiquidacionService implements ILiquidacionService {
         BigDecimal montoAdicional = BigDecimal.ZERO;
 
         if (staff instanceof Cocinero cocinero) {
-            tipo = "Cocina (" + cocinero.getPlusCategoria() + ")";
+            tipo = "Cocina (" + cocinero.getCategoria() + ")";
             conceptoAdicional = "Plus por categoría";
-            montoAdicional = costo.getPlusCategoria(cocinero.getPlusCategoria());
+            montoAdicional = costo.getPlusCategoria(cocinero.getCategoria());
         } else if (staff instanceof Cajero) {
             int anios = Math.max(0, Period.between(staff.getFechaIngreso(), festival.getFechaInicio()).getYears());
             tipo = "Cajero";
