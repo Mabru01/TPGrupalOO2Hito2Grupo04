@@ -11,15 +11,15 @@ import java.time.LocalDate;
 @NoArgsConstructor
 public class PedidoDTO {
 
-    private int idPedido;
+    private long idPedido;
 
     private LocalDate fecha;
 
-    private int idUnidadVenta;
+    private long idUnidadVenta;
 
     private boolean terminado;
 
-    public PedidoDTO(LocalDate fecha, int idUnidadVenta, boolean terminado) {
+    public PedidoDTO(LocalDate fecha, long idUnidadVenta, boolean terminado) {
         this.fecha = fecha;
         this.idUnidadVenta = idUnidadVenta;
         this.terminado = terminado;
