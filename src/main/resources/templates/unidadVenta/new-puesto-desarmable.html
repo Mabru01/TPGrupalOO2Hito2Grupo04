@@ -17,15 +17,15 @@
 
                 <h5 class="text-secondary border-bottom pb-2 mb-3">Datos de la Unidad</h5>
 
+                <!-- Alerta de error por controller -->
+                <div class="alert alert-danger alert-dismissible fade show" role="alert" th:if="${error}">
+                    <span th:text="${error}"></span>
+                </div>
+
                 <div class="mb-3">
                     <label for="nombreComercial" class="col-form-label">Nombre Comercial</label>
                     <input type="text" class="form-control" id="nombreComercial"
                            th:field="*{nombreComercial}" required placeholder="Ej: FoodTruck Las Empanadas"/>
-                </div>
-                <div class="mb-3">
-                    <label for="codigoUnico" class="col-form-label">Código Único</label>
-                    <input type="text" class="form-control" id="codigoUnico"
-                           th:field="*{codigoUnico}" required placeholder="Ej: UV-001"/>
                 </div>
                 <div class="mb-3">
                     <label for="superficie" class="col-form-label">Superficie</label>
@@ -56,7 +56,7 @@
 
                 <div class="d-flex mt-4">
                     <button type="submit" class="btn btn-success me-2">Registrar</button>
-                    <a th:href="@{/unidadVenta}" class="btn btn-outline-secondary">Cancelar</a>
+                    <a th:href="@{/index}" class="btn btn-outline-secondary">Cancelar</a>
                 </div>
             </form>
         </div>

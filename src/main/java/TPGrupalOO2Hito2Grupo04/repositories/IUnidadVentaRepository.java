@@ -11,4 +11,5 @@ public interface IUnidadVentaRepository extends JpaRepository<UnidadVenta, Long>
 
     // Método para buscar por código único
     public abstract Optional<UnidadVenta> findByCodigoUnico(String codigoUnico);
+    public abstract boolean existsByCodigoUnico(String codigo);
 }

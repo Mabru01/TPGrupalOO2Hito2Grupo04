@@ -18,7 +18,7 @@ INSERT INTO usuario (id, activo, mail, password, rol_id, created_at, updated_at)
 VALUES (1, 1, 'admin@sistema.com', '$2a$10$rAz3VMKuVBfjLW31ejcA0OzE.iBoUZGvwQ3O6pNDw8LRZdPKS9XvC', 1, NOW(), NOW());
 
 
-select * from usuario;
+select * from usuario;git
 
 select * from user_role;
 

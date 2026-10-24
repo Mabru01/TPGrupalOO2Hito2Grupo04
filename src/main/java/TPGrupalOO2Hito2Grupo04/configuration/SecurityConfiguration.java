@@ -35,10 +35,11 @@ public class SecurityConfiguration {
 					auth.requestMatchers("/css/*", "/imgs/*", "/js/*", "/vendor/bootstrap/css/*",
 							"/vendor/jquery/*", "/vendor/bootstrap/js/*", "/api/v1/**").permitAll();
 					// Página de inicio pública (el enunciado pide verla sin iniciar sesión)
-					auth.requestMatchers("/", "/index").permitAll();
+					auth.requestMatchers("/", "/index", "/unidadVenta/nuevo/food-truck", "/unidadVenta/nuevo/puesto-desarmable").permitAll();
+					auth.requestMatchers(org.springframework.http.HttpMethod.POST, "/unidadVenta/guardar/food-truck", "/unidadVenta/guardar/puesto-desarmable").permitAll();
 					auth.anyRequest().authenticated();
 				})
-				/*.formLogin(login -> {
+				.formLogin(login -> {
 					login.loginPage("/login");
 					login.loginProcessingUrl("/loginprocess");
 					login.usernameParameter("username");
@@ -46,22 +47,13 @@ public class SecurityConfiguration {
 					login.defaultSuccessUrl("/loginsuccess");
 					login.permitAll();
 				})
-*/
-				.formLogin(login -> {
-					login.permitAll();
-				})
-				/*
+
 				.logout(logout -> {
 					logout.logoutUrl("/logout");
-					logout.logoutSuccessUrl("/login");
+					logout.logoutSuccessUrl("/index");
 					logout.permitAll();
 				})
 
-				 */
-
-				.logout(logout -> {
-					logout.permitAll();
-				})
 				.build();
 	}
 
