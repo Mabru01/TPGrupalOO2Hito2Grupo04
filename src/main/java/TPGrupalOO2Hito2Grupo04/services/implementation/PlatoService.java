@@ -3,6 +3,7 @@ package TPGrupalOO2Hito2Grupo04.services.implementation;
 import java.util.List;
 import java.util.Optional;
 
+import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
@@ -11,7 +12,10 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import TPGrupalOO2Hito2Grupo04.entities.Plato;
+import TPGrupalOO2Hito2Grupo04.entities.UnidadVenta;
+import TPGrupalOO2Hito2Grupo04.dtos.PlatoDTO;
 import TPGrupalOO2Hito2Grupo04.repositories.IPlatoRepository;
+import TPGrupalOO2Hito2Grupo04.repositories.IUnidadVentaRepository;
 import TPGrupalOO2Hito2Grupo04.services.IPlatoService;
 
 @Service("platoService")
@@ -21,9 +25,13 @@ public class PlatoService implements IPlatoService {
             LoggerFactory.getLogger(PlatoService.class);
 
     private final IPlatoRepository platoRepository;
+    private final IUnidadVentaRepository unidadVentaRepository;
+    private final ModelMapper modelMapper;
 
-    public PlatoService(IPlatoRepository platoRepository) {
+    public PlatoService(IPlatoRepository platoRepository, IUnidadVentaRepository unidadVentaRepository, ModelMapper modelMapper) {
         this.platoRepository = platoRepository;
+        this.unidadVentaRepository = unidadVentaRepository;
+        this.modelMapper = modelMapper;
     }
 
     @Override
@@ -55,5 +63,31 @@ public class PlatoService implements IPlatoService {
                     "Error de base de datos al eliminar el Plato con id {}", id, e);
             return false;
         }
+    }
+
+    @Override
+    public Plato registrarPlato(PlatoDTO dto) {
+        // Validar si ya existe un plato con ese nombre
+        if (platoRepository.findByNombre(dto.getNombre()).isPresent()) {
+            throw new IllegalArgumentException("Ya existe un plato registrado con ese nombre.");
+        }
+
+        //Plato plato = modelMapper.map(dto, Plato.class);
+        //plato.setUnidadVenta(unidadVenta);
+
+        // Se busca la Unidad de Venta en la base de datos
+        UnidadVenta unidadVenta = unidadVentaRepository.findById(dto.getIdUnidadVenta())
+                .orElseThrow(() -> new IllegalArgumentException("ERROR: Unidad de venta no encontrada"));
+
+        // Se instancia el Plato manualmente con los datos del DTO
+        // Para evitar instanciar una unidad abtracta.
+        Plato plato = new Plato();
+        plato.setNombre(dto.getNombre());
+        plato.setPrecio(dto.getPrecio());
+        plato.setCosto(dto.getCosto());
+        plato.setUnidadVenta(unidadVenta);
+
+        // Se guarda en la base de datos
+        return platoRepository.save(plato);
     }
 }

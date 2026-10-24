@@ -1,4 +1,5 @@
 package TPGrupalOO2Hito2Grupo04.services;
+import TPGrupalOO2Hito2Grupo04.dtos.PlatoDTO;
 
 import TPGrupalOO2Hito2Grupo04.entities.Plato;
 
@@ -14,4 +15,6 @@ public interface IPlatoService {
     Plato insertOrUpdate(Plato plato);
 
     boolean remove(long id);
+
+    Plato registrarPlato(PlatoDTO dto);
 }
