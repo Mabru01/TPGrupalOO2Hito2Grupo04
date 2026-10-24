@@ -13,12 +13,9 @@ public class Plato {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int idPlato;
-
+    private Long idPlato;
     private String nombre;
-
     private float precio;
-
     private float costo;
 
     @ManyToOne

@@ -9,17 +9,13 @@ import lombok.Setter;
 @NoArgsConstructor
 public class PlatoDTO {
 
-    private int idPlato;
-
+    private Long idPlato;
     private String nombre;
-
     private float precio;
-
     private float costo;
+    private Long idUnidadVenta;
 
-    private int idUnidadVenta;
-
-    public PlatoDTO(String nombre, float precio, float costo, int idUnidadVenta) {
+    public PlatoDTO(String nombre, float precio, float costo, long idUnidadVenta) {
         this.nombre = nombre;
         this.precio = precio;
         this.costo = costo;

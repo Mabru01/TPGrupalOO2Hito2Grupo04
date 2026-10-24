@@ -9,15 +9,15 @@ import lombok.Setter;
 @NoArgsConstructor
 public class ItemPedidoDTO {
 
-    private int idItemPedido;
+    private long idItemPedido;
 
     private int cantidad;
 
-    private int idPedido;
+    private long idPedido;
 
-    private int idPlato;
+    private long idPlato;
 
-    public ItemPedidoDTO(int cantidad, int idPedido, int idPlato) {
+    public ItemPedidoDTO(int cantidad, long idPedido, long idPlato) {
         this.cantidad = cantidad;
         this.idPedido = idPedido;
         this.idPlato = idPlato;
