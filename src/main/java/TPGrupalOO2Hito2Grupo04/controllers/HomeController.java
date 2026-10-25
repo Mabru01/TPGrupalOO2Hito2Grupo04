@@ -3,6 +3,7 @@ package TPGrupalOO2Hito2Grupo04.controllers;
 import java.time.LocalDate;
 import java.util.List;
 
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Controller;
@@ -25,15 +26,22 @@ public class HomeController {
 
     //GET Example: SERVER/index
     // Página de inicio pública: festivales precargados y las acciones de registrarse e iniciar sesión.
-    // Los festivales finalizados solo los ven el administrador y el responsable.
+    // Sin sesión: solo los festivales en curso. Con sesión: también los próximos.
+    // Los finalizados solo los ven el administrador y el responsable.
     @GetMapping("/index")
     public ModelAndView index(Authentication authentication) {
         ModelAndView mAV = new ModelAndView(ViewRouteHelper.INDEX);
         LocalDate hoy = LocalDate.now();
+        boolean conSesion = authentication != null && authentication.isAuthenticated()
+                && !(authentication instanceof AnonymousAuthenticationToken);
         boolean verFinalizados = puedeVerFinalizados(authentication);
 
         List<Festival> festivales = festivalService.getAllWithUnidades();
-        if (!verFinalizados) {
+        if (!conSesion) {
+            festivales = festivales.stream()
+                    .filter(f -> !f.getFechaInicio().isAfter(hoy) && !f.getFechaFin().isBefore(hoy))
+                    .toList();
+        } else if (!verFinalizados) {
             festivales = festivales.stream()
                     .filter(f -> !f.getFechaFin().isBefore(hoy))
                     .toList();
