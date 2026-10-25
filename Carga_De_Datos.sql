@@ -90,7 +90,7 @@ INSERT INTO cajero (id_staff, turno) VALUES
 -- =========================================
 -- COCINERO
 -- =========================================
-INSERT INTO cocinero (id_staff, especialidad, plus_categoria) VALUES
+INSERT INTO cocinero (id_staff, especialidad, categoria) VALUES
 (4, 'Parilla', 'COCINERO'),
 (5, 'Pastas',  'COCINERO_AYUDANTE');
 
