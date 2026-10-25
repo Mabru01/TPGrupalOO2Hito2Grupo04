@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - UNLA TFI</title>
+    <title>Iniciar sesión - Epicentro Gourmet</title>
     <link rel="stylesheet" th:href="@{/vendor/bootstrap/css/bootstrap.min.css}"/>
     <link rel="stylesheet" th:href="@{/css/modern-business.css}"/>
+    <link rel="stylesheet" th:href="@{/css/epicentro.css}"/>
 </head>
 <body class="bg-light">
 
@@ -13,29 +14,33 @@
         <div class="card login-card">
             <div class="card-body">
                 <div class="login-header">
-                    <h3>UNLA TFI</h3>
-                    <p class="text-muted">Inicie sesion para continuar</p>
+                    <h3>Epicentro Gourmet</h3>
+                    <p class="text-muted">Iniciá sesión para continuar</p>
                 </div>
 
                 <div th:if="${error != null}" class="alert alert-danger">
-                    Usuario o contrasena invalidos.
+                    Mail o contraseña incorrectos.
                 </div>
 
                 <div th:if="${logout != null}" class="alert alert-success">
-                    Cesion finalizada correctamente.
+                    Sesión finalizada correctamente.
                 </div>
 
                 <form th:action="@{/loginprocess}" method="post">
                     <div class="mb-3">
-                        <label for="username" class="form-label">Usuario</label>
-                        <input type="text" class="form-control" id="username" name="username" required autofocus placeholder="Ingrese su usuario"/>
+                        <label for="username" class="form-label">Mail</label>
+                        <input type="email" class="form-control" id="username" name="username" required autofocus placeholder="ejemplo@mail.com"/>
                     </div>
                     <div class="mb-3">
-                        <label for="password" class="form-label">Contrasena</label>
-                        <input type="password" class="form-control" id="password" name="password" required placeholder="Ingrese su contrasena"/>
+                        <label for="password" class="form-label">Contraseña</label>
+                        <input type="password" class="form-control" id="password" name="password" required placeholder="Ingresá tu contraseña"/>
                     </div>
-                    <button type="submit" class="btn btn-primary w-100">Ingresar</button>
+                    <button type="submit" class="btn btn-epicentro w-100">Ingresar</button>
                 </form>
+
+                <div class="text-center mt-3">
+                    <a th:href="@{/index}" class="text-muted">Volver al inicio</a>
+                </div>
             </div>
         </div>
     </div>
