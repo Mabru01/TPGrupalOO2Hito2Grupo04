@@ -13,9 +13,15 @@ import lombok.Setter;
 @AllArgsConstructor
 public class LiquidacionDTO {
 
+    private int idStaff;
+
     private String empleado;
 
+    private long dni;
+
     private String tipo;
+
+    private String unidad;
 
     private String festival;
 
