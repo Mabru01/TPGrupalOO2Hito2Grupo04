@@ -9,22 +9,14 @@
 
         <div th:if="${error != null}" class="alert alert-warning" th:text="${error}">Error</div>
 
-        <!-- Administrador: elige festival y empleado -->
+        <!-- Administrador: elige cualquier empleado; el festival es el de su unidad -->
         <form th:if="${rol == 'ADMIN'}" th:action="@{/liquidacion}" method="get" class="form-row align-items-end mb-4">
-            <div class="col-md-5 mb-2">
-                <label for="festivalId">Festival</label>
-                <select class="form-control" id="festivalId" name="festivalId" required>
-                    <option value="">Elegí un festival</option>
-                    <option th:each="f : ${festivales}" th:value="${f.idFestival}" th:text="${f.nombre}"
-                            th:selected="${f.idFestival == festivalId}">Festival</option>
-                </select>
-            </div>
-            <div class="col-md-5 mb-2">
+            <div class="col-md-10 mb-2">
                 <label for="staffId">Empleado</label>
                 <select class="form-control" id="staffId" name="staffId" required>
                     <option value="">Elegí un empleado</option>
                     <option th:each="e : ${empleados}" th:value="${e.idStaff}"
-                            th:text="${e.nombre + ' ' + e.apellido}"
+                            th:text="${e.nombre + ' ' + e.apellido + (e.unidadVenta != null ? ' — ' + e.unidadVenta.nombreComercial + ' (' + e.unidadVenta.festival.nombre + ')' : ' — sin unidad asignada')}"
                             th:selected="${e.idStaff == staffId}">Empleado</option>
                 </select>
             </div>
@@ -56,7 +48,7 @@
                     <small class="text-muted" th:text="${'· ' + liquidacion.tipo}">· Tipo</small>
                 </span>
                 <a class="btn btn-epicentro btn-sm"
-                   th:href="@{/liquidacion/recibo(staffId=${liquidacion.idStaff}, festivalId=${rol == 'ADMIN' ? festivalId : null})}">
+                   th:href="@{/liquidacion/recibo(staffId=${liquidacion.idStaff})}">
                     Descargar recibo (PDF)
                 </a>
             </h4>

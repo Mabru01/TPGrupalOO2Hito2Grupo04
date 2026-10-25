@@ -19,47 +19,41 @@ import TPGrupalOO2Hito2Grupo04.dtos.LiquidacionDTO;
 import TPGrupalOO2Hito2Grupo04.entities.Staff;
 import TPGrupalOO2Hito2Grupo04.entities.UnidadVenta;
 import TPGrupalOO2Hito2Grupo04.helpers.ViewRouteHelper;
-import TPGrupalOO2Hito2Grupo04.services.IFestivalService;
 import TPGrupalOO2Hito2Grupo04.services.ILiquidacionService;
 
-// Liquidación de sueldo según el rol:
-//   ADMIN: elige festival y cualquier empleado
-//   RESPONSABLE: elige entre los empleados de su unidad (festival de la unidad)
-//   EMPLEADO: ve solo su sueldo (festival de su unidad)
+// Liquidación de sueldo según el rol. El festival siempre es el de la unidad donde trabaja el empleado:
+//   ADMIN: elige cualquier empleado
+//   RESPONSABLE: elige entre los empleados de su unidad
+//   EMPLEADO: ve solo su sueldo
 // Los permisos se controlan acá, no solo en la vista.
 @Controller
 @RequestMapping("/liquidacion")
 public class LiquidacionController {
 
     private final ILiquidacionService liquidacionService;
-    private final IFestivalService festivalService;
 
-    public LiquidacionController(ILiquidacionService liquidacionService, IFestivalService festivalService) {
+    public LiquidacionController(ILiquidacionService liquidacionService) {
         this.liquidacionService = liquidacionService;
-        this.festivalService = festivalService;
     }
 
-    //GET Example: SERVER/liquidacion?festivalId=1&staffId=2
+    //GET Example: SERVER/liquidacion?staffId=2
     @GetMapping("")
     public ModelAndView index(Authentication authentication,
-                              @RequestParam(name = "festivalId", required = false) Long festivalId,
                               @RequestParam(name = "staffId", required = false) Integer staffId) {
         ModelAndView mAV = new ModelAndView(ViewRouteHelper.LIQUIDACION_INDEX);
         String rol = rolDe(authentication);
         mAV.addObject("rol", rol);
-        mAV.addObject("festivalId", festivalId);
         mAV.addObject("staffId", staffId);
 
         try {
             if (rol.equals("ADMIN")) {
-                mAV.addObject("festivales", festivalService.getAll());
                 mAV.addObject("empleados", liquidacionService.getEmpleados());
             } else if (rol.equals("RESPONSABLE")) {
                 UnidadVenta unidad = unidadDelResponsable(authentication.getName());
                 mAV.addObject("unidad", unidad.getNombreComercial());
                 mAV.addObject("empleados", liquidacionService.getEmpleadosDeUnidad(unidad.getIdUnidadVenta()));
             }
-            LiquidacionDTO liquidacion = obtenerLiquidacion(authentication, rol, staffId, festivalId);
+            LiquidacionDTO liquidacion = obtenerLiquidacion(authentication, rol, staffId);
             mAV.addObject("liquidacion", liquidacion);
         } catch (IllegalArgumentException e) {
             mAV.addObject("error", e.getMessage());
@@ -67,14 +61,13 @@ public class LiquidacionController {
         return mAV;
     }
 
-    //GET Example: SERVER/liquidacion/recibo?festivalId=1&staffId=2
+    //GET Example: SERVER/liquidacion/recibo?staffId=2
     @GetMapping("/recibo")
     public ResponseEntity<?> recibo(Authentication authentication,
-                                         @RequestParam(name = "festivalId", required = false) Long festivalId,
-                                         @RequestParam(name = "staffId", required = false) Integer staffId) {
+                                    @RequestParam(name = "staffId", required = false) Integer staffId) {
         LiquidacionDTO liquidacion;
         try {
-            liquidacion = obtenerLiquidacion(authentication, rolDe(authentication), staffId, festivalId);
+            liquidacion = obtenerLiquidacion(authentication, rolDe(authentication), staffId);
         } catch (IllegalArgumentException e) {
             liquidacion = null;
         }
@@ -89,10 +82,10 @@ public class LiquidacionController {
     }
 
     // Devuelve la liquidación que el usuario tiene permitido ver (o null si todavía no eligió)
-    private LiquidacionDTO obtenerLiquidacion(Authentication authentication, String rol, Integer staffId, Long festivalId) {
+    private LiquidacionDTO obtenerLiquidacion(Authentication authentication, String rol, Integer staffId) {
         switch (rol) {
             case "ADMIN":
-                return (staffId != null && festivalId != null) ? liquidacionService.liquidar(staffId, festivalId) : null;
+                return staffId != null ? liquidacionService.liquidarEnSuFestival(staffId) : null;
             case "RESPONSABLE":
                 if (staffId == null) {
                     return null;
