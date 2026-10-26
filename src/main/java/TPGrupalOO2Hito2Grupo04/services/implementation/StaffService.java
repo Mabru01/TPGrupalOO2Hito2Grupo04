@@ -6,6 +6,7 @@ import TPGrupalOO2Hito2Grupo04.repositories.IRolRepository;
 import TPGrupalOO2Hito2Grupo04.repositories.IStaffRepository;
 import TPGrupalOO2Hito2Grupo04.repositories.IUnidadVentaRepository;
 import TPGrupalOO2Hito2Grupo04.repositories.IUsuarioRepository;
+import TPGrupalOO2Hito2Grupo04.services.IMailService;
 import TPGrupalOO2Hito2Grupo04.services.IStaffService;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 
 @Service("staffService")
 public class StaffService implements IStaffService {
@@ -30,16 +32,19 @@ public class StaffService implements IStaffService {
     private final PasswordEncoder passwordEncoder;
     private final ModelMapper modelMapper;
     private final IUsuarioRepository usuarioRepository;
+    private final IMailService mailService;
 
     public StaffService(IStaffRepository staffRepository, IUnidadVentaRepository unidadVentaRepository,
                         ModelMapper modelMapper, IRolRepository rolRepository,
-                        PasswordEncoder passwordEncoder, IUsuarioRepository usuarioRepository) {
+                        PasswordEncoder passwordEncoder, IUsuarioRepository usuarioRepository,
+                        IMailService mailService) {
         this.staffRepository = staffRepository;
         this.unidadVentaRepository = unidadVentaRepository;
         this.modelMapper = modelMapper;
         this.rolRepository = rolRepository;
         this.passwordEncoder = passwordEncoder;
         this.usuarioRepository = usuarioRepository;
+        this.mailService = mailService;
     }
 
     @Override
@@ -79,11 +84,26 @@ public class StaffService implements IStaffService {
         }
     }
 
+    private String generarContraseniaAleatoria() {
+        String caracteres = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%";
+        int longitud = 10;
+        Random random = new Random();
+        StringBuilder contrasenia = new StringBuilder();
+        for (int i = 0; i < longitud; i++) {
+            int indice = random.nextInt(caracteres.length());
+            contrasenia.append(caracteres.charAt(indice));
+        }
+        return contrasenia.toString();
+    }
+
     public Staff registrarStaff(StaffDTO staffDTO) {
         // Verifico si el staff no existe antes
         if (staffRepository.findByDni(staffDTO.getDni()).isPresent()) {
             throw new IllegalArgumentException("Ya existe un empleado registrado con ese dni.");
         }
+
+        // Generar una contraseña aleatoria para el nuevo empleado
+        String contraseniaGenerada = generarContraseniaAleatoria();
 
         // 3. Obtener (o crear) el rol EMPLEADO
         Rol rolEmpleado= rolRepository.findByRol("EMPLEADO")
@@ -96,7 +116,7 @@ public class StaffService implements IStaffService {
         // 4. Crear el usuario con ese rol y la contraseña hasheada
         Usuario nuevoUsuario = new Usuario();
         nuevoUsuario.setMail(staffDTO.getEmailStaff());
-        nuevoUsuario.setPassword(passwordEncoder.encode(staffDTO.getPasswordStaff()));
+        nuevoUsuario.setPassword(passwordEncoder.encode(contraseniaGenerada));
         nuevoUsuario.setActivo(true);
         nuevoUsuario.setRol(rolEmpleado);
 
@@ -125,7 +145,17 @@ public class StaffService implements IStaffService {
 
         staff.setUsuario(usuarioGuardado);
 
-        return staffRepository.save(staff);
+        Staff staffGuardado = staffRepository.save(staff);
+
+        // Enviar correo con las credenciales al empleado
+        try {
+            mailService.enviarCorreoCredenciales(staffDTO.getEmailStaff(), staffDTO.getEmailStaff(), contraseniaGenerada);
+            System.out.println("Se envió el correo de credenciales a: " + staffDTO.getEmailStaff());
+        } catch (Exception e) {
+            logger.error("Error al enviar correo de credenciales a {}: {}", staffDTO.getEmailStaff(), e.getMessage());
+        }
+
+        return staffGuardado;
     }
 
     public String obtenerTipoEmpleado(Staff staff) {
