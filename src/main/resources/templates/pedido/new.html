@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title th:text="${pedidoDTO.idPedido != null} ? 'Editar Pedido - Epicentro Gourmet' : 'Nuevo Pedido - Epicentro Gourmet'">Nuevo Pedido - Epicentro Gourmet</title>
+    <head th:replace="~{layout :: head}"></head>
+</head>
+<body>
+
+<!-- Navbar compartido -->
+<nav th:replace="~{layout :: navbar}"></nav>
+
+<div class="container mt-5 pt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-9">
+            <div class="card shadow">
+                <div class="card-header bg-dark text-white">
+                    <h4 class="mb-0" th:text="${pedidoDTO.idPedido != null} ? 'Editar Pedido #' + ${pedidoDTO.idPedido} : 'Registrar Nuevo Pedido'">Registrar Pedido</h4>
+                </div>
+                <div class="card-body">
+
+                    <!-- Formulario conectado dinámicamente para Guardar o Actualizar -->
+                    <form th:action="${pedidoDTO.idPedido != null} ? @{/pedido/actualizar/{id}(id=${pedidoDTO.idPedido})} : @{/pedido/guardar}"
+                          th:object="${pedidoDTO}" method="post" id="formPedido">
+
+                        <!-- Unidad de Venta -->
+                        <div class="form-group mb-3">
+                            <label for="unidadVenta">Unidad de Venta:</label>
+                            <select id="unidadVenta" class="form-control" th:field="*{idUnidadVenta}" required onchange="filtrarPlatos()">
+                                <option value="">-- Seleccione una unidad de venta --</option>
+                                <option th:each="uv : ${unidadesVenta}"
+                                        th:value="${uv.idUnidadVenta}"
+                                        th:text="${uv.nombreComercial}">Unidad</option>
+                            </select>
+                        </div>
+
+                        <!-- Fecha -->
+                        <div class="form-group mb-4">
+                            <label for="fechaTransaccion">Fecha:</label>
+                            <input type="date" id="fechaTransaccion" class="form-control" th:field="*{fechaTransaccion}" required />
+                        </div>
+
+                        <hr class="my-4">
+
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="mb-0">Ítems del Pedido</h5>
+                            <button type="button" class="btn btn-outline-primary btn-sm" onclick="agregarFilaItem()">
+                                <i class="bi bi-plus"></i> + Agregar plato
+                            </button>
+                        </div>
+
+                        <!-- Contenedor dinámico de ítems (Soporta edición con datos previos o alta vacía) -->
+                        <div id="contenedor-items">
+
+                            <!-- Si es edición y ya tiene ítems -->
+                            <th:block th:if="${pedidoDTO.items != null and !pedidoDTO.items.empty}">
+                                <div class="form-row item-row mb-3 align-items-end" th:each="item, iterStat : ${pedidoDTO.items}">
+                                    <div class="form-group col-md-7 mb-0">
+                                        <label>Plato:</label>
+                                        <select class="form-control select-plato" th:name="items[__${iterStat.index}__].idPlato" required>
+                                            <option value="">-- Seleccione un plato --</option>
+                                            <option th:each="plato : ${platos}"
+                                                    th:if="${plato.unidadVenta != null and plato.unidadVenta.idUnidadVenta == pedidoDTO.idUnidadVenta}"
+                                                    th:value="${plato.idPlato}"
+                                                    th:text="${plato.nombre + ' ($' + plato.precio + ')'}"
+                                                    th:selected="${plato.idPlato == item.idPlato}">
+                                            </option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group col-md-3 mb-0">
+                                        <label>Cantidad:</label>
+                                        <input type="number" class="form-control" th:name="items[__${iterStat.index}__].cantidad" th:value="${item.cantidad}" min="1" required />
+                                    </div>
+                                    <div class="form-group col-md-2 mb-0 text-center">
+                                        <button type="button" class="btn btn-danger btn-sm" onclick="eliminarFila(this)">Eliminar</button>
+                                    </div>
+                                </div>
+                            </th:block>
+
+                            <!-- Si es un pedido nuevo (sin ítems previos) -->
+                            <th:block th:if="${pedidoDTO.items == null or pedidoDTO.items.empty}">
+                                <div class="form-row item-row mb-3 align-items-end">
+                                    <div class="form-group col-md-7 mb-0">
+                                        <label>Plato:</label>
+                                        <select class="form-control select-plato" name="items[0].idPlato" required>
+                                            <option value="">-- Primero seleccione una unidad de venta --</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group col-md-3 mb-0">
+                                        <label>Cantidad:</label>
+                                        <input type="number" class="form-control" name="items[0].cantidad" min="1" value="1" required />
+                                    </div>
+                                    <div class="form-group col-md-2 mb-0 text-center">
+                                        <button type="button" class="btn btn-danger btn-sm" onclick="eliminarFila(this)">Eliminar</button>
+                                    </div>
+                                </div>
+                            </th:block>
+
+                        </div>
+
+                        <!-- Select oculto para guardar todas las opciones originales de platos y filtrarlas -->
+                        <select id="plantilla-platos" class="d-none">
+                            <option value="">-- Seleccione un plato --</option>
+                            <option th:each="plato : ${platos}"
+                                    th:value="${plato.idPlato}"
+                                    th:text="${plato.nombre + ' ($' + plato.precio + ')'}"
+                                    th:data-unidad="${plato.unidadVenta != null ? plato.unidadVenta.idUnidadVenta : ''}"></option>
+                        </select>
+
+                        <!-- Botones de acción dinámicos -->
+                        <div class="form-group text-right mt-4">
+                            <a th:href="@{/pedido}" class="btn btn-secondary">Cancelar</a>
+                            <button type="submit" class="btn btn-success" th:text="${pedidoDTO.idPedido != null} ? 'Actualizar Pedido' : 'Guardar Pedido'">Guardar Pedido</button>
+                        </div>
+
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Footer y Scripts compartidos -->
+<footer th:replace="~{layout :: footer}"></footer>
+<div th:replace="~{layout :: scripts}"></div>
+
+
+<!-- Script para Filtrar Platos y Gestionar Filas Dinámicas -->
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        actualizarIndices();
+    });
+
+    function filtrarPlatos() {
+        const idUnidadSeleccionada = document.getElementById('unidadVenta').value;
+        const selectsPlatos = document.querySelectorAll('.select-plato');
+
+        selectsPlatos.forEach(select => {
+            const valorActual = select.value;
+            select.innerHTML = '<option value="">-- Seleccione un plato --</option>';
+
+            const plantilla = document.querySelectorAll('#plantilla-platos option');
+            plantilla.forEach(opt => {
+                if (opt.value && opt.getAttribute('data-unidad') === idUnidadSeleccionada) {
+                    select.appendChild(opt.cloneNode(true));
+                }
+            });
+            select.value = valorActual;
+        });
+    }
+
+    function agregarFilaItem() {
+        const idUnidadSeleccionada = document.getElementById('unidadVenta').value;
+        if (!idUnidadSeleccionada) {
+            alert("Por favor, seleccione primero una Unidad de Venta.");
+            return;
+        }
+
+        const contenedor = document.getElementById('contenedor-items');
+
+        const nuevaFila = document.createElement('div');
+        nuevaFila.className = 'form-row item-row mb-3 align-items-end';
+        nuevaFila.innerHTML = `
+            <div class="form-group col-md-7 mb-0">
+                <label>Plato:</label>
+                <select class="form-control select-plato" required>
+                    <option value="">-- Seleccione un plato --</option>
+                </select>
+            </div>
+            <div class="form-group col-md-3 mb-0">
+                <label>Cantidad:</label>
+                <input type="number" class="form-control" min="1" value="1" required />
+            </div>
+            <div class="form-group col-md-2 mb-0 text-center">
+                <button type="button" class="btn btn-danger btn-sm" onclick="eliminarFila(this)">Eliminar</button>
+            </div>
+        `;
+
+        contenedor.appendChild(nuevaFila);
+
+        const nuevoSelect = nuevaFila.querySelector('.select-plato');
+        const plantilla = document.querySelectorAll('#plantilla-platos option');
+        plantilla.forEach(opt => {
+            if (opt.value && opt.getAttribute('data-unidad') === idUnidadSeleccionada) {
+                nuevoSelect.appendChild(opt.cloneNode(true));
+            }
+        });
+
+        actualizarIndices();
+    }
+
+    function eliminarFila(boton) {
+        const fila = boton.closest('.item-row');
+        fila.remove();
+        actualizarIndices();
+    }
+
+    function actualizarIndices() {
+        const filas = document.querySelectorAll('#contenedor-items .item-row');
+        filas.forEach((fila, index) => {
+            const selectPlato = fila.querySelector('.select-plato');
+            const inputCantidad = fila.querySelector('input[type="number"]');
+
+            if (selectPlato) {
+                selectPlato.name = `items[${index}].idPlato`;
+            }
+            if (inputCantidad) {
+                inputCantidad.name = `items[${index}].cantidad`;
+            }
+        });
+    }
+</script>
+
+</body>
+</html>
