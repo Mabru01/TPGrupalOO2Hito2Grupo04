@@ -13,7 +13,7 @@ public class ItemPedido {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long idItemPedido;
+    private Long idItemPedido;
 
     private int cantidad;
 

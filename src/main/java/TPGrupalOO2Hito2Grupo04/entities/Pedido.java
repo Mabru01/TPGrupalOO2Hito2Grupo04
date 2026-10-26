@@ -17,21 +17,27 @@ public class Pedido {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long idPedido;
+    private Long idPedido;
 
-    private LocalDate fecha;
+    private LocalDate fechaTransaccion;
 
     @ManyToOne
     @JoinColumn(name = "idUnidadVenta", nullable = false)
     private UnidadVenta unidadVenta;
 
-    @OneToMany(mappedBy = "pedido", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private Set<ItemPedido> items = new HashSet<>();
 
     private boolean terminado;
 
-    public Pedido(LocalDate fecha, UnidadVenta unidadVenta) {
-        this.fecha = fecha;
+    public Pedido(LocalDate fechaTransaccion, UnidadVenta unidadVenta) {
+        this.fechaTransaccion = fechaTransaccion;
         this.unidadVenta = unidadVenta;
+    }
+
+    // Helper para mantener la bidireccionalidad al agregar ítems
+    public void agregarItem(ItemPedido item) {
+        items.add(item);
+        item.setPedido(this);
     }
 }
