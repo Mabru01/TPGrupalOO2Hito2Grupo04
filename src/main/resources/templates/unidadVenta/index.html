@@ -19,6 +19,7 @@
             <th>Nombre comercial</th>
             <th>Código único</th>
             <th>Superficie</th>
+            <th class="text-center">Acciones</th>
         </tr>
         </thead>
         <tbody>
@@ -26,6 +27,38 @@
             <td th:text="${u.nombreComercial}"></td>
             <td th:text="${u.codigoUnico}"></td>
             <td th:text="${u.superficie}"></td>
+            <td class="text-center">
+                <!-- Botón que abre el modal específico de esta unidad usando su idUnidadVenta -->
+                <button type="button"
+                        class="btn btn-info btn-sm text-white"
+                        data-toggle="modal"
+                        th:data-target="${'#canonModal-' + u.idUnidadVenta}">
+                    Ver Canon
+                </button>
+
+                <!-- Modal exclusivo para esta unidad de venta -->
+                <div class="modal fade" th:id="${'canonModal-' + u.idUnidadVenta}" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Cálculo de Canon</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>                            </div>
+                            <div class="modal-body text-start">
+                                <p><strong>Unidad:</strong> <span th:text="${u.nombreComercial}"></span></p>
+                                <p><strong>Código:</strong> <span th:text="${u.codigoUnico}"></span></p>
+                                <hr>
+                                <h4 class="text-success">
+                                    Total Canon: $<span th:text="${u.calcularCanon()}"></span>
+                                </h4>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Cerrar</button>                            </div>
+                        </div>
+                    </div>
+                </div>
+            </td>
         </tr>
         </tbody>
     </table>

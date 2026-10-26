@@ -58,4 +58,7 @@ public abstract class UnidadVenta {
         this.responsable = responsable;
         this.festival = festival;
     }
+
+    public abstract double calcularCanon();
+
 }

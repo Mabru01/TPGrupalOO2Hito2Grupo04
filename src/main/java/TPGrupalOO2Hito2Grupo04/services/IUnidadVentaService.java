@@ -31,4 +31,5 @@ public interface IUnidadVentaService {
 
     String generarCodigoUnico();
 
+    double calcularCanon(Long idUnidadVenta);
 }

@@ -139,7 +139,13 @@ public class UnidadVentaService implements IUnidadVentaService {
         return codigo;
     }
 
+    @Override
+    public double calcularCanon(Long idUnidadVenta) {
+        UnidadVenta unidad = unidadVentaRepository.findById(idUnidadVenta)
+                .orElseThrow(() -> new IllegalArgumentException("Sin unidad de venta asignada"));
 
+        return unidad.calcularCanon();
+    }
 
 
 }

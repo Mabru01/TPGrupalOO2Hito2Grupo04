@@ -19,4 +19,11 @@ public class FoodTruck extends UnidadVenta{
         this.patente = patente;
         this.usaLuz = usaLuz;
     }
+
+    @Override
+    public double calcularCanon() {
+        double base = this.superficie * 500.0;
+        return base + (this.usaLuz ? 2000.0 : 0.0);
+    }
+
 }
