@@ -11,7 +11,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 public class PedidoDTO {
 
-    private long idPedido;
+    private Long idPedido;
 
     private LocalDate fecha;
 
