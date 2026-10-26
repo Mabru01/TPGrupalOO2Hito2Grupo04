@@ -8,13 +8,13 @@ import java.util.Optional;
 
 public interface IPlatoService {
 
-    List<Plato> getAll();
+    List<Plato> traerTodos();
 
-    Optional<Plato> findById(long id);
+    Optional<Plato> traerPorId(Long id);
 
-    Plato insertOrUpdate(Plato plato);
+    Plato insertarOActualizar(Plato plato);
 
-    boolean remove(long id);
+    boolean eliminar(Long id);
 
     Plato registrarPlato(PlatoDTO dto);
 }

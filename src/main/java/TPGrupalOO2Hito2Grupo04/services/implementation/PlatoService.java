@@ -35,22 +35,23 @@ public class PlatoService implements IPlatoService {
     }
 
     @Override
-    public List<Plato> getAll() {
-        return platoRepository.findAll();
+    public List<Plato> traerTodos() {
+        List<Plato> platos = platoRepository.findAll();
+        return platoRepository.findAllByOrderByUnidadVentaNombreComercialAsc();
     }
 
     @Override
-    public Optional<Plato> findById(long id) {
+    public Optional<Plato> traerPorId(Long id) {
         return platoRepository.findById(id);
     }
 
     @Override
-    public Plato insertOrUpdate(Plato plato) {
+    public Plato insertarOActualizar(Plato plato) {
         return platoRepository.save(plato);
     }
 
     @Override
-    public boolean remove(long id) {
+    public boolean eliminar(Long id) {
         try {
             platoRepository.deleteById(id);
             return true;
@@ -67,27 +68,25 @@ public class PlatoService implements IPlatoService {
 
     @Override
     public Plato registrarPlato(PlatoDTO dto) {
-        // Validar si ya existe un plato con ese nombre
         if (platoRepository.findByNombre(dto.getNombre()).isPresent()) {
             throw new IllegalArgumentException("Ya existe un plato registrado con ese nombre.");
         }
 
-        //Plato plato = modelMapper.map(dto, Plato.class);
-        //plato.setUnidadVenta(unidadVenta);
-
-        // Se busca la Unidad de Venta en la base de datos
         UnidadVenta unidadVenta = unidadVentaRepository.findById(dto.getIdUnidadVenta())
                 .orElseThrow(() -> new IllegalArgumentException("ERROR: Unidad de venta no encontrada"));
 
-        // Se instancia el Plato manualmente con los datos del DTO
-        // Para evitar instanciar una unidad abtracta.
         Plato plato = new Plato();
+
+        // Si el DTO trae un ID (en caso de modificar), se lo asignamos para que Spring sepa que debe actualizar
+        if (dto.getIdPlato() != null) {
+            plato.setIdPlato(dto.getIdPlato());
+        }
+
         plato.setNombre(dto.getNombre());
         plato.setPrecio(dto.getPrecio());
         plato.setCosto(dto.getCosto());
         plato.setUnidadVenta(unidadVenta);
 
-        // Se guarda en la base de datos
         return platoRepository.save(plato);
     }
 }
