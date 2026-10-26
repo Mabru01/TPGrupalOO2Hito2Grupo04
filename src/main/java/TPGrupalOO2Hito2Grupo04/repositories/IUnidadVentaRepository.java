@@ -12,4 +12,7 @@ public interface IUnidadVentaRepository extends JpaRepository<UnidadVenta, Long>
     // Método para buscar por código único
     public abstract Optional<UnidadVenta> findByCodigoUnico(String codigoUnico);
     public abstract boolean existsByCodigoUnico(String codigo);
+
+    // Unidad de venta a cargo del responsable que inició sesión
+    public abstract Optional<UnidadVenta> findByResponsableMail(String mail);
 }

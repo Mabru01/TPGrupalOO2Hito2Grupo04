@@ -5,20 +5,31 @@
     <nav th:replace="~{layout :: navbar}"></nav>
 
     <main class="container py-4">
-        <h1 class="my-4">Liquidación de sueldo</h1>
+        <h1 class="my-4" th:text="${rol == 'EMPLEADO' ? 'Mi sueldo' : 'Liquidación de sueldo'}">Liquidación de sueldo</h1>
 
-        <form th:action="@{/liquidacion}" method="get" class="form-row align-items-end mb-4">
-            <div class="col-md-5 mb-2">
-                <label for="festivalId">Festival</label>
-                <select class="form-control" id="festivalId" name="festivalId" required>
-                    <option value="">Elegí un festival</option>
-                    <option th:each="f : ${festivales}" th:value="${f.idFestival}" th:text="${f.nombre}"
-                            th:selected="${f.idFestival == festivalId}">Festival</option>
-                </select>
-            </div>
-            <div class="col-md-5 mb-2">
+        <div th:if="${error != null}" class="alert alert-warning" th:text="${error}">Error</div>
+
+        <!-- Administrador: elige cualquier empleado; el festival es el de su unidad -->
+        <form th:if="${rol == 'ADMIN'}" th:action="@{/liquidacion}" method="get" class="form-row align-items-end mb-4">
+            <div class="col-md-10 mb-2">
                 <label for="staffId">Empleado</label>
                 <select class="form-control" id="staffId" name="staffId" required>
+                    <option value="">Elegí un empleado</option>
+                    <option th:each="e : ${empleados}" th:value="${e.idStaff}"
+                            th:text="${e.nombre + ' ' + e.apellido + (e.unidadVenta != null ? ' — ' + e.unidadVenta.nombreComercial + ' (' + e.unidadVenta.festival.nombre + ')' : ' — sin unidad asignada')}"
+                            th:selected="${e.idStaff == staffId}">Empleado</option>
+                </select>
+            </div>
+            <div class="col-md-2 mb-2">
+                <button type="submit" class="btn btn-epicentro btn-block">Calcular</button>
+            </div>
+        </form>
+
+        <!-- Responsable: elige entre los empleados de su unidad -->
+        <form th:if="${rol == 'RESPONSABLE' and unidad != null}" th:action="@{/liquidacion}" method="get" class="form-row align-items-end mb-4">
+            <div class="col-md-10 mb-2">
+                <label for="staffIdResp">Empleado de <strong th:text="${unidad}">tu unidad</strong></label>
+                <select class="form-control" id="staffIdResp" name="staffId" required>
                     <option value="">Elegí un empleado</option>
                     <option th:each="e : ${empleados}" th:value="${e.idStaff}"
                             th:text="${e.nombre + ' ' + e.apellido}"
@@ -26,18 +37,28 @@
                 </select>
             </div>
             <div class="col-md-2 mb-2">
-                <button type="submit" class="btn btn-primary btn-block">Calcular</button>
+                <button type="submit" class="btn btn-epicentro btn-block">Calcular</button>
             </div>
         </form>
 
         <div th:if="${liquidacion != null}" class="card">
-            <h4 class="card-header">
-                <span th:text="${liquidacion.empleado}">Empleado</span>
-                <small class="text-muted" th:text="${'· ' + liquidacion.tipo}">· Tipo</small>
+            <h4 class="card-header d-flex flex-wrap justify-content-between align-items-center">
+                <span>
+                    <span th:text="${liquidacion.empleado}">Empleado</span>
+                    <small class="text-muted" th:text="${'· ' + liquidacion.tipo}">· Tipo</small>
+                </span>
+                <a class="btn btn-epicentro btn-sm"
+                   th:href="@{/liquidacion/recibo(staffId=${liquidacion.idStaff})}">
+                    Descargar recibo (PDF)
+                </a>
             </h4>
             <div class="card-body">
                 <table class="table mb-0">
                     <tbody>
+                        <tr>
+                            <th>Unidad de venta</th>
+                            <td th:text="${liquidacion.unidad}">Unidad</td>
+                        </tr>
                         <tr>
                             <th>Festival</th>
                             <td th:text="${liquidacion.festival + ' (' + liquidacion.diasFestival + ' días)'}">Festival</td>
