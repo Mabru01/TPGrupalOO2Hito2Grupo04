@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: ${DB_URL}
-    username: ${USERNAME}
-    password: ${PASSWORD}
+    url:
+    username:
+    password:
   jpa:
     show-sql: true
     hibernate:
@@ -11,3 +11,12 @@ spring:
       dialect: org.hibernate.dialect.MySQL5Dialect
   thymeleaf:
     cache: false
+
+mail:
+  smtp:
+    host: smtp.gmail.com
+    port: 587
+    username: maxibruni01@gmail.com
+    password: "stcm ghdo lbxa iilu"
+    from: maxibruni01@gmail.com
+

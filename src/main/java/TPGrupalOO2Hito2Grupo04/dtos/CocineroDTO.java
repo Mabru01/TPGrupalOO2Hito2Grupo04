@@ -16,10 +16,12 @@ public class CocineroDTO extends StaffDTO{
 
     private String especialidad;
 
-
     public CocineroDTO(long dni, String nombre, String apellido, LocalDate fechaNacimiento,
-                       LocalDate fechaIngreso, float sueldoBase, LocalDate fechaEgreso, Long idUnidadVenta, String categoria, String especialidad) {
-        super(dni, nombre, apellido, fechaNacimiento, fechaIngreso, sueldoBase, fechaEgreso, idUnidadVenta);
+                       LocalDate fechaIngreso, float sueldoBase, LocalDate fechaEgreso,
+                       Long idUnidadVenta, String categoria, String especialidad, String emailEmpleado,
+                       String passwordStaff, Long idUsuario) {
+        super(dni, nombre, apellido, fechaNacimiento, fechaIngreso, sueldoBase, fechaEgreso,
+                idUnidadVenta, emailEmpleado, passwordStaff, idUsuario);
         this.categoria = categoria;
         this.especialidad = especialidad;
     }

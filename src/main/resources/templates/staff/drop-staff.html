@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{layout :: head}"></head>
+<body>
+<nav th:replace="~{layout :: navbar}"></nav>
+
+<main class="container py-4">
+    <div class="page-header mb-4">
+        <h2>Baja De Empleado</h2>
+    </div>
+
+    <!-- Alerta de error si existe -->
+    <div th:if="${error}" class="alert alert-danger text-center" role="alert">
+        <span th:text="${error}">Mensaje de error</span>
+    </div>
+
+    <div class="card form-card">
+        <div class="card-body">
+            <!-- Paso 1: elegir empleado (siempre visible) -->
+            <form th:action="@{/staff/baja}" method="get">
+                <h5 class="text-secondary border-bottom pb-2 mb-3">Datos del empleado</h5>
+                <div class="mb-3">
+                    <label for="idStaff" class="col-form-label">Empleado a dar de baja</label>
+                    <select class="form-control" id="idStaff" name="idStaff" required onchange="this.form.submit()">
+                        <option value="">Seleccione un empleado</option>
+                        <option th:each="s : ${staffs}"
+                                th:value="${s.idStaff}"
+                                th:text="${s.nombre + ' ' + s.apellido}"
+                                th:selected="${staffDTO != null and staffDTO.idStaff == s.idStaff}">Empleado</option>
+                    </select>
+                </div>
+            </form>
+
+            <!-- Paso 2: confirmar baja (solo si se seleccionó un empleado) -->
+            <div th:if="${staffDTO != null}" class="mt-4 pt-3 border-top">
+                <h5 class="text-danger">Confirmar baja</h5>
+                <p>¿Está seguro que desea dar de baja al empleado <strong th:text="${staffDTO.nombre + ' ' + staffDTO.apellido}"></strong>?</p>
+                <form th:action="@{/staff/baja}" method="post">
+                    <input type="hidden" name="idStaff" th:value="${staffDTO.idStaff}"/>
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-danger">Confirmar baja</button>
+                        <a th:href="@{/staff/baja}" class="btn btn-secondary">Cancelar</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</main>
+<footer th:replace="~{layout :: footer}"></footer>
+<div th:replace="~{layout :: scripts}"></div>
+</body>
+</html>
