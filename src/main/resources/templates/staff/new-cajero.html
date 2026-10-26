@@ -23,6 +23,18 @@
                 <h5 class="text-secondary border-bottom pb-2 mb-3">Datos del empleado</h5>
 
                 <div class="mb-3">
+                    <label for="emailStaff" class="col-form-label">Correo Electrónico</label>
+                    <input type="email" class="form-control" id="emailStaff"
+                           th:field="*{emailStaff}" required placeholder="ejemplo@correo.com"/>
+                </div>
+
+                <div class="mb-3">
+                    <label for="passwordStaff" class="col-form-label">Contraseña Inicial</label>
+                    <input type="password" class="form-control" id="passwordStaff"
+                           th:field="*{passwordStaff}" required placeholder="Ingrese una clave para el usuario"/>
+                </div>
+
+                <div class="mb-3">
                     <label for="idUnidadVenta" class="col-form-label">Unidad de Venta</label>
                     <select class="form-control" id="idUnidadVenta" th:field="*{idUnidadVenta}" required>
                         <option value="">Seleccione una unidad de venta</option>

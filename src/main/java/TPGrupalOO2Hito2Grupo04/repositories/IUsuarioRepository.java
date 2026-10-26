@@ -15,4 +15,9 @@ public interface IUsuarioRepository extends JpaRepository<Usuario, Serializable>
     public abstract Usuario findByMailAndFetchRolEagerly(@Param("mail") String mail);
     Optional<Usuario> findByMail(String mail);
 
+    @Query("SELECT u FROM Usuario u JOIN FETCH u.rol WHERE u.id = (:id)")
+    public abstract Usuario findByIdAndFetchRolEagerly(@Param("id") Serializable id);
+    Optional<Usuario> findById(Serializable id);
+
+
 }
