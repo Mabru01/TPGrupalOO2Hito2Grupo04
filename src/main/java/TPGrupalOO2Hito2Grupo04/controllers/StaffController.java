@@ -5,6 +5,7 @@ import TPGrupalOO2Hito2Grupo04.services.IStaffService;
 import TPGrupalOO2Hito2Grupo04.helpers.ViewRouteHelper;
 import TPGrupalOO2Hito2Grupo04.services.IUnidadVentaService;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
@@ -14,6 +15,7 @@ import java.util.Optional;
 
 @Controller
 @RequestMapping("/staff")
+@PreAuthorize("hasAnyAuthority('RESPONSABLE', 'EMPLEADO')")
 public class StaffController {
     private static final String STAFF_ATTR = "staffDTO";
 

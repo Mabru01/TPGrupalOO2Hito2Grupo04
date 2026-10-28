@@ -69,7 +69,7 @@ public class LiquidacionService implements ILiquidacionService {
 
     @Override
     public Optional<UnidadVenta> getUnidadDeResponsable(String mail) {
-        return unidadVentaRepository.findByResponsableMail(mail);
+        return unidadVentaRepository.findByResponsable_Mail(mail);
     }
 
     @Override

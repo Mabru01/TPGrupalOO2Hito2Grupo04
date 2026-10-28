@@ -29,7 +29,7 @@
                     </li>
                     <!-- El Responsable ve solo su unidad asignada -->
                     <li class="nav-item" sec:authorize="hasAnyAuthority('RESPONSABLE')">
-                        <a class="nav-link" th:href="@{/unidadVenta/mi-unidad}">Unidad asignada</a>
+                        <a class="nav-link" th:href="@{/unidadVenta/mi-unidad}">Mi unidad</a>
                     </li>
                     <li class="nav-item" sec:authorize="hasAnyAuthority('RESPONSABLE')">
                         <a class="nav-link" th:href="@{/liquidacion}">Liquidaciónes</a>

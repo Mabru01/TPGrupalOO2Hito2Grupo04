@@ -2,8 +2,11 @@ package TPGrupalOO2Hito2Grupo04.repositories;
 
 import TPGrupalOO2Hito2Grupo04.entities.UnidadVenta;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository("unidadVentaRepository")
@@ -13,6 +16,7 @@ public interface IUnidadVentaRepository extends JpaRepository<UnidadVenta, Long>
     public abstract Optional<UnidadVenta> findByCodigoUnico(String codigoUnico);
     public abstract boolean existsByCodigoUnico(String codigo);
 
-    // Unidad de venta a cargo del responsable que inició sesión
-    public abstract Optional<UnidadVenta> findByResponsableMail(String mail);
+    // Unidad de ventas a cargo del responsable que inició sesión
+
+    Optional<UnidadVenta> findByResponsable_Mail(String mail);
 }

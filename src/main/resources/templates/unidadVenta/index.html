@@ -5,8 +5,9 @@
 <nav th:replace="~{layout :: navbar}"></nav>
 
 <main class="container py-4">
-    <div class="page-header mb-4 d-flex justify-content-between align-items-center">
-        <h2>Unidades de Venta</h2>
+    <div class="page-header mb-4 d-flex justify-content-between align-items-center" >
+        <h2 sec:authorize="hasAnyAuthority('ADMIN', 'ROLE_ADMIN')" >Unidades de Venta</h2>
+        <h2 sec:authorize="hasAnyAuthority('RESPONSABLE')" >Unidad a cargo</h2>
     </div>
 
     <table class="table table-striped">

@@ -1,6 +1,7 @@
 package TPGrupalOO2Hito2Grupo04.services.implementation;
 
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -147,5 +148,8 @@ public class UnidadVentaService implements IUnidadVentaService {
         return unidad.calcularCanon();
     }
 
-
+    @Override
+    public Optional<UnidadVenta> findByResponsable(String mail) {
+        return unidadVentaRepository.findByResponsable_Mail(mail);
+    }
 }
