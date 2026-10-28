@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head th:replace="~{layout :: head}"></head>
 <body>
 <nav th:replace="~{layout :: navbar}"></nav>
@@ -7,10 +7,6 @@
 <main class="container py-4">
     <div class="page-header mb-4 d-flex justify-content-between align-items-center">
         <h2>Unidades de Venta</h2>
-        <div>
-            <a th:href="@{/unidadVenta/nuevo/food-truck}" class="btn btn-success me-2">Nuevo Food Truck</a>
-            <a th:href="@{/unidadVenta/nuevo/puesto-desarmable}" class="btn btn-success">Nuevo Puesto Desarmable</a>
-        </div>
     </div>
 
     <table class="table table-striped">
@@ -19,7 +15,7 @@
             <th>Nombre comercial</th>
             <th>Código único</th>
             <th>Superficie</th>
-            <th class="text-center">Acciones</th>
+            <th class="text-center" sec:authorize="hasAnyAuthority('RESPONSABLE')" >Acciones</th>
         </tr>
         </thead>
         <tbody>
@@ -27,8 +23,8 @@
             <td th:text="${u.nombreComercial}"></td>
             <td th:text="${u.codigoUnico}"></td>
             <td th:text="${u.superficie}"></td>
-            <td class="text-center">
-                <!-- Botón que abre el modal específico de esta unidad usando su idUnidadVenta -->
+            <td class="text-center" sec:authorize="hasAnyAuthority('RESPONSABLE')" >
+                <!-- Botón para abrir el modal -->
                 <button type="button"
                         class="btn btn-info btn-sm text-white"
                         data-toggle="modal"

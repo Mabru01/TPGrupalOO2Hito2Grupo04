@@ -30,6 +30,7 @@ public class UnidadVentaController {
         return mAV;
     }
 
+
     @GetMapping("/nuevo/food-truck")
     public ModelAndView nuevoFoodTruck() {
         ModelAndView mAV = new ModelAndView(ViewRouteHelper.UnidadVenta_NEW_FOOD_TRUCK);
