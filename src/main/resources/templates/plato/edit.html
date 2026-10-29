@@ -18,10 +18,10 @@
     <div class="card form-card">
         <div class="card-body">
             <form th:action="@{/plato/actualizar}" th:object="${platoDTO}" method="post">
-                <!-- El ID oculto para que sepa qué registro actualizar -->
+                <!-- Uso de ID para actualizar -->
                 <input type="hidden" th:field="*{idPlato}" />
 
-                <!-- Campo oculto para manejar la edición por ID -->
+                <!-- Manejar la edición por ID -->
                 <input type="hidden" th:field="*{idPlato}" />
 
                 <div class="mb-3">

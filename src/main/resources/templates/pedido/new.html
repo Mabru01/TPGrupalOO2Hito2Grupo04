@@ -19,7 +19,7 @@
                 </div>
                 <div class="card-body">
 
-                    <!-- Formulario conectado dinámicamente para Guardar o Actualizar -->
+                    <!-- Formulario Guardar o Actualizar -->
                     <form th:action="${pedidoDTO.idPedido != null} ? @{/pedido/actualizar/{id}(id=${pedidoDTO.idPedido})} : @{/pedido/guardar}"
                           th:object="${pedidoDTO}" method="post" id="formPedido">
 
@@ -49,10 +49,9 @@
                             </button>
                         </div>
 
-                        <!-- Contenedor dinámico de ítems (Soporta edición con datos previos o alta vacía) -->
                         <div id="contenedor-items">
 
-                            <!-- Si es edición y ya tiene ítems -->
+                            <!-- Modificacion -->
                             <th:block th:if="${pedidoDTO.items != null and !pedidoDTO.items.empty}">
                                 <div class="form-row item-row mb-3 align-items-end" th:each="item, iterStat : ${pedidoDTO.items}">
                                     <div class="form-group col-md-7 mb-0">
@@ -77,7 +76,7 @@
                                 </div>
                             </th:block>
 
-                            <!-- Si es un pedido nuevo (sin ítems previos) -->
+                            <!-- Pedido nuevo -->
                             <th:block th:if="${pedidoDTO.items == null or pedidoDTO.items.empty}">
                                 <div class="form-row item-row mb-3 align-items-end">
                                     <div class="form-group col-md-7 mb-0">
@@ -98,7 +97,7 @@
 
                         </div>
 
-                        <!-- Select oculto para guardar todas las opciones originales de platos y filtrarlas -->
+                        <!-- Select para guardar y filtrar -->
                         <select id="plantilla-platos" class="d-none">
                             <option value="">-- Seleccione un plato --</option>
                             <option th:each="plato : ${platos}"
@@ -107,7 +106,7 @@
                                     th:data-unidad="${plato.unidadVenta != null ? plato.unidadVenta.idUnidadVenta : ''}"></option>
                         </select>
 
-                        <!-- Botones de acción dinámicos -->
+                        <!-- Botones de accion -->
                         <div class="form-group text-right mt-4">
                             <a th:href="@{/pedido}" class="btn btn-secondary">Cancelar</a>
                             <button type="submit" class="btn btn-success" th:text="${pedidoDTO.idPedido != null} ? 'Actualizar Pedido' : 'Guardar Pedido'">Guardar Pedido</button>
@@ -126,7 +125,7 @@
 <div th:replace="~{layout :: scripts}"></div>
 
 
-<!-- Script para Filtrar Platos y Gestionar Filas Dinámicas -->
+<!-- Script para Filtrar Platos -->
 <script>
     document.addEventListener("DOMContentLoaded", function() {
         actualizarIndices();
