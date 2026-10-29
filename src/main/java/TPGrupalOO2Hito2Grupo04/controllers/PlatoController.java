@@ -3,9 +3,7 @@ package TPGrupalOO2Hito2Grupo04.controllers;
 import TPGrupalOO2Hito2Grupo04.dtos.PlatoDTO;
 import TPGrupalOO2Hito2Grupo04.entities.Festival;
 import TPGrupalOO2Hito2Grupo04.entities.Plato;
-import TPGrupalOO2Hito2Grupo04.entities.Staff;
 import TPGrupalOO2Hito2Grupo04.entities.UnidadVenta;
-import TPGrupalOO2Hito2Grupo04.repositories.IStaffRepository;
 import TPGrupalOO2Hito2Grupo04.services.IPlatoService;
 import TPGrupalOO2Hito2Grupo04.services.IUnidadVentaService;
 import TPGrupalOO2Hito2Grupo04.services.IFestivalService;
@@ -30,20 +28,17 @@ public class PlatoController {
 
     private final IPlatoService platoService;
     private final IUnidadVentaService unidadVentaService;
-    private final IStaffRepository staffRepository;
     private final ModelMapper modelMapper;
     private final IFestivalService festivalService;
     private final IPedidoService pedidoService;
 
     public PlatoController(IPlatoService platoService,
                            IUnidadVentaService unidadVentaService,
-                           IStaffRepository staffRepository,
                            ModelMapper modelMapper,
                            IFestivalService festivalService,
                            IPedidoService pedidoService) {
         this.platoService = platoService;
         this.unidadVentaService = unidadVentaService;
-        this.staffRepository = staffRepository;
         this.modelMapper = modelMapper;
         this.festivalService = festivalService;
         this.pedidoService = pedidoService;
@@ -57,11 +52,7 @@ public class PlatoController {
 
         ModelAndView mAV = new ModelAndView("plato/index");
 
-        String emailUsuario = SecurityContextHolder.getContext().getAuthentication().getName();
-        Staff staff = staffRepository.findByUsuarioMail(emailUsuario)
-                .orElseThrow(() -> new RuntimeException("Staff no encontrado para el usuario actual"));
-
-        UnidadVenta unidadVentaStaff = staff.getUnidadVenta();
+        UnidadVenta unidadVentaStaff = unidadDelResponsable();
         Festival festivalStaff = unidadVentaStaff.getFestival();
 
         // Filtro de los platos
@@ -103,12 +94,11 @@ public class PlatoController {
     public ModelAndView nuevoPlato() {
         ModelAndView mAV = new ModelAndView("plato/new");
 
-        String emailUsuario = SecurityContextHolder.getContext().getAuthentication().getName();
-        Staff staff = staffRepository.findByUsuarioMail(emailUsuario).orElseThrow();
+        UnidadVenta unidadVenta = unidadDelResponsable();
 
         mAV.addObject(PLATO_ATTR, new PlatoDTO());
-        mAV.addObject("unidadVenta", staff.getUnidadVenta());
-        mAV.addObject("festival", staff.getUnidadVenta().getFestival());
+        mAV.addObject("unidadVenta", unidadVenta);
+        mAV.addObject("festival", unidadVenta.getFestival());
 
         return mAV;
     }
@@ -117,18 +107,18 @@ public class PlatoController {
     @PostMapping("/guardar")
     public ModelAndView guardarPlato(@ModelAttribute(PLATO_ATTR) PlatoDTO platoDTO) {
         ModelAndView mAV = new ModelAndView();
+        UnidadVenta unidadVenta = unidadDelResponsable();
+        // El plato siempre se guarda en la unidad del responsable logueado
+        platoDTO.setIdUnidadVenta(unidadVenta.getIdUnidadVenta());
         try {
             Plato platoRegistrado = platoService.registrarPlato(platoDTO);
             mAV.setViewName("plato/success");
             mAV.addObject("plato", platoRegistrado);
         } catch (IllegalArgumentException e) {
             mAV.setViewName("plato/new");
-            String emailUsuario = SecurityContextHolder.getContext().getAuthentication().getName();
-            Staff staff = staffRepository.findByUsuarioMail(emailUsuario).orElseThrow();
-
             mAV.addObject(PLATO_ATTR, platoDTO);
-            mAV.addObject("unidadVenta", staff.getUnidadVenta());
-            mAV.addObject("festival", staff.getUnidadVenta().getFestival());
+            mAV.addObject("unidadVenta", unidadVenta);
+            mAV.addObject("festival", unidadVenta.getFestival());
             mAV.addObject("error", e.getMessage());
         }
         return mAV;
@@ -137,6 +127,9 @@ public class PlatoController {
     // Eliminar plato por ID
     @GetMapping("/eliminar/{id}")
     public String eliminarPlato(@PathVariable("id") Long id, RedirectAttributes redirect) {
+        if (!esDeMiUnidad(id)) {
+            return "redirect:/plato";
+        }
         boolean eliminado = platoService.eliminar(id);
         if (eliminado) {
             redirect.addFlashAttribute("exito", "Plato eliminado correctamente.");
@@ -149,6 +142,9 @@ public class PlatoController {
     // Carga de datos para modificar.
     @GetMapping("/editar/{id}")
     public ModelAndView editarPlato(@PathVariable("id") Long id) {
+        if (!esDeMiUnidad(id)) {
+            return new ModelAndView("redirect:/plato");
+        }
         ModelAndView mAV = new ModelAndView("plato/edit");
 
         Optional<Plato> platoOpt = platoService.traerPorId(id);
@@ -172,6 +168,10 @@ public class PlatoController {
     // Modificar un plato existente.
     @PostMapping("/actualizar")
     public ModelAndView actualizarPlato(@ModelAttribute(PLATO_ATTR) PlatoDTO platoDTO) {
+        if (!esDeMiUnidad(platoDTO.getIdPlato())) {
+            return new ModelAndView("redirect:/plato");
+        }
+        platoDTO.setIdUnidadVenta(unidadDelResponsable().getIdUnidadVenta());
         ModelAndView mAV = new ModelAndView();
         try {
             Plato platoActualizado = platoService.registrarPlato(platoDTO);
@@ -190,5 +190,23 @@ public class PlatoController {
             mAV.addObject("error", e.getMessage());
         }
         return mAV;
+    }
+
+    // Unidad de venta a cargo del responsable logueado
+    private UnidadVenta unidadDelResponsable() {
+        String emailUsuario = SecurityContextHolder.getContext().getAuthentication().getName();
+        return unidadVentaService.findByResponsable(emailUsuario)
+                .orElseThrow(() -> new RuntimeException("El responsable no tiene una unidad de venta a cargo"));
+    }
+
+    // Verifica que el plato exista y sea de la unidad del responsable logueado
+    private boolean esDeMiUnidad(Long idPlato) {
+        if (idPlato == null) {
+            return false;
+        }
+        long idUnidad = unidadDelResponsable().getIdUnidadVenta();
+        return platoService.traerPorId(idPlato)
+                .map(p -> p.getUnidadVenta() != null && p.getUnidadVenta().getIdUnidadVenta() == idUnidad)
+                .orElse(false);
     }
 }
