@@ -21,7 +21,7 @@ public class PedidoDTO {
 
     private boolean terminado;
 
-    // Lista para recibir los ítems seleccionados en el formulario de alta
+    // Lista para recibir los ítems seleccionados
     private List<ItemPedidoDTO> items = new ArrayList<>();
 
     public PedidoDTO(LocalDate fechaTransaccion, Long idUnidadVenta, boolean terminado) {

@@ -13,7 +13,6 @@
                 <h2>Modificar Plato</h2>
             </div>
 
-            <!-- Tarjeta informativa de la Unidad de Venta -->
             <div class="card bg-light border-primary mb-4 shadow-sm" th:if="${unidadVenta != null}">
                 <div class="card-body text-center">
                     <h5 class="card-title text-primary"><i class="bi bi-info-circle"></i> Destino del Plato</h5>
@@ -22,7 +21,6 @@
                 </div>
             </div>
 
-            <!-- Alerta de error si existe -->
             <div th:if="${error}" class="alert alert-danger text-center" role="alert">
                 <span th:text="${error}">Mensaje de error</span>
             </div>
@@ -30,7 +28,6 @@
             <div class="card form-card shadow-sm">
                 <div class="card-body">
                     <form th:action="@{/plato/actualizar}" th:object="${platoDTO}" method="post">
-                        <!-- Uso de ID para actualizar -->
                         <input type="hidden" th:field="*{idPlato}" />
 
                         <div class="mb-3">

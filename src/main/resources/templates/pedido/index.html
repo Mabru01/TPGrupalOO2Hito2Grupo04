@@ -6,7 +6,6 @@
 
 <main class="container py-4">
 
-    <!-- Tarjeta informativa con el Festival y la Unidad -->
     <div class="card bg-light border-primary mb-4 shadow-sm" th:if="${unidadVenta != null}">
         <div class="card-body">
             <h5 class="card-title text-primary"><i class="bi bi-shop"></i> Mi Unidad Asignada</h5>
@@ -22,11 +21,9 @@
         </a>
     </div>
 
-    <!-- Mensajes de éxito o error -->
     <div th:if="${exito}" class="alert alert-success text-center" role="alert" th:text="${exito}"></div>
     <div th:if="${error}" class="alert alert-danger text-center" role="alert" th:text="${error}"></div>
 
-    <!-- Tabla de Pedidos -->
     <div class="card shadow-sm">
         <div class="card-body p-0">
             <div class="table-responsive">
@@ -34,7 +31,7 @@
                     <thead class="table-dark">
                     <tr>
                         <th>Número</th>
-                        <th>Precio Total</th> <!-- CAMBIADO AQUÍ -->
+                        <th>Precio Total</th>
                         <th>Fecha de Transacción</th>
                         <th class="text-center">Estado</th>
                         <th class="text-center">Acciones</th>
@@ -48,7 +45,6 @@
                         </td>
                     </tr>
 
-                    <!-- Iteración sobre la lista de pedidos -->
                     <tr th:each="pedido : ${pedidos}">
                         <td class="font-weight-bold" th:text="${'#' + pedido.idPedido}">#1</td>
                         <td th:text="${'$' + #numbers.formatDecimal(pedido.precioTotal, 1, 'POINT', 2, 'COMMA')}">$0.00</td> <!-- CAMBIADO AQUÍ -->
@@ -58,7 +54,6 @@
                             <span th:unless="${pedido.terminado}" class="badge badge-warning px-2 py-1 text-dark">En curso</span>
                         </td>
                         <td class="text-center">
-                            <!-- Botón Ver Detalles -->
                             <button type="button"
                                     class="btn btn-info btn-sm text-white"
                                     data-toggle="modal"
@@ -66,10 +61,8 @@
                                 Ver detalles
                             </button>
 
-                            <!-- Botón Editar -->
                             <a th:href="@{/pedido/editar/{id}(id=${pedido.idPedido})}" class="btn btn-warning btn-sm">Editar</a>
 
-                            <!-- Botón Eliminar -->
                             <button type="button"
                                     class="btn btn-danger btn-sm"
                                     data-toggle="modal"
@@ -87,7 +80,6 @@
     </div>
 </main>
 
-<!-- Modales y scripts se mantienen igual -->
 <footer th:replace="~{layout :: footer}"></footer>
 <div th:replace="~{layout :: scripts}"></div>
 </body>

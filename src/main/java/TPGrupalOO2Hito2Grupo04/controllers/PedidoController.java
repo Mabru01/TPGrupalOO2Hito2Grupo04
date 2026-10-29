@@ -38,7 +38,7 @@ public class PedidoController {
         this.staffRepository = staffRepository;
     }
 
-    // Listado principal de pedidos (Filtrado por la unidad del usuario logueado)
+    // Listado principal de pedidos.
     @GetMapping("")
     public String listarPedidos(Model model) {
         String emailUsuario = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -91,20 +91,18 @@ public class PedidoController {
     public String guardarPedido(@ModelAttribute("pedidoDTO") PedidoDTO pedidoDTO,
                                 RedirectAttributes redirectAttributes) {
         try {
-            // Asignar por seguridad la unidad de venta mediante la sesión activa
             String emailUsuario = SecurityContextHolder.getContext().getAuthentication().getName();
             Staff staff = staffRepository.findByUsuarioMail(emailUsuario).orElseThrow();
             pedidoDTO.setIdUnidadVenta(staff.getUnidadVenta().getIdUnidadVenta());
 
             pedidoService.insertarPedido(pedidoDTO);
-            redirectAttributes.addFlashAttribute("exito", "¡Pedido registrado correctamente!");
+            redirectAttributes.addFlashAttribute("exito", "Pedido registrado correctamente");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", "No se pudo registrar el pedido: " + e.getMessage());
         }
         return "redirect:/pedido";
     }
 
-    // Mostrar formulario de modificación cargando el pedido existente
     // Mostrar formulario de modificación cargando el pedido existente
     @GetMapping("/editar/{id}")
     public String mostrarFormularioEditar(@PathVariable("id") Long id, Model model) {
@@ -125,7 +123,6 @@ public class PedidoController {
             pedidoDTO.setIdUnidadVenta(unidadVenta.getIdUnidadVenta());
         }
 
-        // Se mapean los ítems existentes al DTO
         List<ItemPedidoDTO> itemDTOs = pedido.getItems().stream().map(item -> {
             ItemPedidoDTO iDto = new ItemPedidoDTO();
             iDto.setIdPlato(item.getPlato().getIdPlato());
@@ -135,7 +132,6 @@ public class PedidoController {
 
         pedidoDTO.setItems(itemDTOs);
 
-        // CORREGIDO: Usamos List<Plato> en lugar de List<var>
         List<Plato> platosUnidad = platoService.traerTodos().stream()
                 .filter(p -> p.getUnidadVenta() != null && unidadVenta != null && p.getUnidadVenta().getIdUnidadVenta() == unidadVenta.getIdUnidadVenta())
                 .collect(Collectors.toList());
@@ -152,13 +148,12 @@ public class PedidoController {
     @PostMapping("/actualizar/{id}")
     public String actualizarPedido(@PathVariable("id") Long id, @ModelAttribute("pedidoDTO") PedidoDTO pedidoDTO, RedirectAttributes redirectAttributes) {
         try {
-            // Asegurar la unidad por sesión en la actualización
             String emailUsuario = SecurityContextHolder.getContext().getAuthentication().getName();
             Staff staff = staffRepository.findByUsuarioMail(emailUsuario).orElseThrow();
             pedidoDTO.setIdUnidadVenta(staff.getUnidadVenta().getIdUnidadVenta());
 
             pedidoService.actualizarPedido(id, pedidoDTO);
-            redirectAttributes.addFlashAttribute("exito", "¡Pedido actualizado correctamente!");
+            redirectAttributes.addFlashAttribute("exito", "Pedido actualizado correctamente");
             return "redirect:/pedido";
         } catch (Exception e) {
             return "redirect:/pedido/editar/" + id + "?error=" + e.getMessage();
@@ -171,7 +166,7 @@ public class PedidoController {
         try {
             boolean eliminado = pedidoService.eliminar(id);
             if (eliminado) {
-                redirectAttributes.addFlashAttribute("exito", "¡Pedido eliminado correctamente!");
+                redirectAttributes.addFlashAttribute("exito", "Pedido eliminado correctamente");
             } else {
                 redirectAttributes.addFlashAttribute("error", "No se pudo encontrar el pedido a eliminar.");
             }

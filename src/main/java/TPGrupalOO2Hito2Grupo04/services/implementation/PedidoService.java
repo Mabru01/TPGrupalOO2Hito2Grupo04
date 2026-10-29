@@ -38,7 +38,7 @@ public class PedidoService implements IPedidoService {
     private final IPedidoRepository pedidoRepository;
     private final IPlatoRepository platoRepository;
     private final IUnidadVentaRepository unidadVentaRepository;
-    private final IStaffRepository staffRepository; // Inyectamos staffRepository
+    private final IStaffRepository staffRepository;
     private final ModelMapper modelMapper;
 
     public PedidoService(IPedidoRepository pedidoRepository,
@@ -90,12 +90,10 @@ public class PedidoService implements IPedidoService {
         try {
             UnidadVenta unidadVenta;
 
-            // Si el DTO trae un idUnidadVenta (lo puede usar un Admin desde el backend si hiciera falta)
             if (pedidoDTO.getIdUnidadVenta() != null) {
                 unidadVenta = unidadVentaRepository.findById(pedidoDTO.getIdUnidadVenta())
                         .orElseThrow(() -> new Exception("Unidad de venta no encontrada con ID: " + pedidoDTO.getIdUnidadVenta()));
             } else {
-                // Si no lo trae (lo usa el Empleado / Cajero), lo obtenemos automáticamente del usuario logueado
                 String emailUsuario = SecurityContextHolder.getContext().getAuthentication().getName();
 
                 Staff staff = staffRepository.findByUsuarioMail(emailUsuario)
@@ -114,7 +112,6 @@ public class PedidoService implements IPedidoService {
 
             Pedido pedidoGuardado = pedidoRepository.save(pedido);
 
-            // Proceso de los ítems del pedido si existen en el DTO
             if (pedidoDTO.getItems() != null && !pedidoDTO.getItems().isEmpty()) {
                 for (ItemPedidoDTO itemDTO : pedidoDTO.getItems()) {
                     Plato plato = platoRepository.findById(itemDTO.getIdPlato())
@@ -124,7 +121,6 @@ public class PedidoService implements IPedidoService {
                     itemPedido.setCantidad(itemDTO.getCantidad());
                     itemPedido.setPlato(plato);
 
-                    // Asigna el pedido automáticamente con uso de Helper
                     pedido.agregarItem(itemPedido);
                 }
 
@@ -144,7 +140,6 @@ public class PedidoService implements IPedidoService {
     @Override
     @Transactional
     public Pedido actualizarPedido(Long id, PedidoDTO pedidoDTO) throws Exception {
-        // Buscar si el pedido existe
         Pedido pedidoExistente = pedidoRepository.findById(id)
                 .orElseThrow(() -> new Exception("Pedido no encontrado con ID: " + id));
 
@@ -163,7 +158,7 @@ public class PedidoService implements IPedidoService {
         pedidoExistente.setUnidadVenta(unidadVenta);
 
         // Actualizar los ítems utilizando orphanRemoval
-        pedidoExistente.getItems().clear(); // Borra los anteriores con orphanRemoval = true
+        pedidoExistente.getItems().clear();
 
         if (pedidoDTO.getItems() != null && !pedidoDTO.getItems().isEmpty()) {
             for (ItemPedidoDTO itemDTO : pedidoDTO.getItems()) {
@@ -174,7 +169,6 @@ public class PedidoService implements IPedidoService {
                 itemPedido.setCantidad(itemDTO.getCantidad());
                 itemPedido.setPlato(plato);
 
-                // Uso de helper para mantener la bidireccionalidad
                 pedidoExistente.agregarItem(itemPedido);
             }
         }

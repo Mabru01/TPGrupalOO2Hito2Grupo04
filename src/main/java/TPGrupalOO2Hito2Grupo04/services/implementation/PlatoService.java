@@ -29,7 +29,7 @@ public class PlatoService implements IPlatoService {
 
     private final IPlatoRepository platoRepository;
     private final IUnidadVentaRepository unidadVentaRepository;
-    private final IStaffRepository staffRepository; // Inyectamos el repositorio de staff
+    private final IStaffRepository staffRepository;
     private final ModelMapper modelMapper;
 
     public PlatoService(IPlatoRepository platoRepository,
@@ -86,7 +86,6 @@ public class PlatoService implements IPlatoService {
             unidadVenta = unidadVentaRepository.findById(dto.getIdUnidadVenta())
                     .orElseThrow(() -> new IllegalArgumentException("ERROR: Unidad de venta no encontrada"));
         } else {
-            // Si no lo trae (lo usa el Responsable), lo obtenemos automáticamente del usuario logueado
             String emailUsuario = SecurityContextHolder.getContext().getAuthentication().getName();
 
             Staff staff = staffRepository.findByUsuarioMail(emailUsuario)
@@ -100,7 +99,6 @@ public class PlatoService implements IPlatoService {
 
         Plato plato = new Plato();
 
-        // Si el DTO trae un ID (en caso de modificar), se lo asignamos para que Spring actualice
         if (dto.getIdPlato() != null) {
             plato.setIdPlato(dto.getIdPlato());
         }

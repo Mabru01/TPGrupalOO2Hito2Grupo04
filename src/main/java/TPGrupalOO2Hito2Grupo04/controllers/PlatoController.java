@@ -23,7 +23,7 @@ import java.util.Optional;
 
 @Controller
 @RequestMapping("/plato")
-@PreAuthorize("hasAuthority('RESPONSABLE')") // Limitado exclusivamente a Responsables
+@PreAuthorize("hasAuthority('RESPONSABLE')")
 public class PlatoController {
 
     private static final String PLATO_ATTR = "platoDTO";
@@ -49,37 +49,48 @@ public class PlatoController {
         this.pedidoService = pedidoService;
     }
 
-    // Mostrar la tabla con los platos de la unidad del Responsable
-    // Mostrar la tabla con los platos de la unidad del Responsable
+    // Mostrar la tabla con los platos
     @GetMapping({"", "/"})
     public ModelAndView index(
-            @RequestParam(value = "idFestival", required = false) Long idFestival) {
+            @RequestParam(value = "idFestival", required = false) Long idFestival,
+            @RequestParam(value = "idUnidadVenta", required = false) Long idUnidadVenta) {
 
         ModelAndView mAV = new ModelAndView("plato/index");
 
-        // 1. Obtener usuario logueado
         String emailUsuario = SecurityContextHolder.getContext().getAuthentication().getName();
         Staff staff = staffRepository.findByUsuarioMail(emailUsuario)
                 .orElseThrow(() -> new RuntimeException("Staff no encontrado para el usuario actual"));
 
-        UnidadVenta unidadVenta = staff.getUnidadVenta();
-        Festival festival = unidadVenta.getFestival();
+        UnidadVenta unidadVentaStaff = staff.getUnidadVenta();
+        Festival festivalStaff = unidadVentaStaff.getFestival();
 
-        // 2. Filtrar los platos exclusivamente de la unidad del responsable
+        // Filtro de los platos
         List<Plato> platos = platoService.traerTodos().stream()
-                .filter(p -> p.getUnidadVenta() != null && p.getUnidadVenta().getIdUnidadVenta() == unidadVenta.getIdUnidadVenta())
+                .filter(p -> p.getUnidadVenta() != null && p.getUnidadVenta().getIdUnidadVenta() == unidadVentaStaff.getIdUnidadVenta())
                 .toList();
 
         mAV.addObject("platos", platos);
-        mAV.addObject("unidadVenta", unidadVenta);
-        mAV.addObject("festival", festival);
+        mAV.addObject("unidadVenta", unidadVentaStaff);
+        mAV.addObject("festival", festivalStaff);
 
         mAV.addObject("festivales", festivalService.getAll());
+        mAV.addObject("unidadesVenta", unidadVentaService.getAll());
 
-        if (idFestival != null) {
-            PlatoDTO platoEstrella = pedidoService.encontrarPlatoEstrella(unidadVenta.getIdUnidadVenta(), idFestival);
+        // Logica de Plato Estrella
+        if (idFestival != null && idUnidadVenta != null) {
+            PlatoDTO platoEstrella = pedidoService.encontrarPlatoEstrella(idUnidadVenta, idFestival);
             mAV.addObject("platoEstrella", platoEstrella);
-            mAV.addObject("festivalSeleccionadoNombre", festival.getNombre());
+
+            unidadVentaService.findById(idUnidadVenta).ifPresent(uv -> {
+                String nombreUV = uv.getNombreComercial() != null ? uv.getNombreComercial() : "Unidad sin nombre";
+                mAV.addObject("unidadSeleccionadaTexto", nombreUV);
+            });
+
+            festivalService.findById(idFestival).ifPresent(f -> {
+                mAV.addObject("festivalSeleccionadoNombre", f.getNombre());
+            });
+
+            mAV.addObject("idUnidadSeleccionada", idUnidadVenta);
             mAV.addObject("idFestivalSeleccionado", idFestival);
             mAV.addObject("busquedaRealizada", true);
         }
@@ -87,7 +98,7 @@ public class PlatoController {
         return mAV;
     }
 
-    // Formulario para dar de alta un nuevo plato (Ya no requiere lista de unidades)
+    // Formulario alta plato
     @GetMapping("/nuevo")
     public ModelAndView nuevoPlato() {
         ModelAndView mAV = new ModelAndView("plato/new");
@@ -102,12 +113,11 @@ public class PlatoController {
         return mAV;
     }
 
-    // Guardar o registrar el plato
+    // Guardar o registrar plato
     @PostMapping("/guardar")
     public ModelAndView guardarPlato(@ModelAttribute(PLATO_ATTR) PlatoDTO platoDTO) {
         ModelAndView mAV = new ModelAndView();
         try {
-            // El servicio ya se encarga de asignar la unidad automáticamente por sesión si el DTO viene sin ID de unidad
             Plato platoRegistrado = platoService.registrarPlato(platoDTO);
             mAV.setViewName("plato/success");
             mAV.addObject("plato", platoRegistrado);
@@ -124,7 +134,7 @@ public class PlatoController {
         return mAV;
     }
 
-    // Eliminar un plato por ID
+    // Eliminar plato por ID
     @GetMapping("/eliminar/{id}")
     public String eliminarPlato(@PathVariable("id") Long id, RedirectAttributes redirect) {
         boolean eliminado = platoService.eliminar(id);

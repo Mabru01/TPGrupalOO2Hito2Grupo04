@@ -7,20 +7,18 @@
 </head>
 <body>
 
-<!-- Navbar compartido -->
 <nav th:replace="~{layout :: navbar}"></nav>
 
 <div class="container mt-5 pt-4">
     <div class="row justify-content-center">
         <div class="col-md-9">
 
-            <!-- Tarjeta informativa de la Unidad de Venta Asignada -->
             <div class="card bg-light border-primary mb-4 shadow-sm" th:if="${unidadVenta != null}">
                 <div class="card-body">
                     <h5 class="card-title text-primary"><i class="bi bi-info-circle"></i> Destino del Pedido</h5>
                     <p class="mb-1"><strong>Unidad de Venta:</strong> <span th:text="${unidadVenta.nombreComercial}">Nombre Unidad</span></p>
                     <p class="mb-0"><strong>Festival:</strong> <span th:text="${festival != null ? festival.nombre : '-'}">Nombre Festival</span></p>
-                    <small class="text-muted">El pedido se asociará automáticamente a tu unidad asignada.</small>
+                    <small class="text-muted">El pedido se asociará automáticamente a tu unidad.</small>
                 </div>
             </div>
 
@@ -30,14 +28,11 @@
                 </div>
                 <div class="card-body">
 
-                    <!-- Formulario Guardar o Actualizar -->
                     <form th:action="${pedidoDTO.idPedido != null} ? @{/pedido/actualizar/{id}(id=${pedidoDTO.idPedido})} : @{/pedido/guardar}"
                           th:object="${pedidoDTO}" method="post" id="formPedido">
 
-                        <!-- Campo oculto para la Unidad de Venta (Asignada automáticamente por sesión) -->
                         <input type="hidden" th:field="*{idUnidadVenta}" />
 
-                        <!-- Fecha -->
                         <div class="form-group mb-4">
                             <label for="fechaTransaccion">Fecha:</label>
                             <input type="date" id="fechaTransaccion" class="form-control" th:field="*{fechaTransaccion}" required />
@@ -54,7 +49,6 @@
 
                         <div id="contenedor-items">
 
-                            <!-- Modificacion -->
                             <th:block th:if="${pedidoDTO.items != null and !pedidoDTO.items.empty}">
                                 <div class="form-row item-row mb-3 align-items-end" th:each="item, iterStat : ${pedidoDTO.items}">
                                     <div class="form-group col-md-7 mb-0">
@@ -78,7 +72,6 @@
                                 </div>
                             </th:block>
 
-                            <!-- Pedido nuevo -->
                             <th:block th:if="${pedidoDTO.items == null or pedidoDTO.items.empty}">
                                 <div class="form-row item-row mb-3 align-items-end">
                                     <div class="form-group col-md-7 mb-0">
@@ -103,7 +96,6 @@
 
                         </div>
 
-                        <!-- Plantilla oculta con los platos ya filtrados de la unidad -->
                         <select id="plantilla-platos" class="d-none">
                             <option value="">-- Seleccione un plato --</option>
                             <option th:each="plato : ${platos}"
@@ -111,7 +103,6 @@
                                     th:text="${plato.nombre + ' ($' + plato.precio + ')'}"></option>
                         </select>
 
-                        <!-- Botones de accion -->
                         <div class="form-group text-right mt-4">
                             <a th:href="@{/pedido}" class="btn btn-secondary">Cancelar</a>
                             <button type="submit" class="btn btn-success" th:text="${pedidoDTO.idPedido != null} ? 'Actualizar Pedido' : 'Guardar Pedido'">Guardar Pedido</button>
@@ -125,11 +116,9 @@
     </div>
 </div>
 
-<!-- Footer y Scripts compartidos -->
 <footer th:replace="~{layout :: footer}"></footer>
 <div th:replace="~{layout :: scripts}"></div>
 
-<!-- Script simplificado para agregar filas -->
 <script>
     document.addEventListener("DOMContentLoaded", function() {
         actualizarIndices();
