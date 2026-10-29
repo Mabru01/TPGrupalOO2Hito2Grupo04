@@ -22,4 +22,6 @@ public interface IPedidoService {
     Pedido actualizarPedido(Long id, PedidoDTO pedidoDTO) throws Exception;
 
     PlatoDTO encontrarPlatoEstrella(Long idUnidadVenta, Long idFestival);
+
+    public void cambiarEstado(Long idPedido);
 }

@@ -9,12 +9,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import TPGrupalOO2Hito2Grupo04.entities.Plato;
+import TPGrupalOO2Hito2Grupo04.entities.Staff;
 import TPGrupalOO2Hito2Grupo04.entities.UnidadVenta;
 import TPGrupalOO2Hito2Grupo04.dtos.PlatoDTO;
 import TPGrupalOO2Hito2Grupo04.repositories.IPlatoRepository;
+import TPGrupalOO2Hito2Grupo04.repositories.IStaffRepository;
 import TPGrupalOO2Hito2Grupo04.repositories.IUnidadVentaRepository;
 import TPGrupalOO2Hito2Grupo04.services.IPlatoService;
 
@@ -26,17 +29,21 @@ public class PlatoService implements IPlatoService {
 
     private final IPlatoRepository platoRepository;
     private final IUnidadVentaRepository unidadVentaRepository;
+    private final IStaffRepository staffRepository;
     private final ModelMapper modelMapper;
 
-    public PlatoService(IPlatoRepository platoRepository, IUnidadVentaRepository unidadVentaRepository, ModelMapper modelMapper) {
+    public PlatoService(IPlatoRepository platoRepository,
+                        IUnidadVentaRepository unidadVentaRepository,
+                        IStaffRepository staffRepository,
+                        ModelMapper modelMapper) {
         this.platoRepository = platoRepository;
         this.unidadVentaRepository = unidadVentaRepository;
+        this.staffRepository = staffRepository;
         this.modelMapper = modelMapper;
     }
 
     @Override
     public List<Plato> traerTodos() {
-        List<Plato> platos = platoRepository.findAll();
         return platoRepository.findAllByOrderByUnidadVentaNombreComercialAsc();
     }
 
@@ -74,12 +81,26 @@ public class PlatoService implements IPlatoService {
             throw new IllegalArgumentException("Ya existe un plato registrado con ese nombre.");
         }
 
-        UnidadVenta unidadVenta = unidadVentaRepository.findById(dto.getIdUnidadVenta())
-                .orElseThrow(() -> new IllegalArgumentException("ERROR: Unidad de venta no encontrada"));
+        UnidadVenta unidadVenta;
+
+        // Si el DTO trae un idUnidadVenta (lo usa el Administrador desde el selector)
+        if (dto.getIdUnidadVenta() != null) {
+            unidadVenta = unidadVentaRepository.findById(dto.getIdUnidadVenta())
+                    .orElseThrow(() -> new IllegalArgumentException("ERROR: Unidad de venta no encontrada"));
+        } else {
+            String emailUsuario = SecurityContextHolder.getContext().getAuthentication().getName();
+
+            Staff staff = staffRepository.findByUsuarioMail(emailUsuario)
+                    .orElseThrow(() -> new RuntimeException("ERROR: El usuario logueado no tiene un staff/unidad asociada"));
+
+            unidadVenta = staff.getUnidadVenta();
+            if (unidadVenta == null) {
+                throw new IllegalArgumentException("ERROR: El responsable logueado no tiene una unidad de venta asignada.");
+            }
+        }
 
         Plato plato = new Plato();
 
-        // Si el DTO trae un ID (en caso de modificar), se lo asignamos para que Spring actualice
         if (dto.getIdPlato() != null) {
             plato.setIdPlato(dto.getIdPlato());
         }
