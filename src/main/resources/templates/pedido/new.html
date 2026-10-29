@@ -7,34 +7,32 @@
 </head>
 <body>
 
-<!-- Navbar compartido -->
 <nav th:replace="~{layout :: navbar}"></nav>
 
 <div class="container mt-5 pt-4">
     <div class="row justify-content-center">
         <div class="col-md-9">
+
+            <div class="card bg-light border-primary mb-4 shadow-sm" th:if="${unidadVenta != null}">
+                <div class="card-body">
+                    <h5 class="card-title text-primary"><i class="bi bi-info-circle"></i> Destino del Pedido</h5>
+                    <p class="mb-1"><strong>Unidad de Venta:</strong> <span th:text="${unidadVenta.nombreComercial}">Nombre Unidad</span></p>
+                    <p class="mb-0"><strong>Festival:</strong> <span th:text="${festival != null ? festival.nombre : '-'}">Nombre Festival</span></p>
+                    <small class="text-muted">El pedido se asociará automáticamente a tu unidad.</small>
+                </div>
+            </div>
+
             <div class="card shadow">
                 <div class="card-header bg-dark text-white">
                     <h4 class="mb-0" th:text="${pedidoDTO.idPedido != null} ? 'Editar Pedido #' + ${pedidoDTO.idPedido} : 'Registrar Nuevo Pedido'">Registrar Pedido</h4>
                 </div>
                 <div class="card-body">
 
-                    <!-- Formulario Guardar o Actualizar -->
                     <form th:action="${pedidoDTO.idPedido != null} ? @{/pedido/actualizar/{id}(id=${pedidoDTO.idPedido})} : @{/pedido/guardar}"
                           th:object="${pedidoDTO}" method="post" id="formPedido">
 
-                        <!-- Unidad de Venta -->
-                        <div class="form-group mb-3">
-                            <label for="unidadVenta">Unidad de Venta:</label>
-                            <select id="unidadVenta" class="form-control" th:field="*{idUnidadVenta}" required onchange="filtrarPlatos()">
-                                <option value="">-- Seleccione una unidad de venta --</option>
-                                <option th:each="uv : ${unidadesVenta}"
-                                        th:value="${uv.idUnidadVenta}"
-                                        th:text="${uv.nombreComercial}">Unidad</option>
-                            </select>
-                        </div>
+                        <input type="hidden" th:field="*{idUnidadVenta}" />
 
-                        <!-- Fecha -->
                         <div class="form-group mb-4">
                             <label for="fechaTransaccion">Fecha:</label>
                             <input type="date" id="fechaTransaccion" class="form-control" th:field="*{fechaTransaccion}" required />
@@ -51,7 +49,6 @@
 
                         <div id="contenedor-items">
 
-                            <!-- Modificacion -->
                             <th:block th:if="${pedidoDTO.items != null and !pedidoDTO.items.empty}">
                                 <div class="form-row item-row mb-3 align-items-end" th:each="item, iterStat : ${pedidoDTO.items}">
                                     <div class="form-group col-md-7 mb-0">
@@ -59,7 +56,6 @@
                                         <select class="form-control select-plato" th:name="items[__${iterStat.index}__].idPlato" required>
                                             <option value="">-- Seleccione un plato --</option>
                                             <option th:each="plato : ${platos}"
-                                                    th:if="${plato.unidadVenta != null and plato.unidadVenta.idUnidadVenta == pedidoDTO.idUnidadVenta}"
                                                     th:value="${plato.idPlato}"
                                                     th:text="${plato.nombre + ' ($' + plato.precio + ')'}"
                                                     th:selected="${plato.idPlato == item.idPlato}">
@@ -76,13 +72,16 @@
                                 </div>
                             </th:block>
 
-                            <!-- Pedido nuevo -->
                             <th:block th:if="${pedidoDTO.items == null or pedidoDTO.items.empty}">
                                 <div class="form-row item-row mb-3 align-items-end">
                                     <div class="form-group col-md-7 mb-0">
                                         <label>Plato:</label>
                                         <select class="form-control select-plato" name="items[0].idPlato" required>
-                                            <option value="">-- Primero seleccione una unidad de venta --</option>
+                                            <option value="">-- Seleccione un plato --</option>
+                                            <option th:each="plato : ${platos}"
+                                                    th:value="${plato.idPlato}"
+                                                    th:text="${plato.nombre + ' ($' + plato.precio + ')'}">
+                                            </option>
                                         </select>
                                     </div>
                                     <div class="form-group col-md-3 mb-0">
@@ -97,16 +96,13 @@
 
                         </div>
 
-                        <!-- Select para guardar y filtrar -->
                         <select id="plantilla-platos" class="d-none">
                             <option value="">-- Seleccione un plato --</option>
                             <option th:each="plato : ${platos}"
                                     th:value="${plato.idPlato}"
-                                    th:text="${plato.nombre + ' ($' + plato.precio + ')'}"
-                                    th:data-unidad="${plato.unidadVenta != null ? plato.unidadVenta.idUnidadVenta : ''}"></option>
+                                    th:text="${plato.nombre + ' ($' + plato.precio + ')'}"></option>
                         </select>
 
-                        <!-- Botones de accion -->
                         <div class="form-group text-right mt-4">
                             <a th:href="@{/pedido}" class="btn btn-secondary">Cancelar</a>
                             <button type="submit" class="btn btn-success" th:text="${pedidoDTO.idPedido != null} ? 'Actualizar Pedido' : 'Guardar Pedido'">Guardar Pedido</button>
@@ -120,42 +116,15 @@
     </div>
 </div>
 
-<!-- Footer y Scripts compartidos -->
 <footer th:replace="~{layout :: footer}"></footer>
 <div th:replace="~{layout :: scripts}"></div>
 
-
-<!-- Script para Filtrar Platos -->
 <script>
     document.addEventListener("DOMContentLoaded", function() {
         actualizarIndices();
     });
 
-    function filtrarPlatos() {
-        const idUnidadSeleccionada = document.getElementById('unidadVenta').value;
-        const selectsPlatos = document.querySelectorAll('.select-plato');
-
-        selectsPlatos.forEach(select => {
-            const valorActual = select.value;
-            select.innerHTML = '<option value="">-- Seleccione un plato --</option>';
-
-            const plantilla = document.querySelectorAll('#plantilla-platos option');
-            plantilla.forEach(opt => {
-                if (opt.value && opt.getAttribute('data-unidad') === idUnidadSeleccionada) {
-                    select.appendChild(opt.cloneNode(true));
-                }
-            });
-            select.value = valorActual;
-        });
-    }
-
     function agregarFilaItem() {
-        const idUnidadSeleccionada = document.getElementById('unidadVenta').value;
-        if (!idUnidadSeleccionada) {
-            alert("Por favor, seleccione primero una Unidad de Venta.");
-            return;
-        }
-
         const contenedor = document.getElementById('contenedor-items');
 
         const nuevaFila = document.createElement('div');
@@ -181,9 +150,7 @@
         const nuevoSelect = nuevaFila.querySelector('.select-plato');
         const plantilla = document.querySelectorAll('#plantilla-platos option');
         plantilla.forEach(opt => {
-            if (opt.value && opt.getAttribute('data-unidad') === idUnidadSeleccionada) {
-                nuevoSelect.appendChild(opt.cloneNode(true));
-            }
+            nuevoSelect.appendChild(opt.cloneNode(true));
         });
 
         actualizarIndices();

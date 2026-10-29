@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.PageRequest;
@@ -20,9 +21,11 @@ import TPGrupalOO2Hito2Grupo04.dtos.PlatoDTO;
 import TPGrupalOO2Hito2Grupo04.entities.Pedido;
 import TPGrupalOO2Hito2Grupo04.entities.ItemPedido;
 import TPGrupalOO2Hito2Grupo04.entities.Plato;
+import TPGrupalOO2Hito2Grupo04.entities.Staff;
 import TPGrupalOO2Hito2Grupo04.entities.UnidadVenta;
 import TPGrupalOO2Hito2Grupo04.repositories.IPedidoRepository;
 import TPGrupalOO2Hito2Grupo04.repositories.IPlatoRepository;
+import TPGrupalOO2Hito2Grupo04.repositories.IStaffRepository;
 import TPGrupalOO2Hito2Grupo04.repositories.IUnidadVentaRepository;
 import TPGrupalOO2Hito2Grupo04.services.IPedidoService;
 
@@ -35,13 +38,18 @@ public class PedidoService implements IPedidoService {
     private final IPedidoRepository pedidoRepository;
     private final IPlatoRepository platoRepository;
     private final IUnidadVentaRepository unidadVentaRepository;
+    private final IStaffRepository staffRepository;
     private final ModelMapper modelMapper;
 
-    public PedidoService(IPedidoRepository pedidoRepository, IPlatoRepository platoRepository, IUnidadVentaRepository unidadVentaRepository,
+    public PedidoService(IPedidoRepository pedidoRepository,
+                         IPlatoRepository platoRepository,
+                         IUnidadVentaRepository unidadVentaRepository,
+                         IStaffRepository staffRepository,
                          ModelMapper modelMapper) {
         this.pedidoRepository = pedidoRepository;
         this.platoRepository = platoRepository;
         this.unidadVentaRepository = unidadVentaRepository;
+        this.staffRepository = staffRepository;
         this.modelMapper = modelMapper;
     }
 
@@ -80,9 +88,22 @@ public class PedidoService implements IPedidoService {
     @Transactional
     public Pedido insertarPedido(PedidoDTO pedidoDTO) throws Exception {
         try {
-            // Buscar la Unidad de Venta
-            UnidadVenta unidadVenta = unidadVentaRepository.findById(pedidoDTO.getIdUnidadVenta())
-                    .orElseThrow(() -> new Exception("Unidad de venta no encontrada con ID: " + pedidoDTO.getIdUnidadVenta()));
+            UnidadVenta unidadVenta;
+
+            if (pedidoDTO.getIdUnidadVenta() != null) {
+                unidadVenta = unidadVentaRepository.findById(pedidoDTO.getIdUnidadVenta())
+                        .orElseThrow(() -> new Exception("Unidad de venta no encontrada con ID: " + pedidoDTO.getIdUnidadVenta()));
+            } else {
+                String emailUsuario = SecurityContextHolder.getContext().getAuthentication().getName();
+
+                Staff staff = staffRepository.findByUsuarioMail(emailUsuario)
+                        .orElseThrow(() -> new RuntimeException("ERROR: El empleado logueado no tiene un staff/unidad asociada"));
+
+                unidadVenta = staff.getUnidadVenta();
+                if (unidadVenta == null) {
+                    throw new Exception("ERROR: El empleado logueado no tiene una unidad de venta asignada.");
+                }
+            }
 
             Pedido pedido = new Pedido();
             pedido.setFechaTransaccion(pedidoDTO.getFechaTransaccion() != null ? pedidoDTO.getFechaTransaccion() : LocalDate.now());
@@ -91,7 +112,6 @@ public class PedidoService implements IPedidoService {
 
             Pedido pedidoGuardado = pedidoRepository.save(pedido);
 
-            // Proceso de los ítems del pedido si existen en el DTO
             if (pedidoDTO.getItems() != null && !pedidoDTO.getItems().isEmpty()) {
                 for (ItemPedidoDTO itemDTO : pedidoDTO.getItems()) {
                     Plato plato = platoRepository.findById(itemDTO.getIdPlato())
@@ -101,11 +121,10 @@ public class PedidoService implements IPedidoService {
                     itemPedido.setCantidad(itemDTO.getCantidad());
                     itemPedido.setPlato(plato);
 
-                    // Asigna el pedido automáticamente con uso de Helper
                     pedido.agregarItem(itemPedido);
                 }
 
-                // Guardamos el pedido usando CascadeType.ALL)
+                // Guardamos el pedido usando CascadeType.ALL
                 pedidoGuardado = pedidoRepository.save(pedido);
             }
 
@@ -121,19 +140,25 @@ public class PedidoService implements IPedidoService {
     @Override
     @Transactional
     public Pedido actualizarPedido(Long id, PedidoDTO pedidoDTO) throws Exception {
-        // Buscar si el pedido existe
         Pedido pedidoExistente = pedidoRepository.findById(id)
                 .orElseThrow(() -> new Exception("Pedido no encontrado con ID: " + id));
 
-        // Buscar la Unidad de Venta nueva
-        UnidadVenta unidadVenta = unidadVentaRepository.findById(pedidoDTO.getIdUnidadVenta())
-                .orElseThrow(() -> new Exception("Unidad de venta no encontrada con ID: " + pedidoDTO.getIdUnidadVenta()));
+        UnidadVenta unidadVenta;
+        if (pedidoDTO.getIdUnidadVenta() != null) {
+            unidadVenta = unidadVentaRepository.findById(pedidoDTO.getIdUnidadVenta())
+                    .orElseThrow(() -> new Exception("Unidad de venta no encontrada con ID: " + pedidoDTO.getIdUnidadVenta()));
+        } else {
+            String emailUsuario = SecurityContextHolder.getContext().getAuthentication().getName();
+            Staff staff = staffRepository.findByUsuarioMail(emailUsuario)
+                    .orElseThrow(() -> new RuntimeException("ERROR: El empleado logueado no tiene un staff/unidad asociada"));
+            unidadVenta = staff.getUnidadVenta();
+        }
 
         pedidoExistente.setFechaTransaccion(pedidoDTO.getFechaTransaccion());
         pedidoExistente.setUnidadVenta(unidadVenta);
 
         // Actualizar los ítems utilizando orphanRemoval
-        pedidoExistente.getItems().clear(); // Borra los anteriores con orphanRemoval = true
+        pedidoExistente.getItems().clear();
 
         if (pedidoDTO.getItems() != null && !pedidoDTO.getItems().isEmpty()) {
             for (ItemPedidoDTO itemDTO : pedidoDTO.getItems()) {
@@ -144,7 +169,6 @@ public class PedidoService implements IPedidoService {
                 itemPedido.setCantidad(itemDTO.getCantidad());
                 itemPedido.setPlato(plato);
 
-                // Uso de helper para mantener la bidireccionalidad
                 pedidoExistente.agregarItem(itemPedido);
             }
         }
@@ -172,7 +196,7 @@ public class PedidoService implements IPedidoService {
             cantidad = ((Number) fila[1]).longValue();
         }
 
-        // Si la cantidad es 0, significa que no hay pedidos reales, retornamos null
+        // Si la cantidad es 0, significa que no hay pedidos reales se retorna null
         if (cantidad <= 0) {
             return null;
         }
@@ -181,5 +205,15 @@ public class PedidoService implements IPedidoService {
         platoDto.setCantidad(cantidad);
 
         return platoDto;
+    }
+
+    // Cambiar estado pedido
+    @Override
+    public void cambiarEstado(Long idPedido) {
+        Pedido pedido = pedidoRepository.findById(idPedido)
+                .orElseThrow(() -> new RuntimeException("Pedido no encontrado"));
+
+        pedido.setTerminado(!pedido.isTerminado());
+        pedidoRepository.save(pedido);
     }
 }

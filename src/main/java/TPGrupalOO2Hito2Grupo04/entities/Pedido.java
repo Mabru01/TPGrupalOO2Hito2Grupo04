@@ -40,4 +40,14 @@ public class Pedido {
         items.add(item);
         item.setPedido(this);
     }
+
+    // Metodo para sacar precio de un total
+    public double getPrecioTotal() {
+        if (items == null || items.isEmpty()) {
+            return 0.0;
+        }
+        return items.stream()
+                .mapToDouble(item -> (item.getPlato() != null ? item.getPlato().getPrecio() * item.getCantidad() : 0.0))
+                .sum();
+    }
 }
