@@ -196,7 +196,7 @@ public class PedidoService implements IPedidoService {
             cantidad = ((Number) fila[1]).longValue();
         }
 
-        // Si la cantidad es 0, significa que no hay pedidos reales, retornamos null
+        // Si la cantidad es 0, significa que no hay pedidos reales se retorna null
         if (cantidad <= 0) {
             return null;
         }
@@ -205,5 +205,15 @@ public class PedidoService implements IPedidoService {
         platoDto.setCantidad(cantidad);
 
         return platoDto;
+    }
+
+    // Cambiar estado pedido
+    @Override
+    public void cambiarEstado(Long idPedido) {
+        Pedido pedido = pedidoRepository.findById(idPedido)
+                .orElseThrow(() -> new RuntimeException("Pedido no encontrado"));
+
+        pedido.setTerminado(!pedido.isTerminado());
+        pedidoRepository.save(pedido);
     }
 }

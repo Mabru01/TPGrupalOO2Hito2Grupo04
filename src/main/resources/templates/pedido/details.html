@@ -6,9 +6,20 @@
 
 <main class="container py-4">
 
+    <div th:if="${exito}" class="alert alert-success text-center" role="alert" th:text="${exito}"></div>
+    <div th:if="${error}" class="alert alert-danger text-center" role="alert" th:text="${error}"></div>
+
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2>Detalles del Pedido <span th:text="${'#' + pedido.idPedido}">#1</span></h2>
-        <a th:href="@{/pedido}" class="btn btn-secondary">Volver al listado</a>
+        <div>
+            <a th:href="@{/pedido/cambiar-estado/{id}(id=${pedido.idPedido})}"
+               class="btn"
+               th:classappend="${pedido.terminado} ? 'btn-secondary' : 'btn-success'">
+                <i th:class="${pedido.terminado} ? 'bi bi-arrow-counterclockwise' : 'bi bi-check-circle-fill'"></i>
+                <span th:text="${pedido.terminado} ? 'Marcar como En curso' : 'Marcar como Terminado'">Estado</span>
+            </a>
+            <a th:href="@{/pedido}" class="btn btn-secondary ms-2">Volver al listado</a>
+        </div>
     </div>
 
     <div class="card shadow-sm mb-4">
@@ -18,7 +29,7 @@
         <div class="card-body">
             <p><strong>Unidad de Venta:</strong> <span th:text="${pedido.unidadVenta != null ? pedido.unidadVenta.nombreComercial : '-'}"></span></p>
             <p><strong>Fecha:</strong> <span th:text="${pedido.fechaTransaccion}"></span></p>
-            <p><strong>Estado:</strong>
+            <p class="mb-0"><strong>Estado:</strong>
                 <span th:if="${pedido.terminado}" class="badge badge-success">Terminado</span>
                 <span th:unless="${pedido.terminado}" class="badge badge-warning text-dark">En curso</span>
             </p>
@@ -47,8 +58,8 @@
                     <tr th:each="item : ${pedido.items}">
                         <td th:text="${item.plato != null ? item.plato.nombre : 'Plato no disponible'}">Milanesa</td>
                         <td class="text-center" th:text="${item.cantidad}">2</td>
-                        <td class="text-right" th:text="${item.plato != null ? '$' + item.plato.precio : '-'}">$1500</td>
-                        <td class="text-right" th:text="${item.plato != null ? '$' + (item.plato.precio * item.cantidad) : '-'}">$3000</td>
+                        <td class="text-right" th:text="${item.plato != null ? '$' + #numbers.formatDecimal(item.plato.precio, 1, 2) : '-'}">$1500</td>
+                        <td class="text-right" th:text="${item.plato != null ? '$' + #numbers.formatDecimal(item.plato.precio * item.cantidad, 1, 2) : '-'}">$3000</td>
                     </tr>
                     </tbody>
                 </table>

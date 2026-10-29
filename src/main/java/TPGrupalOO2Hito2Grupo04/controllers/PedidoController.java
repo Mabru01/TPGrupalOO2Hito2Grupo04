@@ -144,7 +144,7 @@ public class PedidoController {
         return "pedido/new";
     }
 
-    // Proceso de actualización
+    // Proceso de actualización.
     @PostMapping("/actualizar/{id}")
     public String actualizarPedido(@PathVariable("id") Long id, @ModelAttribute("pedidoDTO") PedidoDTO pedidoDTO, RedirectAttributes redirectAttributes) {
         try {
@@ -160,7 +160,7 @@ public class PedidoController {
         }
     }
 
-    // Eliminacion
+    // Eliminacion.
     @GetMapping("/eliminar/{id}")
     public String eliminarPedido(@PathVariable("id") Long id, RedirectAttributes redirectAttributes) {
         try {
@@ -172,6 +172,18 @@ public class PedidoController {
             }
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", "No se pudo eliminar el pedido: " + e.getMessage());
+        }
+        return "redirect:/pedido";
+    }
+
+    // Cambiar el estado
+    @GetMapping("/cambiar-estado/{id}")
+    public String cambiarEstado(@PathVariable("id") Long id, RedirectAttributes redirect) {
+        try {
+            pedidoService.cambiarEstado(id);
+            redirect.addFlashAttribute("exito", "El estado del pedido fue actualizado.");
+        } catch (Exception e) {
+            redirect.addFlashAttribute("error", "No se pudo actualizar el estado del pedido.");
         }
         return "redirect:/pedido";
     }
