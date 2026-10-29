@@ -14,6 +14,7 @@ public class PlatoDTO {
     private float precio;
     private float costo;
     private Long idUnidadVenta;
+    private Long cantidad;
 
     public PlatoDTO(String nombre, float precio, float costo, long idUnidadVenta) {
         this.nombre = nombre;

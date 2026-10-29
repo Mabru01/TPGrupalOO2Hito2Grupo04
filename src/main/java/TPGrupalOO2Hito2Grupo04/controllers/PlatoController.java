@@ -4,6 +4,8 @@ import TPGrupalOO2Hito2Grupo04.dtos.PlatoDTO;
 import TPGrupalOO2Hito2Grupo04.entities.Plato;
 import TPGrupalOO2Hito2Grupo04.services.IPlatoService;
 import TPGrupalOO2Hito2Grupo04.services.IUnidadVentaService;
+import TPGrupalOO2Hito2Grupo04.services.IFestivalService;
+import TPGrupalOO2Hito2Grupo04.services.IPedidoService;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -21,18 +23,54 @@ public class PlatoController {
     private final IPlatoService platoService;
     private final IUnidadVentaService unidadVentaService;
     private final ModelMapper modelMapper;
+    private final IFestivalService festivalService;
+    private final IPedidoService pedidoService;
 
-    public PlatoController(IPlatoService platoService, IUnidadVentaService unidadVentaService, ModelMapper modelMapper) {
+    public PlatoController(IPlatoService platoService,
+                           IUnidadVentaService unidadVentaService,
+                           ModelMapper modelMapper,
+                           IFestivalService festivalService,
+                           IPedidoService pedidoService) {
         this.platoService = platoService;
         this.unidadVentaService = unidadVentaService;
         this.modelMapper = modelMapper;
+        this.festivalService = festivalService;
+        this.pedidoService = pedidoService;
     }
 
     // Mostrar la tabla con todos los platos
     @GetMapping({"", "/"})
-    public ModelAndView index() {
+    public ModelAndView index(
+            @RequestParam(value = "idUnidadVenta", required = false) Long idUnidadVenta,
+            @RequestParam(value = "idFestival", required = false) Long idFestival) {
+
         ModelAndView mAV = new ModelAndView("plato/index");
+
         mAV.addObject("platos", platoService.traerTodos());
+        mAV.addObject("unidadesVenta", unidadVentaService.getAll());
+        mAV.addObject("festivales", festivalService.getAll());
+
+        if (idUnidadVenta != null && idFestival != null) {
+            // Llamamos al metodo original que devuelve el PlatoDTO
+            PlatoDTO platoEstrella = pedidoService.encontrarPlatoEstrella(idUnidadVenta, idFestival);
+
+            mAV.addObject("platoEstrella", platoEstrella);
+
+            unidadVentaService.findById(idUnidadVenta).ifPresent(uv -> {
+                String nombreUV = uv.getNombreComercial() != null ? uv.getNombreComercial() : "Unidad sin nombre";
+                mAV.addObject("unidadSeleccionadaTexto", nombreUV);
+            });
+
+            // Busqueda de el nombre del festival asociado
+            festivalService.findById(idFestival).ifPresent(f ->
+                    mAV.addObject("festivalSeleccionadoNombre", f.getNombre())
+            );
+
+            mAV.addObject("idUnidadSeleccionada", idUnidadVenta);
+            mAV.addObject("idFestivalSeleccionado", idFestival);
+            mAV.addObject("busquedaRealizada", true);
+        }
+
         return mAV;
     }
 
@@ -62,7 +100,7 @@ public class PlatoController {
         return mAV;
     }
 
-    // Acción para eliminar un plato por ID
+    // Eliminar un plato por ID
     @GetMapping("/eliminar/{id}")
     public String eliminarPlato(@PathVariable("id") Long id, RedirectAttributes redirect) {
         boolean eliminado = platoService.eliminar(id);

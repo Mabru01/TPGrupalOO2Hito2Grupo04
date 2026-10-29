@@ -77,7 +77,7 @@ public class PlatoService implements IPlatoService {
 
         Plato plato = new Plato();
 
-        // Si el DTO trae un ID (en caso de modificar), se lo asignamos para que Spring sepa que debe actualizar
+        // Si el DTO trae un ID (en caso de modificar), se lo asignamos para que Spring actualice
         if (dto.getIdPlato() != null) {
             plato.setIdPlato(dto.getIdPlato());
         }

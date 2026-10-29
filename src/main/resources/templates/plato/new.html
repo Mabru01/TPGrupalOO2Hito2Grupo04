@@ -10,7 +10,7 @@
         <h2>Nuevo Plato</h2>
     </div>
 
-    <!-- Alerta de error si existe -->
+    <!-- Alerta de error -->
     <div th:if="${error}" class="alert alert-danger text-center" role="alert">
         <span th:text="${error}">Mensaje de error</span>
     </div>
@@ -19,7 +19,7 @@
         <div class="card-body">
             <form th:action="@{/plato/guardar}" th:object="${platoDTO}" method="post">
 
-                <!-- Campo oculto para manejar la edición por ID -->
+                <!-- Campo oculto, edición por ID -->
                 <input type="hidden" th:field="*{idPlato}" />
 
                 <div class="mb-3">

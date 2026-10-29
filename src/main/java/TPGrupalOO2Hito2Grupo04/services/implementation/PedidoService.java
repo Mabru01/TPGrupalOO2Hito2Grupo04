@@ -11,9 +11,12 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.domain.PageRequest;
+import org.modelmapper.ModelMapper;
 
 import TPGrupalOO2Hito2Grupo04.dtos.PedidoDTO;
 import TPGrupalOO2Hito2Grupo04.dtos.ItemPedidoDTO;
+import TPGrupalOO2Hito2Grupo04.dtos.PlatoDTO;
 import TPGrupalOO2Hito2Grupo04.entities.Pedido;
 import TPGrupalOO2Hito2Grupo04.entities.ItemPedido;
 import TPGrupalOO2Hito2Grupo04.entities.Plato;
@@ -32,13 +35,14 @@ public class PedidoService implements IPedidoService {
     private final IPedidoRepository pedidoRepository;
     private final IPlatoRepository platoRepository;
     private final IUnidadVentaRepository unidadVentaRepository;
+    private final ModelMapper modelMapper;
 
-    public PedidoService(IPedidoRepository pedidoRepository,
-                         IPlatoRepository platoRepository,
-                         IUnidadVentaRepository unidadVentaRepository) {
+    public PedidoService(IPedidoRepository pedidoRepository, IPlatoRepository platoRepository, IUnidadVentaRepository unidadVentaRepository,
+                         ModelMapper modelMapper) {
         this.pedidoRepository = pedidoRepository;
         this.platoRepository = platoRepository;
         this.unidadVentaRepository = unidadVentaRepository;
+        this.modelMapper = modelMapper;
     }
 
     @Override
@@ -76,11 +80,10 @@ public class PedidoService implements IPedidoService {
     @Transactional
     public Pedido insertarPedido(PedidoDTO pedidoDTO) throws Exception {
         try {
-            // Buscar la Unidad de Venta asociada
+            // Buscar la Unidad de Venta
             UnidadVenta unidadVenta = unidadVentaRepository.findById(pedidoDTO.getIdUnidadVenta())
                     .orElseThrow(() -> new Exception("Unidad de venta no encontrada con ID: " + pedidoDTO.getIdUnidadVenta()));
 
-            // Crear y configurar la entidad Pedido
             Pedido pedido = new Pedido();
             pedido.setFechaTransaccion(pedidoDTO.getFechaTransaccion() != null ? pedidoDTO.getFechaTransaccion() : LocalDate.now());
             pedido.setUnidadVenta(unidadVenta);
@@ -88,7 +91,7 @@ public class PedidoService implements IPedidoService {
 
             Pedido pedidoGuardado = pedidoRepository.save(pedido);
 
-            // Procesar los ítems del pedido si existen en el DTO
+            // Proceso de los ítems del pedido si existen en el DTO
             if (pedidoDTO.getItems() != null && !pedidoDTO.getItems().isEmpty()) {
                 for (ItemPedidoDTO itemDTO : pedidoDTO.getItems()) {
                     Plato plato = platoRepository.findById(itemDTO.getIdPlato())
@@ -102,7 +105,7 @@ public class PedidoService implements IPedidoService {
                     pedido.agregarItem(itemPedido);
                 }
 
-                // Guardamos el pedido (CascadeType.ALL se encarga de guardar los ítems solo)
+                // Guardamos el pedido usando CascadeType.ALL)
                 pedidoGuardado = pedidoRepository.save(pedido);
             }
 
@@ -122,11 +125,10 @@ public class PedidoService implements IPedidoService {
         Pedido pedidoExistente = pedidoRepository.findById(id)
                 .orElseThrow(() -> new Exception("Pedido no encontrado con ID: " + id));
 
-        // Buscar la Unidad de Venta nueva si cambió
+        // Buscar la Unidad de Venta nueva
         UnidadVenta unidadVenta = unidadVentaRepository.findById(pedidoDTO.getIdUnidadVenta())
                 .orElseThrow(() -> new Exception("Unidad de venta no encontrada con ID: " + pedidoDTO.getIdUnidadVenta()));
 
-        // Actualizar datos
         pedidoExistente.setFechaTransaccion(pedidoDTO.getFechaTransaccion());
         pedidoExistente.setUnidadVenta(unidadVenta);
 
@@ -148,5 +150,36 @@ public class PedidoService implements IPedidoService {
         }
 
         return pedidoRepository.save(pedidoExistente);
+    }
+
+    @Override
+    public PlatoDTO encontrarPlatoEstrella(Long idUnidadVenta, Long idFestival) {
+        List<Object[]> resultados = pedidoRepository.encontrarPlatoEstrella(
+                idUnidadVenta,
+                idFestival,
+                PageRequest.of(0, 1)
+        );
+
+        if (resultados == null || resultados.isEmpty()) {
+            return null;
+        }
+
+        Object[] fila = resultados.get(0);
+        Plato plato = (Plato) fila[0];
+
+        Long cantidad = 0L;
+        if (fila.length > 1 && fila[1] != null) {
+            cantidad = ((Number) fila[1]).longValue();
+        }
+
+        // Si la cantidad es 0, significa que no hay pedidos reales, retornamos null
+        if (cantidad <= 0) {
+            return null;
+        }
+
+        PlatoDTO platoDto = modelMapper.map(plato, PlatoDTO.class);
+        platoDto.setCantidad(cantidad);
+
+        return platoDto;
     }
 }
