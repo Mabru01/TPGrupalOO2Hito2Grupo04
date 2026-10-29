@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url:
-    username:
-    password:
+    url: ${DB_URL}
+    username: ${USERNAME}
+    password: ${PASSWORD}
   jpa:
     show-sql: true
     hibernate:
