@@ -53,6 +53,7 @@
                             <span th:unless="${pedido.terminado}" class="badge badge-warning px-2 py-1 text-dark">En curso</span>
                         </td>
                         <td class="text-center">
+
                             <button type="button"
                                     class="btn btn-info btn-sm text-white"
                                     th:onclick="'abrirModalDetalle(' + ${pedido.idPedido} + ')'">
@@ -61,6 +62,7 @@
 
                             <a th:href="@{/pedido/editar/{id}(id=${pedido.idPedido})}" class="btn btn-warning btn-sm">Editar</a>
 
+                            <!-- Botón Eliminar con Modal (Restaurado) -->
                             <button type="button"
                                     class="btn btn-danger btn-sm"
                                     data-toggle="modal"
@@ -78,7 +80,7 @@
     </div>
 </main>
 
-<!-- Modales de Detalles para cada pedido -->
+<!-- Modal pedido -->
 <div th:each="pedido : ${pedidos}">
     <div class="modal fade" th:id="'detalleModal-' + ${pedido.idPedido}" tabindex="-1" role="dialog" aria-hidden="true">
         <div class="modal-dialog modal-lg" role="document">
@@ -138,12 +140,45 @@
     </div>
 </div>
 
+<!-- Modal de elimiancion -->
+<div class="modal fade" id="confirmarEliminarPedidoModal" tabindex="-1" role="dialog" aria-labelledby="modalPedidoLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="modalPedidoLabel">Confirmar eliminación</h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                ¿Está seguro de que desea eliminar el pedido <strong id="idPedidoModal"></strong> con fecha <strong id="fechaPedidoModal"></strong>?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <a id="btnConfirmarEliminarPedido" href="#" class="btn btn-danger">Eliminar</a>
+            </div>
+        </div>
+    </div>
+</div>
+
 <footer th:replace="~{layout :: footer}"></footer>
 <div th:replace="~{layout :: scripts}"></div>
 
 <script>
     function abrirModalDetalle(idPedido) {
         $('#detalleModal-' + idPedido).modal('show');
+    }
+
+    // Script para la eliminación por modal
+    function prepararEliminacionPedido(button) {
+        var id = button.getAttribute("data-id");
+        var fecha = button.getAttribute("data-fecha");
+
+        document.getElementById("idPedidoModal").textContent = "#" + id;
+        document.getElementById("fechaPedidoModal").textContent = fecha;
+
+        var botonConfirmar = document.getElementById("btnConfirmarEliminarPedido");
+        botonConfirmar.href = "/pedido/eliminar/" + id;
     }
 </script>
 </body>
