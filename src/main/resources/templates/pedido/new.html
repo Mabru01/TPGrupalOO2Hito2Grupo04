@@ -124,6 +124,7 @@
         actualizarIndices();
     });
 
+    // Script para limpiar y clonar las opciones de la seleccion en el formulario evitando bugs.
     function agregarFilaItem() {
         const contenedor = document.getElementById('contenedor-items');
 
@@ -133,7 +134,6 @@
             <div class="form-group col-md-7 mb-0">
                 <label>Plato:</label>
                 <select class="form-control select-plato" required>
-                    <option value="">-- Seleccione un plato --</option>
                 </select>
             </div>
             <div class="form-group col-md-3 mb-0">
@@ -148,6 +148,8 @@
         contenedor.appendChild(nuevaFila);
 
         const nuevoSelect = nuevaFila.querySelector('.select-plato');
+
+        nuevoSelect.innerHTML = '';
         const plantilla = document.querySelectorAll('#plantilla-platos option');
         plantilla.forEach(opt => {
             nuevoSelect.appendChild(opt.cloneNode(true));
