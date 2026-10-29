@@ -20,4 +20,9 @@ public interface IStaffService {
 
     Staff registrarStaff(StaffDTO staffDTO);
 
+    Staff modificarStaff(StaffDTO staffDTO);
+
+    void darBajaEmpleado(StaffDTO staffDTO);
+
+    StaffDTO obtenerDTOPorId(int idStaff);
 }

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{layout :: head}"></head>
+<body>
+<nav th:replace="~{layout :: navbar}"></nav>
+
+<main class="container py-4">
+    <div class="page-header mb-4">
+        <h2>Modificar Empleado</h2>
+    </div>
+
+    <!-- Alerta de error si existe -->
+    <div th:if="${error}" class="alert alert-danger text-center" role="alert">
+        <span th:text="${error}">Mensaje de error</span>
+    </div>
+
+    <div class="card form-card">
+        <div class="card-body">
+            <!-- Paso 1: elegir empleado (siempre visible) -->
+            <form th:action="@{/staff/modificar}" method="get">
+                <h5 class="text-secondary border-bottom pb-2 mb-3">Datos del empleado</h5>
+                <div class="mb-3">
+                    <label for="idStaff" class="col-form-label">Empleado a modificar</label>
+                    <select class="form-control" id="idStaff" name="idStaff" required onchange="this.form.submit()">
+                        <option value="">Seleccione un empleado</option>
+                        <option th:each="s : ${staffs}"
+                                th:value="${s.idStaff}"
+                                th:text="${s.nombre + ' ' + s.apellido}"
+                                th:selected="${staffDTO != null and staffDTO.idStaff == s.idStaff}">Empleado</option>
+                    </select>
+                </div>
+            </form>
+            <form th:if="${staffDTO != null}" th:action="@{/staff/modificar}" th:object="${staffDTO}" method="post">
+                <input type="hidden" th:field="*{idStaff}"/>
+
+                <div class="mb-3">
+                    <label for="dni" class="col-form-label">DNI</label>
+                    <input type="number" class="form-control" id="dni" th:field="*{dni}" required/>
+                </div>
+
+                <div class="mb-3">
+                    <label for="nombre" class="col-form-label">Nombre</label>
+                    <input type="text" class="form-control" id="nombre" th:field="*{nombre}" required/>
+                </div>
+
+                <div class="mb-3">
+                    <label for="apellido" class="col-form-label">Apellido</label>
+                    <input type="text" class="form-control" id="apellido" th:field="*{apellido}" required placeholder="Ej: Suarez"/>
+                </div>
+
+                <div class="mb-3">
+                    <label for="fechaNacimiento" class="col-form-label">Fecha de Nacimiento</label>
+                    <input type="date" class="form-control" id="fechaNacimiento" th:field="*{fechaNacimiento}" required/>
+                </div>
+
+                <div class="mb-3">
+                    <label for="sueldoBase" class="col-form-label">Sueldo</label>
+                    <input type="number" step="0.01" class="form-control" id="sueldoBase" th:field="*{sueldoBase}" required placeholder="Ej: 1250000"/>
+                </div>
+
+                <div class="mb-3">
+                    <label for="idUnidadVenta" class="col-form-label">Unidad de Venta</label>
+                    <select class="form-control" id="idUnidadVenta" th:field="*{idUnidadVenta}">
+                        <option value="">Seleccione una unidad de venta</option>
+                        <option th:each="uv : ${unidadesVenta}"
+                                th:value="${uv.idUnidadVenta}"
+                                th:text="${uv.nombreComercial}">Unidad de Venta</option>
+                    </select>
+                </div>
+
+                <!-- Campos específicos de Cajero -->
+                <div th:if="${staffDTO instanceof T(TPGrupalOO2Hito2Grupo04.dtos.CajeroDTO)}">
+                    <h5 class="text-secondary border-bottom pb-2 mb-3">Datos de Cajero</h5>
+                    <div class="mb-3">
+                        <label for="turno" class="col-form-label">Turno</label>
+                        <input type="text" class="form-control" id="turno" th:field="*{turno}" placeholder="Ej: Mañana"/>
+                    </div>
+                </div>
+
+                <!-- Campos específicos de Cocinero -->
+                <div th:if="${staffDTO instanceof T(TPGrupalOO2Hito2Grupo04.dtos.CocineroDTO)}">
+                    <h5 class="text-secondary border-bottom pb-2 mb-3">Datos de Cocinero</h5>
+                    <div class="mb-3">
+                        <label for="categoria" class="col-form-label">Categoría</label>
+                        <input type="text" class="form-control" id="categoria" th:field="*{categoria}" placeholder="Ej: Chef"/>
+                    </div>
+                    <div class="mb-3">
+                        <label for="especialidad" class="col-form-label">Especialidad</label>
+                        <input type="text" class="form-control" id="especialidad" th:field="*{especialidad}" placeholder="Ej: Pizzas"/>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between mt-4">
+                    <button type="submit" class="btn btn-epicentro">Guardar cambios</button>
+                    <a th:href="@{/staff}" class="btn btn-outline-secondary px-4">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{layout :: footer}"></footer>
+<div th:replace="~{layout :: scripts}"></div>
+</body>
+</html>

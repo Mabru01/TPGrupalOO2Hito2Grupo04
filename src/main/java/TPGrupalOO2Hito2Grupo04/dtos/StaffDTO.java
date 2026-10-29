@@ -29,10 +29,17 @@ public class StaffDTO {
 
     private LocalDate fechaEgreso;
 
+    private String emailStaff;
+
+    private String passwordStaff;
+
     private Long idUnidadVenta;
 
+    private Long idUsuario;
+
     public StaffDTO(long dni, String nombre, String apellido, LocalDate fechaNacimiento,
-                    LocalDate fechaIngreso, float sueldoBase, LocalDate fechaEgreso, Long idUnidadVenta) {
+                    LocalDate fechaIngreso, float sueldoBase, LocalDate fechaEgreso,
+                    Long idUnidadVenta, String emailStaff, String passwordStaff, Long idUsuario) {
         this.setDni(dni);
         this.nombre = nombre;
         this.apellido = apellido;
@@ -41,6 +48,9 @@ public class StaffDTO {
         this.sueldoBase = sueldoBase;
         this.fechaEgreso = fechaEgreso;
         this.idUnidadVenta = idUnidadVenta;
+        this.emailStaff = emailStaff;
+        this.passwordStaff = passwordStaff;
+        this.idUsuario = idUsuario;
     }
 }
 
