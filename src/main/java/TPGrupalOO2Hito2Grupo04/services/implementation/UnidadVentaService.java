@@ -163,6 +163,15 @@ public class UnidadVentaService implements IUnidadVentaService {
         unidadVentaRepository.save(unidad); // Guardamos la actualización
     }
 
+    @Override
+    public void reactivar(Long id) {
+        UnidadVenta unidad = unidadVentaRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Unidad de venta no encontrada"));
+
+        unidad.setActiva(true); // Cambiamos el estado
+        unidadVentaRepository.save(unidad); // Guardamos la actualización
+    }
+
 
     @Override
     public void modificarFoodTruck(Long id, FoodTruckDTO dto) {

@@ -38,6 +38,7 @@ public interface IUnidadVentaService {
     Optional<UnidadVenta> findByResponsable(String mail);
 
     public void darDeBaja(Long id);
+    public void reactivar(Long id);
 
     void modificarFoodTruck(Long id, FoodTruckDTO dto);
     void modificarPuestoDesarmable(Long id, PuestoDesarmableDTO dto);
