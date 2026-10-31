@@ -75,7 +75,9 @@ public class PlatoService implements IPlatoService {
 
     @Override
     public Plato registrarPlato(PlatoDTO dto) {
-        if (platoRepository.findByNombre(dto.getNombre()).isPresent()) {
+        // El nombre no puede repetirse con OTRO plato (al modificar, el plato se encuentra a sí mismo)
+        Optional<Plato> mismoNombre = platoRepository.findByNombre(dto.getNombre());
+        if (mismoNombre.isPresent() && !mismoNombre.get().getIdPlato().equals(dto.getIdPlato())) {
             throw new IllegalArgumentException("Ya existe un plato registrado con ese nombre.");
         }
 

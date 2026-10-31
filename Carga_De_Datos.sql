@@ -104,7 +104,7 @@ INSERT INTO plato (id_plato, nombre, precio, costo, id_unidad_venta) VALUES
 -- =========================================
 -- PEDIDO
 -- =========================================
-INSERT INTO pedido (id_pedido, fecha, terminado, id_unidad_venta) VALUES
+INSERT INTO pedido (id_pedido, fecha_transaccion, terminado, id_unidad_venta) VALUES
 (1, '2026-08-15', FALSE, 1),
 (2, '2026-08-20', FALSE, 2),
 (3, '2026-08-25', FALSE, 3);

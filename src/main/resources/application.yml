@@ -16,7 +16,8 @@ mail:
   smtp:
     host: smtp.gmail.com
     port: 587
-    username: maxibruni01@gmail.com
-    password: "stcm ghdo lbxa iilu"
-    from: maxibruni01@gmail.com
+    # Cuenta de Gmail y contraseña de aplicación: se cargan como variables de entorno, nunca en el código
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    from: ${MAIL_USERNAME:}
 
