@@ -1,4 +1,6 @@
 package TPGrupalOO2Hito2Grupo04.services;
+import TPGrupalOO2Hito2Grupo04.dtos.FoodTruckDTO;
+import TPGrupalOO2Hito2Grupo04.dtos.PuestoDesarmableDTO;
 import TPGrupalOO2Hito2Grupo04.entities.UnidadVenta;
 import TPGrupalOO2Hito2Grupo04.entities.Usuario;
 import TPGrupalOO2Hito2Grupo04.entities.Festival;
@@ -34,4 +36,10 @@ public interface IUnidadVentaService {
     double calcularCanon(Long idUnidadVenta);
 
     Optional<UnidadVenta> findByResponsable(String mail);
+
+    public void darDeBaja(Long id);
+    public void reactivar(Long id);
+
+    void modificarFoodTruck(Long id, FoodTruckDTO dto);
+    void modificarPuestoDesarmable(Long id, PuestoDesarmableDTO dto);
 }
