@@ -121,6 +121,7 @@ public class UnidadVentaService implements IUnidadVentaService {
 
         unidadVenta.setResponsable(usuarioGuardado);
         unidadVenta.setFestival(festival);
+        unidadVenta.setActiva(true);
         unidadVenta.setCodigoUnico(generarCodigoUnico());
         return unidadVentaRepository.save(unidadVenta);
     }
@@ -152,4 +153,45 @@ public class UnidadVentaService implements IUnidadVentaService {
     public Optional<UnidadVenta> findByResponsable(String mail) {
         return unidadVentaRepository.findByResponsable_Mail(mail);
     }
+
+    @Override
+    public void darDeBaja(Long id) {
+        UnidadVenta unidad = unidadVentaRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Unidad de venta no encontrada"));
+
+        unidad.setActiva(false); // Cambiamos el estado
+        unidadVentaRepository.save(unidad); // Guardamos la actualización
+    }
+
+
+    @Override
+    public void modificarFoodTruck(Long id, FoodTruckDTO dto) {
+        FoodTruck ft = (FoodTruck) unidadVentaRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("FoodTruck no encontrado"));
+
+        // Actualizás los campos comunes y los propios de FoodTruck
+
+        ft.setNombreComercial(dto.getNombreComercial());
+        ft.setSuperficie(dto.getSuperficie());
+        ft.setPatente(dto.getPatente());
+        ft.setUsaLuz(dto.isUsaLuz());
+
+        unidadVentaRepository.save(ft);
+    }
+
+    @Override
+    public void modificarPuestoDesarmable(Long id, PuestoDesarmableDTO dto) {
+        PuestoDesarmable pd = (PuestoDesarmable) unidadVentaRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Puesto Desarmable no encontrado"));
+
+        pd.setNombreComercial(dto.getNombreComercial());
+        pd.setSuperficie(dto.getSuperficie());
+        pd.setCantidad(dto.getCantidad());
+        pd.setTiempoMontaje(dto.getTiempoMontaje());
+
+        unidadVentaRepository.save(pd);
+    }
+
+
+
 }

@@ -17,6 +17,7 @@ public interface IUnidadVentaRepository extends JpaRepository<UnidadVenta, Long>
     public abstract boolean existsByCodigoUnico(String codigo);
 
     // Unidad de ventas a cargo del responsable que inició sesión
-
+    List<UnidadVenta> findByActivaTrue();
+    Optional<UnidadVenta> findByCodigoUnicoAndActivaTrue(String codigoUnico);
     Optional<UnidadVenta> findByResponsable_Mail(String mail);
 }

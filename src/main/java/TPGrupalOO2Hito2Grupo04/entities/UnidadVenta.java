@@ -31,6 +31,9 @@ public abstract class UnidadVenta {
     @JoinColumn(name = "idUsuario", nullable = false)
     protected Usuario responsable;
 
+    @Column (name = "activa", nullable = false)
+    private boolean activa;
+
     // many-to-one name="festival" column="idFestival" not-null="true"
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "idFestival", nullable = false)

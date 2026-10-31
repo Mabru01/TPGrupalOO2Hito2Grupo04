@@ -2,10 +2,14 @@ package TPGrupalOO2Hito2Grupo04.controllers;
 
 import TPGrupalOO2Hito2Grupo04.dtos.FoodTruckDTO;
 import TPGrupalOO2Hito2Grupo04.dtos.PuestoDesarmableDTO;
+import TPGrupalOO2Hito2Grupo04.entities.FoodTruck;
+import TPGrupalOO2Hito2Grupo04.entities.PuestoDesarmable;
 import TPGrupalOO2Hito2Grupo04.entities.UnidadVenta;
 import TPGrupalOO2Hito2Grupo04.services.IUnidadVentaService;
 import TPGrupalOO2Hito2Grupo04.helpers.ViewRouteHelper;
+import TPGrupalOO2Hito2Grupo04.repositories.IUnidadVentaRepository;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import java.security.Principal;
 import org.springframework.security.core.Authentication;
@@ -23,6 +27,10 @@ import java.util.Optional;
 @Controller
 @RequestMapping("/unidadVenta")
 public class UnidadVentaController {
+
+
+    @Autowired
+    private IUnidadVentaRepository unidadVentaRepository;
 
     private static final String UNIDAD_VENTA_ATTR = "unidadVentaDTO";
 
@@ -106,6 +114,40 @@ public class UnidadVentaController {
             return ViewRouteHelper.UnidadVenta_NEW_PUESTO;
         }
     }
+
+
+    // 1. EL GET: Detecta qué unidad tiene el responsable y muestra el form que corresponda
+    @GetMapping("/modificar")
+    public ModelAndView vistaModificar(Principal principal) {
+        UnidadVenta unidad = unidadVentaRepository.findByResponsable_Mail(principal.getName())
+                .orElseThrow(() -> new RuntimeException("No tenés unidad de venta asignada"));
+
+        ModelAndView mav = new ModelAndView();
+
+        if (unidad instanceof FoodTruck) {
+            mav.setViewName("unidadventa/modificar-food-truck");
+            mav.addObject("foodTruckDTO", unidad);
+        } else if (unidad instanceof PuestoDesarmable) {
+            mav.setViewName("unidadventa/modificar-puesto-desarmable");
+            mav.addObject("puestoDesarmableDTO", unidad);
+        }
+
+        return mav;
+    }
+
+    @PostMapping("/actualizar/foodtruck/{id}")
+    public RedirectView actualizarFoodTruck(@PathVariable Long id, @ModelAttribute FoodTruckDTO dto) {
+        unidadVentaService.modificarFoodTruck(id, dto);
+        return new RedirectView("/unidadVenta/mi-unidad");
+    }
+
+    @PostMapping("/actualizar/puestoDesarmable/{id}")
+    public RedirectView actualizarPuestoDesarmable(@PathVariable Long id, @ModelAttribute PuestoDesarmableDTO dto) {
+        unidadVentaService.modificarPuestoDesarmable(id, dto);
+        return new RedirectView("/unidadVenta/mi-unidad");
+    }
+
+
 
 
 }
