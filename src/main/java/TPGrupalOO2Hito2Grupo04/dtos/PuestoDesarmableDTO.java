@@ -13,7 +13,7 @@ public class PuestoDesarmableDTO extends UnidadVentaDTO {
 	private int tiempoMontaje;
 
     public PuestoDesarmableDTO(String nombreComercial, double superficie,
-                               String codigoUnico, boolean activa, String emailResponsable, String passwordResponsable, int idFestival,
+                               String codigoUnico, boolean activa, String emailResponsable, String passwordResponsable, long idFestival,
                                int cantidad, int tiempoMontaje) {
         super(nombreComercial, superficie, codigoUnico, activa, emailResponsable, passwordResponsable, idFestival);
         this.cantidad = cantidad;

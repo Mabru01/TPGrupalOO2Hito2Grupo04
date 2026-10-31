@@ -60,6 +60,7 @@ public abstract class UnidadVenta {
         this.codigoUnico = codigoUnico;
         this.responsable = responsable;
         this.festival = festival;
+        this.activa = true;
     }
 
     public abstract double calcularCanon();

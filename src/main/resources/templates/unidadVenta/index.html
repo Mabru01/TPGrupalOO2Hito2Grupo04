@@ -19,7 +19,7 @@
             <th>Nombre comercial</th>
             <th>Código único</th>
             <th>Superficie</th>
-            <th>Activo</th>
+            <th>Estado</th>
             <th class="text-center" sec:authorize="hasAnyAuthority('RESPONSABLE')" >Acciones</th>
         </tr>
         </thead>
@@ -28,7 +28,10 @@
             <td th:text="${u.nombreComercial}"></td>
             <td th:text="${u.codigoUnico}"></td>
             <td th:text="${u.superficie}"></td>
-            <td th:text="${u.activa}"></td>
+            <td>
+                <span th:if="${u.activa}" class="badge bg-success">Activa</span>
+                <span th:unless="${u.activa}" class="badge bg-danger">Inactiva</span>
+            </td>
             <td class="text-center" sec:authorize="hasAnyAuthority('RESPONSABLE')" >
 
                 <!-- ================= ACCIONES CUANDO ESTÁ ACTIVA ================= -->
