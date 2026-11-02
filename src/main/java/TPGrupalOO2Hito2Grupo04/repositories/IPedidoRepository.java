@@ -24,4 +24,7 @@ public interface IPedidoRepository extends JpaRepository<Pedido, Long> {
             @Param("idFestival") Long idFestival,
             Pageable pageable
     );
+
+    @Query("SELECT DISTINCT p FROM Pedido p LEFT JOIN FETCH p.items i LEFT JOIN FETCH i.plato")
+    List<Pedido> findAllWithItemsAndPlatos();
 }

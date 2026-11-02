@@ -44,7 +44,7 @@ public class PlatoController {
         this.pedidoService = pedidoService;
     }
 
-    // Mostrar la tabla con los platos
+    // Mostrar la tabla con los platos (filtrando los activos y permitiendo registros previos con activo nulo)
     @GetMapping({"", "/"})
     public ModelAndView index(
             @RequestParam(value = "idFestival", required = false) Long idFestival,
@@ -55,9 +55,10 @@ public class PlatoController {
         UnidadVenta unidadVentaStaff = unidadDelResponsable();
         Festival festivalStaff = unidadVentaStaff.getFestival();
 
-        // Filtro de los platos
+        // Filtro de los platos: de la unidad y que NO estén dados de baja lógicamente (admite true o null para viejos registros)
         List<Plato> platos = platoService.traerTodos().stream()
                 .filter(p -> p.getUnidadVenta() != null && p.getUnidadVenta().getIdUnidadVenta() == unidadVentaStaff.getIdUnidadVenta())
+                .filter(p -> !Boolean.FALSE.equals(p.getActivo()))
                 .toList();
 
         mAV.addObject("platos", platos);
@@ -124,7 +125,7 @@ public class PlatoController {
         return mAV;
     }
 
-    // Eliminar plato por ID
+    // Eliminar plato por ID (Baja lógica)
     @GetMapping("/eliminar/{id}")
     public String eliminarPlato(@PathVariable("id") Long id, RedirectAttributes redirect) {
         if (!esDeMiUnidad(id)) {
@@ -196,7 +197,7 @@ public class PlatoController {
     private UnidadVenta unidadDelResponsable() {
         String emailUsuario = SecurityContextHolder.getContext().getAuthentication().getName();
         return unidadVentaService.findByResponsable(emailUsuario)
-                .orElseThrow(() -> new RuntimeException("El responsable no tiene una unidad de venta a cargo"));
+                .orElseThrow(() -> new RuntimeException("El responsable no tiene una unidad de venta a su cargo"));
     }
 
     // Verifica que el plato exista y sea de la unidad del responsable logueado

@@ -7,8 +7,6 @@ import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -60,27 +58,26 @@ public class PlatoService implements IPlatoService {
     @Override
     public boolean eliminar(Long id) {
         try {
-            platoRepository.deleteById(id);
-            return true;
-        } catch (EmptyResultDataAccessException |
-                 DataIntegrityViolationException e) {
-            logger.warn("No se pudo eliminar el Plato con id {}", id, e);
-            return false;
+            Plato plato = platoRepository.findById(id).orElse(null);
+
+            if (plato != null) {
+                plato.setActivo(false);
+                platoRepository.save(plato);
+
+                logger.info("Plato con id {} dado de baja con éxito.", id);
+                return true;
+            } else {
+                logger.warn("No se encontró el Plato con id {}.", id);
+                return false;
+            }
         } catch (DataAccessException e) {
-            logger.error(
-                    "Error de base de datos al eliminar el Plato con id {}", id, e);
+            logger.error("Error en la base de datos al dar de baja el Plato con id {}", id, e);
             return false;
         }
     }
 
     @Override
     public Plato registrarPlato(PlatoDTO dto) {
-        // El nombre no puede repetirse con OTRO plato (al modificar, el plato se encuentra a sí mismo)
-        Optional<Plato> mismoNombre = platoRepository.findByNombre(dto.getNombre());
-        if (mismoNombre.isPresent() && !mismoNombre.get().getIdPlato().equals(dto.getIdPlato())) {
-            throw new IllegalArgumentException("Ya existe un plato registrado con ese nombre.");
-        }
-
         UnidadVenta unidadVenta;
 
         // Si el DTO trae un idUnidadVenta (lo usa el Administrador desde el selector)
@@ -99,12 +96,38 @@ public class PlatoService implements IPlatoService {
             }
         }
 
-        Plato plato = new Plato();
+        Optional<Plato> mismoNombre = platoRepository.findByNombre(dto.getNombre());
+        Plato plato;
 
-        if (dto.getIdPlato() != null) {
-            plato.setIdPlato(dto.getIdPlato());
+        if (mismoNombre.isPresent()) {
+            Plato platoExistente = mismoNombre.get();
+
+            // Si el nombre pertenece a OTRO registro distinto al que estamos editando
+            if (dto.getIdPlato() == null || !platoExistente.getIdPlato().equals(dto.getIdPlato())) {
+
+                // Si el plato existente está inactivo, lo reactivamos en lugar de tirar error
+                if (Boolean.FALSE.equals(platoExistente.getActivo())) {
+                    plato = platoExistente;
+                    plato.setActivo(true); // ¡Lo reactivamos!
+                } else {
+                    // Si ya existe y está activo, prohibido duplicar
+                    throw new IllegalArgumentException("Ya existe un plato activo registrado con ese nombre.");
+                }
+            } else {
+                // Es el mismo plato que estamos actualizando
+                plato = platoExistente;
+            }
+        } else {
+            // Si no existe ninguno con ese nombre, creamos uno nuevo o usamos el ID si viene en el DTO
+            if (dto.getIdPlato() != null) {
+                plato = platoRepository.findById(dto.getIdPlato()).orElse(new Plato());
+            } else {
+                plato = new Plato();
+                plato.setActivo(true); // Aseguramos que nace activo
+            }
         }
 
+        // Actualizamos los campos
         plato.setNombre(dto.getNombre());
         plato.setPrecio(dto.getPrecio());
         plato.setCosto(dto.getCosto());

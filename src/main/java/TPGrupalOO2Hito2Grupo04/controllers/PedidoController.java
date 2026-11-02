@@ -71,8 +71,10 @@ public class PedidoController {
             pedidoDTO.setIdUnidadVenta(unidadVenta.getIdUnidadVenta());
         }
 
+        // Permitimos platos activos (true) y registros previos antiguos (null), ocultando solo los dados de baja (false)
         List<Plato> platosUnidad = platoService.traerTodos().stream()
                 .filter(p -> p.getUnidadVenta() != null && unidadVenta != null && p.getUnidadVenta().getIdUnidadVenta() == unidadVenta.getIdUnidadVenta())
+                .filter(p -> !Boolean.FALSE.equals(p.getActivo()))
                 .collect(Collectors.toList());
 
         model.addAttribute("pedidoDTO", pedidoDTO);
@@ -130,8 +132,15 @@ public class PedidoController {
 
         pedidoDTO.setItems(itemDTOs);
 
+        // Obtenemos los IDs de los platos que ya forman parte de este pedido (por si están inactivos)
+        List<Long> idsPlatosEnPedido = pedido.getItems().stream()
+                .map(item -> item.getPlato().getIdPlato())
+                .collect(Collectors.toList());
+
+    // Permitimos platos activos o viejos (!Boolean.FALSE.equals) O los que ya están guardados en este pedido histórico
         List<Plato> platosUnidad = platoService.traerTodos().stream()
                 .filter(p -> p.getUnidadVenta() != null && unidadVenta != null && p.getUnidadVenta().getIdUnidadVenta() == unidadVenta.getIdUnidadVenta())
+                .filter(p -> !Boolean.FALSE.equals(p.getActivo()) || idsPlatosEnPedido.contains(p.getIdPlato()))
                 .collect(Collectors.toList());
 
         model.addAttribute("pedidoDTO", pedidoDTO);
@@ -144,18 +153,23 @@ public class PedidoController {
 
     // Proceso de actualización.
     @PostMapping("/actualizar/{id}")
-    public String actualizarPedido(@PathVariable("id") Long id, @ModelAttribute("pedidoDTO") PedidoDTO pedidoDTO, RedirectAttributes redirectAttributes) {
+    public String actualizarPedido(@PathVariable("id") Long id,
+                                   @ModelAttribute("pedidoDTO") PedidoDTO pedidoDTO,
+                                   RedirectAttributes redirectAttributes) {
         if (!esDeMiUnidad(id)) {
             return "redirect:/pedido";
         }
         try {
             pedidoDTO.setIdUnidadVenta(unidadDelUsuario().getIdUnidadVenta());
-
             pedidoService.actualizarPedido(id, pedidoDTO);
+
             redirectAttributes.addFlashAttribute("exito", "Pedido actualizado correctamente");
             return "redirect:/pedido";
+
         } catch (Exception e) {
-            return "redirect:/pedido/editar/" + id + "?error=" + e.getMessage();
+            // Guardamos el mensaje de error en los atributos flash y redirigimos al formulario de edición
+            redirectAttributes.addFlashAttribute("error", "No se pudo actualizar el pedido: " + e.getMessage());
+            return "redirect:/pedido/editar/" + id;
         }
     }
 
