@@ -17,6 +17,7 @@ public class Plato {
     private String nombre;
     private float precio;
     private float costo;
+    private Boolean activo = true;
 
     @ManyToOne
     @JoinColumn(name = "idUnidadVenta", nullable = false)
