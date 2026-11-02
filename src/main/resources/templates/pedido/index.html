@@ -118,6 +118,7 @@
                                 <td colspan="4" class="text-center py-3 text-muted">Este pedido no contiene ítems.</td>
                             </tr>
                             <tr th:each="item : ${pedido.items}">
+                                <!-- Muestra solo el nombre normal del plato en los detalles -->
                                 <td th:text="${item.plato != null ? item.plato.nombre : 'Plato no disponible'}"></td>
                                 <td class="text-center" th:text="${item.cantidad}"></td>
                                 <td class="text-right" th:text="${item.plato != null && item.plato.precio != null ? '$' + #numbers.formatDecimal(item.plato.precio, 1, 2) : '-'}"></td>

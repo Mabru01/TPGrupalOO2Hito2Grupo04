@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8"/>
     <title th:text="${pedidoDTO.idPedido != null} ? 'Editar Pedido - Epicentro Gourmet' : 'Nuevo Pedido - Epicentro Gourmet'">Nuevo Pedido - Epicentro Gourmet</title>
-    <head th:replace="~{layout :: head}"></head>
+    <th:block th:replace="~{layout :: head}"></th:block>
 </head>
 <body>
 
@@ -21,6 +21,10 @@
                     <small class="text-muted">El pedido se asociará automáticamente a tu unidad.</small>
                 </div>
             </div>
+
+            <!-- Alertas de éxito o error que vienen del backend -->
+            <div th:if="${exito}" class="alert alert-success text-center" role="alert" th:text="${exito}"></div>
+            <div th:if="${error}" class="alert alert-danger text-center" role="alert" th:text="${error}"></div>
 
             <div class="card shadow">
                 <div class="card-header bg-dark text-white">
@@ -57,7 +61,7 @@
                                             <option value="">-- Seleccione un plato --</option>
                                             <option th:each="plato : ${platos}"
                                                     th:value="${plato.idPlato}"
-                                                    th:text="${plato.nombre + ' ($' + plato.precio + ')'}"
+                                                    th:text="${plato.nombre + ' ($' + plato.precio + ')' + (plato.activo == false ? ' [No disponible]' : '')}"
                                                     th:selected="${plato.idPlato == item.idPlato}">
                                             </option>
                                         </select>
@@ -80,7 +84,7 @@
                                             <option value="">-- Seleccione un plato --</option>
                                             <option th:each="plato : ${platos}"
                                                     th:value="${plato.idPlato}"
-                                                    th:text="${plato.nombre + ' ($' + plato.precio + ')'}">
+                                                    th:text="${plato.nombre + ' ($' + plato.precio + ')' + (plato.activo == false ? ' [No disponible]' : '')}">
                                             </option>
                                         </select>
                                     </div>
@@ -100,7 +104,7 @@
                             <option value="">-- Seleccione un plato --</option>
                             <option th:each="plato : ${platos}"
                                     th:value="${plato.idPlato}"
-                                    th:text="${plato.nombre + ' ($' + plato.precio + ')'}"></option>
+                                    th:text="${plato.nombre + ' ($' + plato.precio + ')' + (plato.activo == false ? ' [No disponible]' : '')}"></option>
                         </select>
 
                         <div class="form-group text-right mt-4">
@@ -124,7 +128,6 @@
         actualizarIndices();
     });
 
-    // Script para limpiar y clonar las opciones de la seleccion en el formulario evitando bugs.
     function agregarFilaItem() {
         const contenedor = document.getElementById('contenedor-items');
 

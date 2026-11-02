@@ -3,6 +3,7 @@ package TPGrupalOO2Hito2Grupo04.services.implementation;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +24,7 @@ import TPGrupalOO2Hito2Grupo04.entities.ItemPedido;
 import TPGrupalOO2Hito2Grupo04.entities.Plato;
 import TPGrupalOO2Hito2Grupo04.entities.Staff;
 import TPGrupalOO2Hito2Grupo04.entities.UnidadVenta;
+import TPGrupalOO2Hito2Grupo04.entities.Festival;
 import TPGrupalOO2Hito2Grupo04.repositories.IPedidoRepository;
 import TPGrupalOO2Hito2Grupo04.repositories.IPlatoRepository;
 import TPGrupalOO2Hito2Grupo04.repositories.IStaffRepository;
@@ -54,11 +56,13 @@ public class PedidoService implements IPedidoService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Pedido> traerTodo() {
-        return pedidoRepository.findAll();
+        return pedidoRepository.findAllWithItemsAndPlatos();
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Optional<Pedido> traerPorId(Long id) {
         return pedidoRepository.findById(id);
     }
@@ -105,8 +109,25 @@ public class PedidoService implements IPedidoService {
                 }
             }
 
+            LocalDate fechaPedido = pedidoDTO.getFechaTransaccion() != null ? pedidoDTO.getFechaTransaccion() : LocalDate.now();
+            LocalDate hoy = LocalDate.now();
+
+            // Validación de fecha pasada
+            if (fechaPedido.isBefore(hoy)) {
+                throw new Exception("No se pueden registrar pedidos con fechas anteriores al día de hoy.");
+            }
+
+            // Validación de rango del festival
+            Festival festival = unidadVenta.getFestival();
+            if (festival != null) {
+                if (fechaPedido.isBefore(festival.getFechaInicio()) || fechaPedido.isAfter(festival.getFechaFin())) {
+                    throw new Exception("La fecha del pedido debe estar dentro del período del festival: "
+                            + festival.getNombre() + " (" + festival.getFechaInicio() + " al " + festival.getFechaFin() + ")");
+                }
+            }
+
             Pedido pedido = new Pedido();
-            pedido.setFechaTransaccion(pedidoDTO.getFechaTransaccion() != null ? pedidoDTO.getFechaTransaccion() : LocalDate.now());
+            pedido.setFechaTransaccion(fechaPedido);
             pedido.setUnidadVenta(unidadVenta);
             pedido.setTerminado(false);
 
@@ -117,6 +138,11 @@ public class PedidoService implements IPedidoService {
                     Plato plato = platoRepository.findById(itemDTO.getIdPlato())
                             .orElseThrow(() -> new Exception("Plato no encontrado con ID: " + itemDTO.getIdPlato()));
 
+                    // Para nuevo pedido, no se permiten platos dados de baja
+                    if (Boolean.FALSE.equals(plato.getActivo())) {
+                        throw new Exception("El plato '" + plato.getNombre() + "' no esta disponible, debe seleccionar un plato activo.");
+                    }
+
                     ItemPedido itemPedido = new ItemPedido();
                     itemPedido.setCantidad(itemDTO.getCantidad());
                     itemPedido.setPlato(plato);
@@ -124,7 +150,6 @@ public class PedidoService implements IPedidoService {
                     pedido.agregarItem(itemPedido);
                 }
 
-                // Guardamos el pedido usando CascadeType.ALL
                 pedidoGuardado = pedidoRepository.save(pedido);
             }
 
@@ -154,7 +179,23 @@ public class PedidoService implements IPedidoService {
             unidadVenta = staff.getUnidadVenta();
         }
 
-        pedidoExistente.setFechaTransaccion(pedidoDTO.getFechaTransaccion());
+        LocalDate fechaPedido = pedidoDTO.getFechaTransaccion();
+        LocalDate hoy = LocalDate.now();
+
+        if (fechaPedido != null) {
+            if (fechaPedido.isBefore(hoy)) {
+                throw new Exception("No se pueden registrar pedidos con fechas anteriores al día de hoy.");
+            }
+            Festival festival = unidadVenta.getFestival();
+            if (festival != null) {
+                if (fechaPedido.isBefore(festival.getFechaInicio()) || fechaPedido.isAfter(festival.getFechaFin())) {
+                    throw new Exception("La fecha del pedido debe estar dentro del período del festival: "
+                            + festival.getNombre() + " (" + festival.getFechaInicio() + " al " + festival.getFechaFin() + ")");
+                }
+            }
+        }
+
+        pedidoExistente.setFechaTransaccion(fechaPedido);
         pedidoExistente.setUnidadVenta(unidadVenta);
 
         // Actualizar los ítems utilizando orphanRemoval
@@ -164,6 +205,11 @@ public class PedidoService implements IPedidoService {
             for (ItemPedidoDTO itemDTO : pedidoDTO.getItems()) {
                 Plato plato = platoRepository.findById(itemDTO.getIdPlato())
                         .orElseThrow(() -> new Exception("Plato no encontrado con ID: " + itemDTO.getIdPlato()));
+
+                // Validación estricta: si está dado de baja, no se permite aceptar la edición
+                if (Boolean.FALSE.equals(plato.getActivo())) {
+                    throw new Exception("El plato '" + plato.getNombre() + "' no esta disponible, debe seleccionar un plato activo.");
+                }
 
                 ItemPedido itemPedido = new ItemPedido();
                 itemPedido.setCantidad(itemDTO.getCantidad());
@@ -196,7 +242,6 @@ public class PedidoService implements IPedidoService {
             cantidad = ((Number) fila[1]).longValue();
         }
 
-        // Si la cantidad es 0, significa que no hay pedidos reales se retorna null
         if (cantidad <= 0) {
             return null;
         }
@@ -207,7 +252,6 @@ public class PedidoService implements IPedidoService {
         return platoDto;
     }
 
-    // Cambiar estado pedido
     @Override
     public void cambiarEstado(Long idPedido) {
         Pedido pedido = pedidoRepository.findById(idPedido)
