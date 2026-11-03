@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: head}"></head>
+<body>
+<nav th:replace="~{layout :: navbar}"></nav>
+
+<main class="container py-4">
+    <div class="page-header mb-4">
+        <h2>Reporte de recaudación</h2>
+        <p class="text-muted mb-0" th:if="${reporte}">
+            <strong th:text="${reporte.unidad}">Unidad</strong> en
+            <span th:text="${reporte.festival}">Festival</span>
+            (<span th:text="${#temporals.format(reporte.fechaInicio, 'dd/MM/yyyy') + ' al ' + #temporals.format(reporte.fechaFin, 'dd/MM/yyyy')}"></span>)
+        </p>
+    </div>
+
+    <div class="alert alert-warning" th:if="${error}" th:text="${error}"></div>
+
+    <div th:if="${reporte}">
+        <!-- Resumen -->
+        <div class="row mb-4">
+            <div class="col-md-6 col-lg-3 mb-3">
+                <div class="card dato-reporte dato-principal h-100"><div class="card-body">
+                    <div class="small">Recaudación total</div>
+                    <div class="h3 mb-0" th:text="${'$ ' + #numbers.formatDecimal(reporte.recaudacionTotal, 1, 'POINT', 2, 'COMMA')}">$ 0</div>
+                </div></div>
+            </div>
+            <div class="col-6 col-lg-3 mb-3">
+                <div class="card dato-reporte h-100"><div class="card-body">
+                    <div class="small text-muted">Pedidos</div>
+                    <div class="h4 mb-0" th:text="${reporte.cantidadPedidos}">0</div>
+                </div></div>
+            </div>
+            <div class="col-6 col-lg-3 mb-3">
+                <div class="card dato-reporte h-100"><div class="card-body">
+                    <div class="small text-muted">Platos vendidos</div>
+                    <div class="h4 mb-0" th:text="${reporte.platosVendidos}">0</div>
+                </div></div>
+            </div>
+            <div class="col-md-6 col-lg-3 mb-3">
+                <div class="card dato-reporte h-100"><div class="card-body">
+                    <div class="small text-muted">Promedio por pedido</div>
+                    <div class="h4 mb-0" th:text="${'$ ' + #numbers.formatDecimal(reporte.promedioPorPedido, 1, 'POINT', 2, 'COMMA')}">$ 0</div>
+                </div></div>
+            </div>
+        </div>
+
+        <!-- Detalle por plato -->
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Recaudación por plato</h5>
+                <p class="text-muted mb-0" th:if="${reporte.ventasPorPlato.isEmpty()}">
+                    Todavía no hay pedidos de tu unidad dentro de las fechas del festival.
+                </p>
+                <div class="table-responsive" th:unless="${reporte.ventasPorPlato.isEmpty()}">
+                    <table class="table mb-0">
+                        <thead>
+                        <tr>
+                            <th>Plato</th>
+                            <th class="text-center">Vendidos</th>
+                            <th class="text-right">Precio</th>
+                            <th class="text-right">Recaudado</th>
+                            <th style="width: 30%">Del total</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="v : ${reporte.ventasPorPlato}">
+                            <td class="font-weight-bold" th:text="${v.plato}"></td>
+                            <td class="text-center" th:text="${v.cantidad}"></td>
+                            <td class="text-right text-nowrap" th:text="${'$ ' + #numbers.formatDecimal(v.precioUnitario, 1, 'POINT', 2, 'COMMA')}"></td>
+                            <td class="text-right text-nowrap" th:text="${'$ ' + #numbers.formatDecimal(v.subtotal, 1, 'POINT', 2, 'COMMA')}"></td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="barra-reporte flex-grow-1 mr-2">
+                                        <div class="barra-relleno" th:style="'width: ' + ${v.porcentaje} + '%'"></div>
+                                    </div>
+                                    <span class="small text-nowrap" th:text="${#numbers.formatDecimal(v.porcentaje, 1, 'POINT', 1, 'COMMA') + ' %'}">0 %</span>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <p class="small text-muted mt-3">
+            Se suman los pedidos de la unidad hechos entre el inicio y el fin del festival: cantidad × precio de cada plato.
+        </p>
+    </div>
+</main>
+
+<footer th:replace="~{layout :: footer}"></footer>
+<div th:replace="~{layout :: scripts}"></div>
+</body>
+</html>
