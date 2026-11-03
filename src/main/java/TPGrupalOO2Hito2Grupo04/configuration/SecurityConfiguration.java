@@ -44,7 +44,8 @@ public class SecurityConfiguration {
 					login.loginProcessingUrl("/loginprocess");
 					login.usernameParameter("username");
 					login.passwordParameter("password");
-					login.defaultSuccessUrl("/loginsuccess");
+					// Siempre al inicio después del login (no a la última página guardada, que puede ser de otro rol)
+					login.defaultSuccessUrl("/loginsuccess", true);
 					login.permitAll();
 				})
 
