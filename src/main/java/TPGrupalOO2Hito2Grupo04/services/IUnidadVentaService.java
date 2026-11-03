@@ -1,11 +1,8 @@
 package TPGrupalOO2Hito2Grupo04.services;
-import TPGrupalOO2Hito2Grupo04.dtos.FoodTruckDTO;
-import TPGrupalOO2Hito2Grupo04.dtos.PuestoDesarmableDTO;
-import TPGrupalOO2Hito2Grupo04.dtos.ReporteMayoresCanonDTO;
+import TPGrupalOO2Hito2Grupo04.dtos.*;
 import TPGrupalOO2Hito2Grupo04.entities.UnidadVenta;
 import TPGrupalOO2Hito2Grupo04.entities.Usuario;
 import TPGrupalOO2Hito2Grupo04.entities.Festival;
-import TPGrupalOO2Hito2Grupo04.dtos.UnidadVentaDTO;
 import TPGrupalOO2Hito2Grupo04.repositories.IUnidadVentaRepository;
 import TPGrupalOO2Hito2Grupo04.repositories.IFoodTruckRepository;
 import TPGrupalOO2Hito2Grupo04.repositories.IPuestoDesarmableRepository;
@@ -45,4 +42,6 @@ public interface IUnidadVentaService {
     void modificarPuestoDesarmable(Long id, PuestoDesarmableDTO dto);
     List<ReporteMayoresCanonDTO> obtenerUnidadesConMayorCanon(Long idFestival, int cantidad);
     byte[] generarReporteMayoresCanonPdf(List<ReporteMayoresCanonDTO> reporte, Long idFestival);
+
+    List<RankingRecaudacionUnidadDTO> obtenerRankingRecaudacion(Long idFestival);
 }

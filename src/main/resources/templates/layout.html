@@ -28,7 +28,10 @@
                       <a class="nav-link" th:href="@{/unidadVenta}">Unidades de venta</a>
                   </li>
                   <li class="nav-item" sec:authorize="hasAnyAuthority('ADMIN', 'ROLE_ADMIN')">
-                      <a class="nav-link" th:href="@{/unidadVenta/reporte}">Reporte</a>
+                      <a class="nav-link" th:href="@{/unidadVenta/reporte}">Canon</a>
+                  </li>
+                  <li class="nav-item" sec:authorize="hasAnyAuthority('ADMIN', 'ROLE_ADMIN')">
+                      <a class="nav-link" th:href="@{/unidadVenta/ranking}">Recaudacion</a>
                   </li>
                   <!-- El Responsable ve solo su unidad asignada -->
                   <li class="nav-item" sec:authorize="hasAnyAuthority('RESPONSABLE')">
