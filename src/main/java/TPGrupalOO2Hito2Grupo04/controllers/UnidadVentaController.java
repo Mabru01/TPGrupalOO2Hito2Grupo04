@@ -175,7 +175,7 @@ public class UnidadVentaController {
             @RequestParam(defaultValue = "3") int cantidad,
             Model model) {
 
-        ModelAndView mav = new ModelAndView("reporte/mayorCanon"); // HTML
+        ModelAndView mav = new ModelAndView(ViewRouteHelper.reporte_MAYOR_CANON); // HTML
 
         mav.addObject("festivales", festivalService.getAll());
         mav.addObject("idFestivalSeleccionado", idFestival);
@@ -196,14 +196,11 @@ public class UnidadVentaController {
             @RequestParam Long idFestival,
             @RequestParam(defaultValue = "3") int cantidad) {
 
-        // 1. Obtenemos los datos del reporte con el stream que ya armamos
         List<ReporteMayoresCanonDTO> reporte = unidadVentaService.obtenerUnidadesConMayorCanon(idFestival, cantidad);
 
-        // 2. Llamamos a un método del servicio que convierta esto en PDF (o usas una clase generadora)
         byte[] pdfBytes = unidadVentaService.generarReporteMayoresCanonPdf(reporte, idFestival);
 
-        // 3. Configuramos los headers HTTP exactamente igual que en LiquidacionController
-        String nombreArchivo = "reporte-mayores-canon-festival-" + idFestival + ".pdf";
+        String nombreArchivo = ViewRouteHelper.reporte_PDF_MAYOR_CANON + idFestival + ".pdf";
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + nombreArchivo + "\"")
