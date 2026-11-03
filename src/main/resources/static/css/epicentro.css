@@ -15,6 +15,13 @@
     letter-spacing: 0.02em;
 }
 
+.badge-puesto {
+    background-color: var(--eg-crema);
+    color: var(--eg-oscuro);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
 .btn-epicentro {
     background-color: var(--eg-acento);
     border-color: var(--eg-acento);
