@@ -1,6 +1,7 @@
 package TPGrupalOO2Hito2Grupo04.services;
 import TPGrupalOO2Hito2Grupo04.dtos.FoodTruckDTO;
 import TPGrupalOO2Hito2Grupo04.dtos.PuestoDesarmableDTO;
+import TPGrupalOO2Hito2Grupo04.dtos.ReporteMayoresCanonDTO;
 import TPGrupalOO2Hito2Grupo04.entities.UnidadVenta;
 import TPGrupalOO2Hito2Grupo04.entities.Usuario;
 import TPGrupalOO2Hito2Grupo04.entities.Festival;
@@ -42,4 +43,6 @@ public interface IUnidadVentaService {
 
     void modificarFoodTruck(Long id, FoodTruckDTO dto);
     void modificarPuestoDesarmable(Long id, PuestoDesarmableDTO dto);
+    List<ReporteMayoresCanonDTO> obtenerUnidadesConMayorCanon(Long idFestival, int cantidad);
+    byte[] generarReporteMayoresCanonPdf(List<ReporteMayoresCanonDTO> reporte, Long idFestival);
 }

@@ -2,6 +2,7 @@ package TPGrupalOO2Hito2Grupo04.controllers;
 
 import TPGrupalOO2Hito2Grupo04.dtos.FoodTruckDTO;
 import TPGrupalOO2Hito2Grupo04.dtos.PuestoDesarmableDTO;
+import TPGrupalOO2Hito2Grupo04.dtos.ReporteMayoresCanonDTO;
 import TPGrupalOO2Hito2Grupo04.entities.FoodTruck;
 import TPGrupalOO2Hito2Grupo04.entities.PuestoDesarmable;
 import TPGrupalOO2Hito2Grupo04.entities.UnidadVenta;
@@ -9,7 +10,11 @@ import TPGrupalOO2Hito2Grupo04.services.IUnidadVentaService;
 import TPGrupalOO2Hito2Grupo04.helpers.ViewRouteHelper;
 import TPGrupalOO2Hito2Grupo04.repositories.IUnidadVentaRepository;
 
+import TPGrupalOO2Hito2Grupo04.services.implementation.FestivalService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import java.security.Principal;
 import org.springframework.security.core.Authentication;
@@ -34,9 +39,11 @@ public class UnidadVentaController {
     private static final String LISTA_UNIDADES_ATTR = "unidadVentas";
 
     private final IUnidadVentaService unidadVentaService;
+    private final FestivalService festivalService;
 
-    public UnidadVentaController(IUnidadVentaService unidadVentaService) {
+    public UnidadVentaController(IUnidadVentaService unidadVentaService, FestivalService festivalService) {
         this.unidadVentaService = unidadVentaService;
+        this.festivalService = festivalService;
     }
 
     @GetMapping("")
@@ -160,5 +167,48 @@ public class UnidadVentaController {
         unidadVentaService.reactivar(id);
         return new RedirectView(ViewRouteHelper.UnidadVenta_MINE);
     }
+
+    @GetMapping("/reporte")
+    @PreAuthorize("hasAnyAuthority('ADMIN','ROLE_ADMIN')")
+    public ModelAndView verReporteMayoresCanon(
+            @RequestParam(required = false) Long idFestival,
+            @RequestParam(defaultValue = "3") int cantidad,
+            Model model) {
+
+        ModelAndView mav = new ModelAndView(ViewRouteHelper.reporte_MAYOR_CANON); // HTML
+
+        mav.addObject("festivales", festivalService.getAll());
+        mav.addObject("idFestivalSeleccionado", idFestival);
+        mav.addObject("cantidadSeleccionada", cantidad);
+
+        if (idFestival != null) {
+            List<ReporteMayoresCanonDTO> reporte = unidadVentaService.obtenerUnidadesConMayorCanon(idFestival, cantidad);
+            mav.addObject("reporteList", reporte);
+        }
+
+        return mav;
+    }
+
+
+    @GetMapping("/reporte/pdf")
+    @PreAuthorize("hasAnyAuthority('ADMIN','ROLE_ADMIN')")
+    public ResponseEntity<byte[]> descargarReportePdf(
+            @RequestParam Long idFestival,
+            @RequestParam(defaultValue = "3") int cantidad) {
+
+        List<ReporteMayoresCanonDTO> reporte = unidadVentaService.obtenerUnidadesConMayorCanon(idFestival, cantidad);
+
+        byte[] pdfBytes = unidadVentaService.generarReporteMayoresCanonPdf(reporte, idFestival);
+
+        String nombreArchivo = ViewRouteHelper.reporte_PDF_MAYOR_CANON + idFestival + ".pdf";
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + nombreArchivo + "\"")
+                .contentType(MediaType.APPLICATION_PDF)
+                .body(pdfBytes);
+    }
+
+
+
 
 }

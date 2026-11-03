@@ -1,13 +1,14 @@
 package TPGrupalOO2Hito2Grupo04.services.implementation;
 
 import java.time.LocalDate;
-import java.util.Collections;
+import java.util.*;
 import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.Comparator;
 
 import TPGrupalOO2Hito2Grupo04.repositories.IFestivalRepository;
 import TPGrupalOO2Hito2Grupo04.repositories.IUsuarioRepository;
+import com.lowagie.text.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.modelmapper.ModelMapper;
@@ -15,6 +16,27 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
+
+import java.awt.Color;
+import java.io.ByteArrayOutputStream;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.List;
+import java.util.Locale;
+
+import com.lowagie.text.Document;
+import com.lowagie.text.DocumentException;
+import com.lowagie.text.Element;
+import com.lowagie.text.Font;
+import com.lowagie.text.FontFactory;
+import com.lowagie.text.PageSize;
+import com.lowagie.text.Paragraph;
+import com.lowagie.text.Phrase;
+import com.lowagie.text.pdf.PdfPCell;
+import com.lowagie.text.pdf.PdfPTable;
+import com.lowagie.text.pdf.PdfWriter;
+import com.lowagie.text.pdf.PdfWriter;
+import java.io.ByteArrayOutputStream;
 
 import TPGrupalOO2Hito2Grupo04.entities.*;
 import TPGrupalOO2Hito2Grupo04.dtos.*;
@@ -201,6 +223,98 @@ public class UnidadVentaService implements IUnidadVentaService {
         unidadVentaRepository.save(pd);
     }
 
+    @Override
+    public List<ReporteMayoresCanonDTO> obtenerUnidadesConMayorCanon(Long idFestival, int cantidad){
+        List<UnidadVenta> unidades = unidadVentaRepository.findByFestivalIdFestivalAndActivaTrue(idFestival);
 
+        return unidades.stream()
+                // Transformacion de cada UnidadVenta en un ReporteMayoresCanonDTO
+                .map(u -> new ReporteMayoresCanonDTO(
+                        u.getNombreComercial(),
+                        u.getCodigoUnico(),
+                        (u instanceof FoodTruck ? "Food Truck" : "Puesto Desarmable"), // Determinamos el tipo
+                        u.calcularCanon() //
+                ))
+                // Ordenamos de mayor a menor
+                .sorted(Comparator.comparingDouble(ReporteMayoresCanonDTO::getCanon).reversed())
+                .limit(cantidad)
+                // Convertimos el Stream de nuevo a una List
+                .collect(Collectors.toList());
+
+    }
+
+    @Override
+    public byte[] generarReporteMayoresCanonPdf(List<ReporteMayoresCanonDTO> reporte, Long idFestival) {
+        // Formato para los pesos argentinos ($ 1.234,56)
+        DecimalFormat pesos = new DecimalFormat("$ #,##0.00", new DecimalFormatSymbols(Locale.of("es", "AR")));
+        Color bordo = new Color(59, 31, 43); // Color institucional del proyecto
+
+        // Fuentes
+        Font titulo = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 16, bordo);
+        Font subtitulo = FontFactory.getFont(FontFactory.HELVETICA, 10, Color.GRAY);
+        Font normal = FontFactory.getFont(FontFactory.HELVETICA, 10);
+        Font blanca = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 10, Color.WHITE);
+
+        ByteArrayOutputStream salida = new ByteArrayOutputStream();
+        Document documento = new Document(PageSize.A4, 40, 40, 40, 40);
+
+        try {
+            PdfWriter.getInstance(documento, salida);
+            documento.open();
+
+            // Encabezado
+            documento.add(new Paragraph("Epicentro Gourmet", titulo));
+            documento.add(new Paragraph("Reporte de Unidades con Mayor Canon - Festival ID: " + idFestival, subtitulo));
+            documento.add(new Paragraph(" ")); // Espacio en blanco
+
+            // Tabla de 4 columnas
+            PdfPTable tabla = new PdfPTable(4);
+            tabla.setWidthPercentage(100);
+            tabla.setWidths(new float[]{35, 20, 25, 20}); // Proporción de ancho
+
+            // Celdas de Encabezado
+            String[] headers = {"Nombre Comercial", "Código Único", "Tipo de Unidad", "Canon ($)"};
+            for (int i = 0; i < headers.length; i++) {
+                PdfPCell celda = new PdfPCell(new Phrase(headers[i], blanca));
+                celda.setBackgroundColor(bordo);
+                if (i == 3) celda.setHorizontalAlignment(Element.ALIGN_RIGHT);
+                celda.setPadding(6);
+                tabla.addCell(celda);
+            }
+
+            // Filas con los datos del DTO
+            for (ReporteMayoresCanonDTO dto : reporte) {
+                // Nombre
+                PdfPCell c1 = new PdfPCell(new Phrase(dto.getNombreComercial(), normal));
+                c1.setPadding(6);
+                tabla.addCell(c1);
+
+                // Código
+                PdfPCell c2 = new PdfPCell(new Phrase(dto.getCodigoUnico(), normal));
+                c2.setPadding(6);
+                tabla.addCell(c2);
+
+                // Tipo
+                PdfPCell c3 = new PdfPCell(new Phrase(dto.getTipoUnidad(), normal));
+                c3.setPadding(6);
+                tabla.addCell(c3);
+
+                // Canon (Alineado a la derecha)
+                PdfPCell c4 = new PdfPCell(new Phrase(pesos.format(dto.getCanon()), normal));
+                c4.setHorizontalAlignment(Element.ALIGN_RIGHT);
+                c4.setPadding(6);
+                tabla.addCell(c4);
+            }
+
+            documento.add(tabla);
+
+        } catch (DocumentException e) {
+            throw new IllegalStateException("No se pudo generar el PDF del reporte", e);
+        } finally {
+            documento.close();
+        }
+
+        return salida.toByteArray();
+    }
 
 }

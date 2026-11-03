@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: head}"></head>
+<body>
+<nav th:replace="~{layout :: navbar}"></nav>
+
+<div class="container mt-4">
+    <h2>Reporte: Unidades con Mayor Canon</h2>
+    <hr class="mb-4">
+
+    <form th:action="@{/unidadVenta/reporte}" method="get" class="row g-3 align-items-end p-4 bg-white shadow-sm rounded mb-5">
+
+        <!-- Selector de Festival -->
+        <div class="col-md-5">
+            <label for="idFestival" class="form-label fw-bold">Seleccionar Festival:</label>
+            <select id="idFestival" name="idFestival" class="form-select" required>
+                <option value="" disabled th:selected="${idFestivalSeleccionado == null}">-- Seleccione un festival --</option>
+                <option th:each="f : ${festivales}"
+                        th:value="${f.idFestival}"
+                        th:text="${f.nombre}"
+                        th:selected="${f.idFestival == idFestivalSeleccionado}">
+                </option>
+            </select>
+        </div>
+
+        <!-- Input para la cantidad X -->
+        <div class="col-md-3">
+            <label for="cantidad" class="form-label fw-bold">Top (Cantidad):</label>
+            <input type="number" id="cantidad" name="cantidad" class="form-control" min="1"
+                   th:value="${cantidadSeleccionada != null ? cantidadSeleccionada : 3}" required>
+        </div>
+
+        <!-- Botón Submit -->
+        <div class="col-md-4">
+            <button type="submit" class="btn btn-primary w-100">
+                Calcular Unidades
+            </button>
+        </div>
+    </form>
+
+    <!-- Tabla de Resultados (Agregado mb-5 para separar del footer) -->
+    <div th:if="${reporteList != null}" class="card shadow-sm mb-5">
+
+        <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Resultados del Reporte</h5>
+
+            <a th:href="@{/unidadVenta/reporte/pdf(idFestival=${idFestivalSeleccionado}, cantidad=${cantidadSeleccionada})}"
+               class="btn btn-danger btn-sm">
+                <i class="bi bi-file-earmark-pdf"></i> Descargar PDF
+            </a>
+        </div>
+
+        <div class="card-body p-0">
+            <table class="table table-striped table-hover mb-0">
+                <thead>
+                <tr>
+                    <th>Nombre Comercial</th>
+                    <th>Código Único</th>
+                    <th>Tipo de Unidad</th>
+                    <th>Canon ($)</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="dto : ${reporteList}">
+                    <td th:text="${dto.nombreComercial}"></td>
+                    <td th:text="${dto.codigoUnico}"></td>
+                    <td th:text="${dto.tipoUnidad}"></td>
+                    <td class="fw-bold text-success" th:text="${'$' + #numbers.formatDecimal(dto.canon, 1, 2)}"></td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(reporteList)}">
+                    <td colspan="4" class="text-center text-muted py-3">
+                        No se encontraron unidades activas para el festival seleccionado.
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<footer th:replace="~{layout :: footer}"></footer>
+<div th:replace="~{layout :: scripts}"></div>
+</body>
+</html>
