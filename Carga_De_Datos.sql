@@ -47,12 +47,12 @@ INSERT INTO costo (id_costo, costo_montaje, costo_superficie, plus_electricidad,
 -- =========================================
 -- UNIDAD VENTA
 -- =========================================
-INSERT INTO unidad_venta (id_unidad_venta, nombre_comercial, superficie, codigo_unico, id_festival, id_usuario) VALUES
-(1, 'Pollos',       2000, '1234',  1, 2),
-(2, 'Carnes',       3000, '5678',  2, 1),
-(3, 'Hamburguesas', 2500, '1111',  1, 3),
-(4, 'Pizzas',       3000, '1112',  1, 4),
-(5, 'Refrigerios',  4000, '91011', 3, 5);
+INSERT INTO unidad_venta (id_unidad_venta, nombre_comercial, superficie, codigo_unico, id_festival, id_usuario, activa) VALUES
+(1, 'Pollos',       2000, '1234',  1, 2, TRUE),
+(2, 'Carnes',       3000, '5678',  2, 1, TRUE),
+(3, 'Hamburguesas', 2500, '1111',  1, 3, TRUE),
+(4, 'Pizzas',       3000, '1112',  1, 4, TRUE),
+(5, 'Refrigerios',  4000, '91011', 3, 5, TRUE);
 
 -- =========================================
 -- PUESTO DESARMABLE
@@ -116,5 +116,27 @@ INSERT INTO item_pedido (id_item_pedido, id_pedido, id_plato, cantidad) VALUES
 (1, 1, 1, 2),
 (2, 2, 2, 3),
 (3, 3, 1, 5);
+
+-- =========================================
+-- VENTAS DE POLLOS EN EL FESTIVAL UNO (10/10 al 15/11), para el reporte de recaudación
+-- =========================================
+INSERT INTO plato (id_plato, nombre, precio, costo, id_unidad_venta, activo) VALUES
+(3, 'Pollo al limón', 18000, 9000, 1, TRUE),
+(4, 'Papas fritas',    6000, 2000, 1, TRUE),
+(5, 'Gaseosa',         2500,  800, 1, TRUE);
+
+INSERT INTO pedido (id_pedido, fecha_transaccion, terminado, id_unidad_venta) VALUES
+(4, '2026-10-12', TRUE,  1),
+(5, '2026-10-15', TRUE,  1),
+(6, '2026-10-20', TRUE,  1),
+(7, '2026-10-26', TRUE,  1),
+(8, '2026-11-02', FALSE, 1);
+
+INSERT INTO item_pedido (id_item_pedido, id_pedido, id_plato, cantidad) VALUES
+(4,  4, 2, 2), (5,  4, 4, 2), (6,  4, 5, 2),
+(7,  5, 3, 1), (8,  5, 5, 1),
+(9,  6, 2, 3), (10, 6, 4, 3),
+(11, 7, 3, 2), (12, 7, 4, 1), (13, 7, 5, 3),
+(14, 8, 2, 1), (15, 8, 5, 1);
 
 
