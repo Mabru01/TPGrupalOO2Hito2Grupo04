@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: head}"></head>
+<body>
+<nav th:replace="~{layout :: navbar}"></nav>
+
+<div class="container mt-5">
+    <h2 class="mb-4 text-center">Ranking de Unidades de Venta por Recaudación</h2>
+
+    <!-- Formulario para seleccionar el Festival -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <form method="get" th:action="@{/unidadVenta/ranking}" class="row g-3 align-items-center">
+                <div class="col-auto">
+                    <label for="idFestival" class="col-form-label fw-bold">Seleccionar Festival:</label>
+                </div>
+                <div class="col-auto">
+                    <select name="idFestival" id="idFestival" class="form-select" required>
+                        <option value="" disabled selected>-- Elija un festival --</option>
+                        <option th:each="f : ${festivales}"
+                                th:value="${f.idFestival}"
+                                th:text="${f.nombre}"
+                                th:selected="${f.idFestival == idFestivalSeleccionado}">
+                        </option>
+                    </select>
+                </div>
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-primary">Generar Ranking</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Tabla de Resultados (Solo se muestra si hay datos) -->
+    <div th:if="${rankingList != null}" class="card shadow-sm">
+        <div class="card-body">
+            <table class="table table-striped align-middle">
+                <thead class="table-dark">
+                <tr>
+                    <th>#</th>
+                    <th>Código Único</th>
+                    <th>Nombre Comercial</th>
+                    <th class="text-end">Recaudación Total</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="u, iter : ${rankingList}">
+                    <td class="fw-bold" th:text="${iter.count}">1</td>
+                    <td th:text="${u.codigoUnico}">ABC123</td>
+                    <td th:text="${u.nombreComercial}">Puesto de Hamburguesas</td>
+                    <td class="text-end fw-bold text-success" th:text="${'$ ' + #numbers.formatDecimal(u.recaudacionTotal, 1, 'COMMA', 2, 'POINT')}">$ 0.00</td>
+                </tr>
+                <!-- Mensaje por si la lista viene vacía -->
+                <tr th:if="${#lists.isEmpty(rankingList)}">
+                    <td colspan="4" class="text-center text-muted">No hay registros de ventas para este festival.</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<footer th:replace="~{layout :: footer}"></footer>
+<div th:replace="~{layout :: scripts}"></div>
+</body>
+</html>
+
+
+
