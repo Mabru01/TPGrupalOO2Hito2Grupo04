@@ -3,7 +3,9 @@ package TPGrupalOO2Hito2Grupo04.controllers;
 import TPGrupalOO2Hito2Grupo04.dtos.*;
 import TPGrupalOO2Hito2Grupo04.entities.Cajero;
 import TPGrupalOO2Hito2Grupo04.entities.Cocinero;
+import TPGrupalOO2Hito2Grupo04.entities.Festival;
 import TPGrupalOO2Hito2Grupo04.entities.Staff;
+import TPGrupalOO2Hito2Grupo04.services.IFestivalService;
 import TPGrupalOO2Hito2Grupo04.services.IStaffService;
 import TPGrupalOO2Hito2Grupo04.helpers.ViewRouteHelper;
 import TPGrupalOO2Hito2Grupo04.services.IUnidadVentaService;
@@ -16,6 +18,9 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.view.RedirectView;
 
 import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/staff")
@@ -24,12 +29,14 @@ public class StaffController {
 
     private final IStaffService staffService;
     private final IUnidadVentaService unidadVentaService;
+    private final IFestivalService festivalService;
     private final ModelMapper modelMapper;
 
 
-    public StaffController(IStaffService staffService, IUnidadVentaService unidadVentaService, ModelMapper modelMapper) {
+    public StaffController(IStaffService staffService, IUnidadVentaService unidadVentaService, IFestivalService festivalService, ModelMapper modelMapper) {
         this.staffService = staffService;
         this.unidadVentaService = unidadVentaService;
+        this.festivalService = festivalService;
         this.modelMapper = modelMapper;
     }
 
@@ -197,6 +204,27 @@ public class StaffController {
         String mail = authentication.getName();
         Staff staff = staffService.findByMail(mail);
         mAV.addObject("staff", staff);
+        return mAV;
+    }
+
+    @GetMapping("/calendario")
+    @PreAuthorize("isAuthenticated()")
+    public ModelAndView calendario() {
+        ModelAndView mAV = new ModelAndView(ViewRouteHelper.STAFF_CALENDARIO);
+        List<Festival> festivales = festivalService.getAll();
+        // Mapear solo los campos necesarios para evitar referencias circulares al serializar
+        List<Map<String, Object>> festivalesDTO = festivales.stream()
+            .map(f -> {
+                Map<String, Object> dto = new HashMap<>();
+                dto.put("nombre", f.getNombre());
+                dto.put("temporada", f.getTemporada());
+                dto.put("fechaInicio", f.getFechaInicio().toString());
+                dto.put("fechaFin", f.getFechaFin().toString());
+                return dto;
+            })
+            .toList();
+        mAV.addObject("festivales", festivalesDTO);
+        mAV.addObject("hoy", LocalDate.now());
         return mAV;
     }
 

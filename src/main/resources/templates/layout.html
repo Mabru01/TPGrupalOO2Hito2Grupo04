@@ -89,6 +89,7 @@
                             <div class="dropdown-divider" th:if="${nombreUsuario != null or unidadUsuario != null}"></div>
                             <a class="dropdown-item" th:href="@{/staff/perfil}" sec:authorize="hasAnyAuthority('EMPLEADO', 'ROLE_EMPLEADO')">Mi perfil</a>
                             <a class="dropdown-item" th:href="@{/staff/cambiar/contrasenia}" sec:authorize="hasAnyAuthority('EMPLEADO', 'ROLE_EMPLEADO')">Cambiar contraseña</a>
+                            <a class="dropdown-item" th:href="@{/staff/calendario}" sec:authorize="isAuthenticated()">Calendario</a>
                             <form th:action="@{/logout}" method="post">
                                 <button type="submit" class="dropdown-item">Cerrar sesión</button>
                             </form>
