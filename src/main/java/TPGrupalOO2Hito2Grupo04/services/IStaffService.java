@@ -26,5 +26,9 @@ public interface IStaffService {
 
     void darBajaEmpleado(StaffDTO staffDTO);
 
+    boolean reactivar(long idStaff);
+
+    List<Staff> getStaffsDadosDeBaja();
+
     StaffDTO obtenerDTOPorId(int idStaff);
 }

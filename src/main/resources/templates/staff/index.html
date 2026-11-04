@@ -9,7 +9,7 @@
         <h2>Empleados</h2>
         <div>
             <a th:href="@{/staff/nuevo/cocinero}" class="btn btn-success me-2">Nuevo Cocinero</a>
-            <a th:href="@{/staff/nuevo/cajero}" class="btn btn-success">Nuevo Cajero</a>
+            <a th:href="@{/staff/nuevo/cajero}" class="btn btn-success me-2">Nuevo Cajero</a>
         </div>
     </div>
 
@@ -20,6 +20,7 @@
             <th>DNI</th>
             <th>Sueldo</th>
             <th>Tipo</th>
+            <th>Activo</th>
         </tr>
         </thead>
         <tbody>
@@ -28,6 +29,10 @@
             <td th:text="${s.dni}"></td>
             <td th:text="${s.sueldoBase}"></td>
             <td th:text="${s.class.simpleName}"></td>
+            <td>
+                <span th:if="${s.fechaEgreso == null}" class="badge bg-success">Activo</span>
+                <span th:unless="${s.fechaEgreso == null}" class="badge bg-danger">Inactivo</span>
+            </td>
         </tr>
         </tbody>
     </table>

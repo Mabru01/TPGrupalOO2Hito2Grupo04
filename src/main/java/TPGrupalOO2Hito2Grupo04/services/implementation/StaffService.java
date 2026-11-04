@@ -236,6 +236,43 @@ public class StaffService implements IStaffService {
         }
     }
 
+    @Override
+    public List<Staff> getStaffsDadosDeBaja() {
+        return staffRepository.findByFechaEgresoIsNotNull();
+    }
+
+    @Override
+    public boolean reactivar(long idStaff) {
+        try {
+            Staff staff = staffRepository.findById(idStaff).orElse(null);
+
+            if (staff == null) {
+                logger.warn("No se encontró un empleado con id {}.", idStaff);
+                return false;
+            }
+
+            if (staff.getFechaEgreso() == null) {
+                logger.warn("El empleado con id {} no está dado de baja.", idStaff);
+                return false;
+            }
+
+            staff.setFechaEgreso(null);
+            staffRepository.save(staff);
+
+            Usuario usuario = staff.getUsuario();
+            if (usuario != null) {
+                usuario.setActivo(true);
+                usuarioRepository.save(usuario);
+            }
+
+            logger.info("Empleado con id {} reactivado con éxito.", idStaff);
+            return true;
+        } catch (DataAccessException e) {
+            logger.error("Error en la base de datos al reactivar el empleado con id {}", idStaff, e);
+            return false;
+        }
+    }
+
     public StaffDTO obtenerDTOPorId(int idStaff) {
         Staff staff = staffRepository.findById(idStaff)
                 .orElseThrow(() -> new IllegalArgumentException("ERROR: Empleado no encontrado"));

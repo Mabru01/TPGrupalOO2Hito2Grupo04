@@ -22,4 +22,7 @@ public interface IStaffRepository extends JpaRepository<Staff, Serializable> {
 
     // Staff con rol Empleado
     public abstract List<Staff> findByUsuarioRolRol(String rol);
+
+    // Staff dados de baja (con fechaEgreso no nula)
+    public abstract List<Staff> findByFechaEgresoIsNotNull();
 }

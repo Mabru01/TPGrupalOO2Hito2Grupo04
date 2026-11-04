@@ -30,6 +30,7 @@ public class ViewRouteHelper {
     public final static String STAFF_NEW_CAJERO = "staff/new-cajero";
     public final static String STAFF_UPDATE = "staff/update-staff";
     public final static String STAFF_DROP= "staff/drop-staff";
+    public final static String STAFF_REACTIVATE = "staff/reactivate-staff";
     public final static String STAFF_PARTIAL_VIEW = "staff/partialPersonView";
 
     //USER

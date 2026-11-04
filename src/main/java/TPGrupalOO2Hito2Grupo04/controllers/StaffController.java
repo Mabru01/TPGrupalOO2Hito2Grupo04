@@ -145,4 +145,37 @@ public class StaffController {
             return mAV;
         }
     }
+
+    @GetMapping("/reactivar")
+    public ModelAndView reactivar(@RequestParam(required = false) Integer idStaff) {
+        ModelAndView mAV = new ModelAndView(ViewRouteHelper.STAFF_REACTIVATE);
+        mAV.addObject("staffs", staffService.getStaffsDadosDeBaja());
+        if (idStaff != null) {
+            try {
+                Staff staff = staffService.findById(idStaff)
+                        .orElseThrow(() -> new IllegalArgumentException("ERROR: Empleado no encontrado"));
+                mAV.addObject(STAFF_ATTR, modelMapper.map(staff, StaffDTO.class));
+            } catch (IllegalArgumentException e) {
+                mAV.addObject("error", e.getMessage());
+            }
+        }
+        return mAV;
+    }
+
+    @PostMapping("/reactivar")
+    public ModelAndView reactivarStaff(@ModelAttribute("staffDTO") StaffDTO staffDTO) {
+        try {
+            boolean resultado = staffService.reactivar(staffDTO.getIdStaff());
+            if (!resultado) {
+                throw new IllegalArgumentException("No se pudo reactivar el empleado. Verifique que esté dado de baja.");
+            }
+            return new ModelAndView(new RedirectView(ViewRouteHelper.STAFF_ROOT));
+        } catch (IllegalArgumentException e) {
+            ModelAndView mAV = new ModelAndView(ViewRouteHelper.STAFF_REACTIVATE);
+            mAV.addObject("staffs", staffService.getAll());
+            mAV.addObject(STAFF_ATTR, staffDTO);
+            mAV.addObject("error", e.getMessage());
+            return mAV;
+        }
+    }
 }
