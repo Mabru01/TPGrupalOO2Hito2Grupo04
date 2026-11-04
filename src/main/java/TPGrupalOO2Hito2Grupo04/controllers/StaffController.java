@@ -190,6 +190,16 @@ public class StaffController {
         }
     }
 
+    @GetMapping("/perfil")
+    @PreAuthorize("hasAuthority('EMPLEADO')")
+    public ModelAndView perfil(Authentication authentication) {
+        ModelAndView mAV = new ModelAndView(ViewRouteHelper.STAFF_PERFIL);
+        String mail = authentication.getName();
+        Staff staff = staffService.findByMail(mail);
+        mAV.addObject("staff", staff);
+        return mAV;
+    }
+
     @GetMapping("/cambiar/contrasenia")
     @PreAuthorize("hasAuthority('EMPLEADO')")
     public ModelAndView cambiarContrasenia() {

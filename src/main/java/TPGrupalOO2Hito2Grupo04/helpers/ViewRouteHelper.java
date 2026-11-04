@@ -33,6 +33,7 @@ public class ViewRouteHelper {
     public final static String STAFF_REACTIVATE = "staff/reactivate-staff";
     public final static String STAFF_PARTIAL_VIEW = "staff/partialPersonView";
     public final static String STAFF_CAMBIAR_CONTRASENA = "staff/cambiar-contrasenia";
+    public final static String STAFF_PERFIL = "staff/perfil";
 
     //USER
     public final static String USER_LOGIN = "user/login";
