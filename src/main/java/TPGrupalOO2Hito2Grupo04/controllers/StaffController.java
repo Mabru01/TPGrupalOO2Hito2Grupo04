@@ -106,7 +106,9 @@ public class StaffController {
         mAV.addObject("unidadesVenta", unidadVentaService.getAll());
         if (idStaff != null) {
             try {
-                mAV.addObject(STAFF_ATTR, staffService.obtenerDTOPorId(idStaff));
+                StaffDTO staffDTO = new StaffDTO();
+                staffService.obtenerDTOPorId(idStaff, staffDTO);
+                mAV.addObject(STAFF_ATTR, staffDTO);
             } catch (IllegalArgumentException e) {
                 mAV.addObject("error", e.getMessage());
             }

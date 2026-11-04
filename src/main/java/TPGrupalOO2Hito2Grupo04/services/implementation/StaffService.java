@@ -8,9 +8,8 @@ import TPGrupalOO2Hito2Grupo04.repositories.IUnidadVentaRepository;
 import TPGrupalOO2Hito2Grupo04.repositories.IUsuarioRepository;
 import TPGrupalOO2Hito2Grupo04.services.IMailService;
 import TPGrupalOO2Hito2Grupo04.services.IStaffService;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -23,10 +22,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 
+@Slf4j
 @Service("staffService")
 public class StaffService implements IStaffService {
-    private static final Logger logger = LoggerFactory.getLogger(StaffService.class);
-
     private final IStaffRepository staffRepository;
     private final IUnidadVentaRepository unidadVentaRepository;
     private final IRolRepository rolRepository;
@@ -88,10 +86,10 @@ public class StaffService implements IStaffService {
             staffRepository.deleteById(id);
             return true;
         } catch (EmptyResultDataAccessException | DataIntegrityViolationException e) {
-            logger.warn("Could not remove Staff with id {}", id, e);
+            log.warn("Could not remove Staff with id {}", id, e);
             return false;
         } catch (DataAccessException e) {
-            logger.error("Database error while removing Staff with id {}", id, e);
+            log.error("Database error while removing Staff with id {}", id, e);
             return false;
         }
     }
@@ -170,21 +168,12 @@ public class StaffService implements IStaffService {
             mailService.enviarCorreoCredenciales(staffDTO.getEmailStaff(), staffDTO.getEmailStaff(), contraseniaGenerada);
             System.out.println("Se envió el correo de credenciales a: " + staffDTO.getEmailStaff());
         } catch (Exception e) {
-            logger.error("Error al enviar correo de credenciales a {}: {}", staffDTO.getEmailStaff(), e.getMessage());
+            log.error("Error al enviar correo de credenciales a {}: {}", staffDTO.getEmailStaff(), e.getMessage());
         }
 
         return staffGuardado;
     }
 
-    public String obtenerTipoEmpleado(Staff staff) {
-        if (staff instanceof Cocinero) {
-            return "Cocinero";
-        }
-        if (staff instanceof Cajero) {
-            return "Cajero";
-        }
-        return "Staff";
-    }
 
     public Staff modificarStaff(StaffDTO staffDTO) {
         // 1. Cargo el empleado existente
@@ -254,12 +243,12 @@ public class StaffService implements IStaffService {
             Staff staff = staffRepository.findById(idStaff).orElse(null);
 
             if (staff == null) {
-                logger.warn("No se encontró un empleado con id {}.", idStaff);
+                log.warn("No se encontró un empleado con id {}.", idStaff);
                 return false;
             }
 
             if (staff.getFechaEgreso() == null) {
-                logger.warn("El empleado con id {} no está dado de baja.", idStaff);
+                log.warn("El empleado con id {} no está dado de baja.", idStaff);
                 return false;
             }
 
@@ -272,47 +261,31 @@ public class StaffService implements IStaffService {
                 usuarioRepository.save(usuario);
             }
 
-            logger.info("Empleado con id {} reactivado con éxito.", idStaff);
+            log.info("Empleado con id {} reactivado con éxito.", idStaff);
             return true;
         } catch (DataAccessException e) {
-            logger.error("Error en la base de datos al reactivar el empleado con id {}", idStaff, e);
+            log.error("Error en la base de datos al reactivar el empleado con id {}", idStaff, e);
             return false;
         }
     }
 
-    public StaffDTO obtenerDTOPorId(int idStaff) {
+    @Override
+    public void obtenerDTOPorId(int idStaff, StaffDTO staffDTO) {
         Staff staff = staffRepository.findById(idStaff)
                 .orElseThrow(() -> new IllegalArgumentException("ERROR: Empleado no encontrado"));
 
-        if (staff instanceof Cajero cajero) {
-            CajeroDTO cajeroDTO = new CajeroDTO();
-            cajeroDTO.setIdStaff(cajero.getIdStaff());
-            cajeroDTO.setDni(cajero.getDni());
-            cajeroDTO.setNombre(cajero.getNombre());
-            cajeroDTO.setApellido(cajero.getApellido());
-            cajeroDTO.setFechaNacimiento(cajero.getFechaNacimiento());
-            cajeroDTO.setFechaIngreso(cajero.getFechaIngreso());
-            cajeroDTO.setSueldoBase(cajero.getSueldoBase());
-            cajeroDTO.setFechaEgreso(cajero.getFechaEgreso());
-            cajeroDTO.setIdUnidadVenta(cajero.getUnidadVenta() != null ? cajero.getUnidadVenta().getIdUnidadVenta() : null);
+        modelMapper.map(staff, staffDTO);
+        if (staff.getUnidadVenta() != null) {
+            staffDTO.setIdUnidadVenta(staff.getUnidadVenta().getIdUnidadVenta());
+        }
+
+        if (staff instanceof Cajero cajero && staffDTO instanceof CajeroDTO cajeroDTO) {
             cajeroDTO.setTurno(cajero.getTurno());
-            return cajeroDTO;
-        } else if (staff instanceof Cocinero cocinero) {
-            CocineroDTO cocineroDTO = new CocineroDTO();
-            cocineroDTO.setIdStaff(cocinero.getIdStaff());
-            cocineroDTO.setDni(cocinero.getDni());
-            cocineroDTO.setNombre(cocinero.getNombre());
-            cocineroDTO.setApellido(cocinero.getApellido());
-            cocineroDTO.setFechaNacimiento(cocinero.getFechaNacimiento());
-            cocineroDTO.setFechaIngreso(cocinero.getFechaIngreso());
-            cocineroDTO.setSueldoBase(cocinero.getSueldoBase());
-            cocineroDTO.setFechaEgreso(cocinero.getFechaEgreso());
-            cocineroDTO.setIdUnidadVenta(cocinero.getUnidadVenta() != null ? cocinero.getUnidadVenta().getIdUnidadVenta() : null);
+        } else if (staff instanceof Cocinero cocinero && staffDTO instanceof CocineroDTO cocineroDTO) {
             cocineroDTO.setCategoria(cocinero.getCategoria());
             cocineroDTO.setEspecialidad(cocinero.getEspecialidad());
-            return cocineroDTO;
         } else {
-            throw new IllegalArgumentException("Tipo de empleado desconocido");
+            throw new IllegalArgumentException("Tipo de empleado desconocido o DTO incompatible");
         }
     }
 

@@ -32,7 +32,7 @@ public interface IStaffService {
 
     List<Staff> getStaffsDadosDeBaja();
 
-    StaffDTO obtenerDTOPorId(int idStaff);
+    void obtenerDTOPorId(int idStaff, StaffDTO staffDTO);
 
     void empleadoCambiarContrasenia(int idUsuario, String contraseniaActual, String nuevaContrasenia, String confirmarContrasenia);
 }
