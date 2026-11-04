@@ -10,17 +10,17 @@
         <h2>Nuevo Cocinero</h2>
     </div>
 
-    <!-- Alerta de error si existe -->
-    <div th:if="${error}" class="alert alert-danger text-center" role="alert">
-        <span th:text="${error}">Mensaje de error</span>
-    </div>
-
     <div class="card form-card">
         <div class="card-body">
             <form th:action="@{/staff/guardar/cocinero}"
                   th:object="${staffDTO}" method="post">
 
                 <h5 class="text-secondary border-bottom pb-2 mb-3">Datos del empleado</h5>
+
+                <!-- Alerta de error por controller -->
+                <div class="alert alert-danger alert-dismissible fade show" role="alert" th:if="${error}">
+                    <span th:text="${error}"></span>
+                </div>
 
                 <div class="mb-3">
                     <label for="emailStaff" class="col-form-label">Correo Electrónico</label>

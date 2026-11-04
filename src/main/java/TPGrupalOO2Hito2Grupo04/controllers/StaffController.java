@@ -57,17 +57,33 @@ public class StaffController {
     }
 
     @PostMapping("/guardar/cocinero")
-    public RedirectView guardarCocinero(
+    public ModelAndView guardarCocinero(
             @ModelAttribute("staffDTO") CocineroDTO staffDTO) {
-        staffService.registrarStaff(staffDTO);
-        return new RedirectView(ViewRouteHelper.STAFF_ROOT);
+        try {
+            staffService.registrarStaff(staffDTO);
+            return new ModelAndView(new RedirectView(ViewRouteHelper.STAFF_ROOT));
+        } catch (IllegalArgumentException e) {
+            ModelAndView mAV = new ModelAndView(ViewRouteHelper.STAFF_NEW_COCINERO);
+            mAV.addObject("unidadesVenta", unidadVentaService.getAll());
+            mAV.addObject(STAFF_ATTR, new CocineroDTO());
+            mAV.addObject("error", e.getMessage());
+            return mAV;
+        }
     }
 
     @PostMapping("/guardar/cajero")
-    public RedirectView guardarCocinero(
+    public ModelAndView guardarCajero(
             @ModelAttribute("staffDTO") CajeroDTO staffDTO) {
-        staffService.registrarStaff(staffDTO);
-        return new RedirectView(ViewRouteHelper.STAFF_ROOT);
+        try {
+            staffService.registrarStaff(staffDTO);
+            return new ModelAndView(new RedirectView(ViewRouteHelper.STAFF_ROOT));
+        } catch (IllegalArgumentException e) {
+            ModelAndView mAV = new ModelAndView(ViewRouteHelper.STAFF_NEW_CAJERO);
+            mAV.addObject(STAFF_ATTR, new CajeroDTO());
+            mAV.addObject("unidadesVenta", unidadVentaService.getAll());
+            mAV.addObject("error", e.getMessage());
+            return mAV;
+        }
     }
 
     @GetMapping("/modificar")
@@ -86,9 +102,18 @@ public class StaffController {
     }
 
     @PostMapping("/modificar")
-    public RedirectView modificarStaff(@ModelAttribute("staffDTO") StaffDTO staffDTO) {
-        staffService.modificarStaff(staffDTO);
-        return new RedirectView(ViewRouteHelper.STAFF_ROOT);
+    public ModelAndView modificarStaff(@ModelAttribute("staffDTO") StaffDTO staffDTO) {
+        try {
+            staffService.modificarStaff(staffDTO);
+            return new ModelAndView(new RedirectView(ViewRouteHelper.STAFF_ROOT));
+        } catch (IllegalArgumentException e) {
+            ModelAndView mAV = new ModelAndView(ViewRouteHelper.STAFF_UPDATE);
+            mAV.addObject("staffs", staffService.getAll());
+            mAV.addObject("unidadesVenta", unidadVentaService.getAll());
+            mAV.addObject(STAFF_ATTR, staffDTO);
+            mAV.addObject("error", e.getMessage());
+            return mAV;
+        }
     }
 
     @GetMapping("/baja")
@@ -108,8 +133,16 @@ public class StaffController {
     }
 
     @PostMapping("/baja")
-    public RedirectView eliminarStaff(@ModelAttribute("staffDTO") StaffDTO staffDTO) {
-        staffService.darBajaEmpleado(staffDTO);
-        return new RedirectView(ViewRouteHelper.STAFF_ROOT);
+    public ModelAndView eliminarStaff(@ModelAttribute("staffDTO") StaffDTO staffDTO) {
+        try {
+            staffService.darBajaEmpleado(staffDTO);
+            return new ModelAndView(new RedirectView(ViewRouteHelper.STAFF_ROOT));
+        } catch (IllegalArgumentException e) {
+            ModelAndView mAV = new ModelAndView(ViewRouteHelper.STAFF_DROP);
+            mAV.addObject("staffs", staffService.getAll());
+            mAV.addObject(STAFF_ATTR, staffDTO);
+            mAV.addObject("error", e.getMessage());
+            return mAV;
+        }
     }
 }

@@ -10,16 +10,17 @@
         <h2>Modificar Empleado</h2>
     </div>
 
-    <!-- Alerta de error si existe -->
-    <div th:if="${error}" class="alert alert-danger text-center" role="alert">
-        <span th:text="${error}">Mensaje de error</span>
-    </div>
-
     <div class="card form-card">
         <div class="card-body">
             <!-- Paso 1: elegir empleado (siempre visible) -->
             <form th:action="@{/staff/modificar}" method="get">
                 <h5 class="text-secondary border-bottom pb-2 mb-3">Datos del empleado</h5>
+
+                <!-- Alerta de error por controller -->
+                <div class="alert alert-danger alert-dismissible fade show" role="alert" th:if="${error}">
+                    <span th:text="${error}"></span>
+                </div>
+
                 <div class="mb-3">
                     <label for="idStaff" class="col-form-label">Empleado a modificar</label>
                     <select class="form-control" id="idStaff" name="idStaff" required onchange="this.form.submit()">
@@ -32,6 +33,7 @@
                 </div>
             </form>
             <form th:if="${staffDTO != null}" th:action="@{/staff/modificar}" th:object="${staffDTO}" method="post">
+
                 <input type="hidden" th:field="*{idStaff}"/>
 
                 <div class="mb-3">

@@ -18,6 +18,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.Period;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
@@ -106,6 +107,12 @@ public class StaffService implements IStaffService {
             throw new IllegalArgumentException("Ya existe un empleado registrado con ese dni.");
         }
 
+        // Verifico que el empleado sea mayor de edad
+        Period edad = Period.between(staffDTO.getFechaNacimiento(), LocalDate.now());
+        if (edad.getYears() < 18) {
+            throw new IllegalArgumentException("No se puede registrar un empleado menor de edad.");
+        }
+
         // Generar una contraseña aleatoria para el nuevo empleado
         String contraseniaGenerada = generarContraseniaAleatoria();
 
@@ -184,7 +191,13 @@ public class StaffService implements IStaffService {
             }
         });
 
-        // 3. Actualizo los campos comunes
+        // 3. Verifico que el empleado sea mayor de edad
+        Period edad = Period.between(staffDTO.getFechaNacimiento(), LocalDate.now());
+        if (edad.getYears() < 18) {
+            throw new IllegalArgumentException("No se puede modificar a un empleado menor de edad.");
+        }
+
+        // 4. Actualizo los campos comunes
         staff.setDni(staffDTO.getDni());
         staff.setNombre(staffDTO.getNombre());
         staff.setApellido(staffDTO.getApellido());
