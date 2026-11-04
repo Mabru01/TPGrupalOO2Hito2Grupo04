@@ -19,4 +19,7 @@ public interface IStaffRepository extends JpaRepository<Staff, Serializable> {
 
     // Staff que trabaja en una unidad de venta
     public abstract List<Staff> findByUnidadVentaIdUnidadVenta(long idUnidadVenta);
+
+    // Staff con rol Empleado
+    public abstract List<Staff> findByUsuarioRolRol(String rol);
 }

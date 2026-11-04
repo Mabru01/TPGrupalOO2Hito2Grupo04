@@ -36,7 +36,7 @@ public class StaffController {
     @GetMapping("")
     public ModelAndView index() {
         ModelAndView mAV = new ModelAndView(ViewRouteHelper.STAFF_INDEX);
-        mAV.addObject("staffs", staffService.getAll());
+        mAV.addObject("staffs", staffService.getAllByRolEmpleado());
         return mAV;
     }
 
