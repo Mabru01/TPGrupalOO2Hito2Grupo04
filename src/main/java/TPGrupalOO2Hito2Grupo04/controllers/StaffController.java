@@ -9,6 +9,7 @@ import TPGrupalOO2Hito2Grupo04.helpers.ViewRouteHelper;
 import TPGrupalOO2Hito2Grupo04.services.IUnidadVentaService;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
@@ -18,7 +19,6 @@ import java.time.LocalDate;
 
 @Controller
 @RequestMapping("/staff")
-@PreAuthorize("hasAnyAuthority('RESPONSABLE', 'ROLE_RESPONSABLE')")
 public class StaffController {
     private static final String STAFF_ATTR = "staffDTO";
 
@@ -34,6 +34,7 @@ public class StaffController {
     }
 
     @GetMapping("")
+    @PreAuthorize("hasAnyAuthority('RESPONSABLE', 'ROLE_RESPONSABLE')")
     public ModelAndView index() {
         ModelAndView mAV = new ModelAndView(ViewRouteHelper.STAFF_INDEX);
         mAV.addObject("staffs", staffService.getAllByRolEmpleado());
@@ -41,7 +42,7 @@ public class StaffController {
     }
 
     @GetMapping("/nuevo/cocinero")
-    @PreAuthorize("hasAuthority('RESPONSABLE')")
+    @PreAuthorize("hasAnyAuthority('RESPONSABLE', 'ROLE_RESPONSABLE')")
     public ModelAndView nuevoCocinero() {
         ModelAndView mAV = new ModelAndView(ViewRouteHelper.STAFF_NEW_COCINERO);
         mAV.addObject("unidadesVenta", unidadVentaService.getAll()); // Para el desplegable (select)
@@ -50,7 +51,7 @@ public class StaffController {
     }
 
     @GetMapping("/nuevo/cajero")
-    @PreAuthorize("hasAuthority('RESPONSABLE')")
+    @PreAuthorize("hasAnyAuthority('RESPONSABLE', 'ROLE_RESPONSABLE')")
     public ModelAndView nuevoCajero() {
         ModelAndView mAV = new ModelAndView(ViewRouteHelper.STAFF_NEW_CAJERO);
         mAV.addObject(STAFF_ATTR, new CajeroDTO());
@@ -59,7 +60,7 @@ public class StaffController {
     }
 
     @PostMapping("/guardar/cocinero")
-    @PreAuthorize("hasAuthority('RESPONSABLE')")
+    @PreAuthorize("hasAnyAuthority('RESPONSABLE', 'ROLE_RESPONSABLE')")
     public ModelAndView guardarCocinero(
             @ModelAttribute("staffDTO") CocineroDTO staffDTO) {
         try {
@@ -75,7 +76,7 @@ public class StaffController {
     }
 
     @PostMapping("/guardar/cajero")
-    @PreAuthorize("hasAuthority('RESPONSABLE')")
+    @PreAuthorize("hasAnyAuthority('RESPONSABLE', 'ROLE_RESPONSABLE')")
     public ModelAndView guardarCajero(
             @ModelAttribute("staffDTO") CajeroDTO staffDTO) {
         try {
@@ -91,7 +92,7 @@ public class StaffController {
     }
 
     @GetMapping("/modificar")
-    @PreAuthorize("hasAuthority('RESPONSABLE')")
+    @PreAuthorize("hasAnyAuthority('RESPONSABLE', 'ROLE_RESPONSABLE')")
     public ModelAndView modificar(@RequestParam(required = false) Integer idStaff) {
         ModelAndView mAV = new ModelAndView(ViewRouteHelper.STAFF_UPDATE);
         mAV.addObject("staffs", staffService.getAllByRolEmpleado());
@@ -107,7 +108,7 @@ public class StaffController {
     }
 
     @PostMapping("/modificar")
-    @PreAuthorize("hasAuthority('RESPONSABLE')")
+    @PreAuthorize("hasAnyAuthority('RESPONSABLE', 'ROLE_RESPONSABLE')")
     public ModelAndView modificarStaff(@ModelAttribute("staffDTO") StaffDTO staffDTO) {
         try {
             staffService.modificarStaff(staffDTO);
@@ -123,7 +124,7 @@ public class StaffController {
     }
 
     @GetMapping("/baja")
-    @PreAuthorize("hasAuthority('RESPONSABLE')")
+    @PreAuthorize("hasAnyAuthority('RESPONSABLE', 'ROLE_RESPONSABLE')")
     public ModelAndView baja(@RequestParam(required = false) Integer idStaff) {
         ModelAndView mAV = new ModelAndView(ViewRouteHelper.STAFF_DROP);
         mAV.addObject("staffs", staffService.getAllByRolEmpleado());
@@ -140,7 +141,7 @@ public class StaffController {
     }
 
     @PostMapping("/baja")
-    @PreAuthorize("hasAuthority('RESPONSABLE')")
+    @PreAuthorize("hasAnyAuthority('RESPONSABLE', 'ROLE_RESPONSABLE')")
     public ModelAndView eliminarStaff(@ModelAttribute("staffDTO") StaffDTO staffDTO) {
         try {
             staffService.darBajaEmpleado(staffDTO);
@@ -155,7 +156,7 @@ public class StaffController {
     }
 
     @GetMapping("/reactivar")
-    @PreAuthorize("hasAuthority('RESPONSABLE')")
+    @PreAuthorize("hasAnyAuthority('RESPONSABLE', 'ROLE_RESPONSABLE')")
     public ModelAndView reactivar(@RequestParam(required = false) Integer idStaff) {
         ModelAndView mAV = new ModelAndView(ViewRouteHelper.STAFF_REACTIVATE);
         mAV.addObject("staffs", staffService.getStaffsDadosDeBaja());
@@ -172,7 +173,7 @@ public class StaffController {
     }
 
     @PostMapping("/reactivar")
-    @PreAuthorize("hasAuthority('RESPONSABLE')")
+    @PreAuthorize("hasAnyAuthority('RESPONSABLE', 'ROLE_RESPONSABLE')")
     public ModelAndView reactivarStaff(@ModelAttribute("staffDTO") StaffDTO staffDTO) {
         try {
             boolean resultado = staffService.reactivar(staffDTO.getIdStaff());
@@ -184,6 +185,44 @@ public class StaffController {
             ModelAndView mAV = new ModelAndView(ViewRouteHelper.STAFF_REACTIVATE);
             mAV.addObject("staffs", staffService.getAll());
             mAV.addObject(STAFF_ATTR, staffDTO);
+            mAV.addObject("error", e.getMessage());
+            return mAV;
+        }
+    }
+
+    @GetMapping("/cambiar/contrasenia")
+    @PreAuthorize("hasAuthority('EMPLEADO')")
+    public ModelAndView cambiarContrasenia() {
+        ModelAndView mAV = new ModelAndView(ViewRouteHelper.STAFF_CAMBIAR_CONTRASENA);
+        mAV.addObject("contraseniaDTO", new CambiarContraseniaDTO());
+        return mAV;
+    }
+
+    @PostMapping("/cambiar/contrasenia")
+    @PreAuthorize("hasAuthority('EMPLEADO')")
+    public ModelAndView cambiarContrasenia(
+            @ModelAttribute("contraseniaDTO") CambiarContraseniaDTO dto,
+            Authentication authentication) {
+
+        try {
+            // Obtener el empleado logueado
+            String mail = authentication.getName();
+            Staff staff = staffService.findByMail(mail);
+
+            // Validar y cambiar la contraseña
+            staffService.empleadoCambiarContrasenia(
+                staff.getUsuario().getId(),
+                dto.getContraseniaActual(),
+                dto.getNuevaContrasenia(),
+                dto.getConfirmarContrasenia()
+            );
+
+            // Logout automático
+            return new ModelAndView(new RedirectView("/logout?success=true"));
+
+        } catch (IllegalArgumentException e) {
+            ModelAndView mAV = new ModelAndView(ViewRouteHelper.STAFF_CAMBIAR_CONTRASENA);
+            mAV.addObject("contraseniaDTO", dto);
             mAV.addObject("error", e.getMessage());
             return mAV;
         }

@@ -16,6 +16,8 @@ public interface IStaffService {
 
     Staff findByDni(long dni);
 
+    Staff findByMail(String mail);
+
     Staff insertOrUpdate(Staff staff);
 
     boolean remove(long id);
@@ -31,4 +33,6 @@ public interface IStaffService {
     List<Staff> getStaffsDadosDeBaja();
 
     StaffDTO obtenerDTOPorId(int idStaff);
+
+    void empleadoCambiarContrasenia(int idUsuario, String contraseniaActual, String nuevaContrasenia, String confirmarContrasenia);
 }

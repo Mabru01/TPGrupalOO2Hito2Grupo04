@@ -84,6 +84,7 @@
                                 <div class="text-muted" th:if="${unidadUsuario}" th:text="${unidadUsuario}">Unidad</div>
                             </div>
                             <div class="dropdown-divider" th:if="${nombreUsuario != null or unidadUsuario != null}"></div>
+                            <a class="dropdown-item" th:href="@{/staff/cambiar/contrasenia}" sec:authorize="hasAnyAuthority('EMPLEADO', 'ROLE_EMPLEADO')">Cambiar contraseña</a>
                             <form th:action="@{/logout}" method="post">
                                 <button type="submit" class="dropdown-item">Cerrar sesión</button>
                             </form>

@@ -71,6 +71,13 @@ public class StaffService implements IStaffService {
     }
 
     @Override
+    public Staff findByMail(String mail) {
+        return staffRepository.findByUsuarioMail(mail).orElseThrow(
+                () -> new IllegalArgumentException("ERROR: Empleado no encontrado con ese mail")
+        );
+    }
+
+    @Override
     public Staff insertOrUpdate(Staff staff) {
         return staffRepository.save(staff);
     }
@@ -308,4 +315,35 @@ public class StaffService implements IStaffService {
             throw new IllegalArgumentException("Tipo de empleado desconocido");
         }
     }
+
+    @Override
+    public void empleadoCambiarContrasenia(int idUsuario, String contraseniaActual, String nuevaContrasenia, String confirmarContrasenia) {
+        Usuario usuario = usuarioRepository.findById(idUsuario)
+                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
+
+        // 1. Validar contraseña actual
+        if (!passwordEncoder.matches(contraseniaActual, usuario.getPassword())) {
+            throw new IllegalArgumentException("La contraseña actual es incorrecta");
+        }
+
+        // 2. Validar que coincidan
+        if (!nuevaContrasenia.equals(confirmarContrasenia)) {
+            throw new IllegalArgumentException("La nueva contraseña y la confirmación no coinciden");
+        }
+
+        // 3. Validar que sea diferente
+        if (passwordEncoder.matches(nuevaContrasenia, usuario.getPassword())) {
+            throw new IllegalArgumentException("La nueva contraseña debe ser diferente a la actual");
+        }
+
+        // 4. Validar complejidad
+        if (!nuevaContrasenia.matches("^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d).{8,}$")) {
+            throw new IllegalArgumentException("La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula y un número");
+        }
+
+        // 5. Guardar la nueva contraseña encriptada
+        usuario.setPassword(passwordEncoder.encode(nuevaContrasenia));
+        usuarioRepository.save(usuario);
+    }
+
 }
