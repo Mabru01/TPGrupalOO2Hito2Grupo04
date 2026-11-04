@@ -52,6 +52,10 @@ public class StaffService implements IStaffService {
         return staffRepository.findAll();
     }
 
+    public List<Staff> getAllByRolEmpleado() {
+        return staffRepository.findByUsuarioRolRol("EMPLEADO");
+    }
+
     @Override
     public Optional<Staff> findById(long id) {
         return staffRepository.findById(id);

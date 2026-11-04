@@ -10,6 +10,8 @@ public interface IStaffService {
 
     List<Staff> getAll();
 
+    List<Staff> getAllByRolEmpleado();
+
     Optional<Staff> findById(long id);
 
     Staff findByDni(long dni);

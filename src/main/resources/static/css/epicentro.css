@@ -15,6 +15,13 @@
     letter-spacing: 0.02em;
 }
 
+.badge-puesto {
+    background-color: var(--eg-crema);
+    color: var(--eg-oscuro);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
 .btn-epicentro {
     background-color: var(--eg-acento);
     border-color: var(--eg-acento);
@@ -99,3 +106,27 @@
     font-size: 0.85rem;
 }
 
+/* Reporte de recaudación */
+.dato-reporte {
+    border: 0;
+    border-radius: 10px;
+    box-shadow: 0 2px 12px rgba(59, 31, 43, 0.08);
+}
+
+.dato-principal {
+    background-color: var(--eg-oscuro);
+    color: #fff;
+}
+
+.barra-reporte {
+    min-width: 120px;
+    height: 8px;
+    border-radius: 999px;
+    background-color: #f1e6e2;
+    overflow: hidden;
+}
+
+.barra-relleno {
+    height: 100%;
+    background-color: var(--eg-acento);
+}

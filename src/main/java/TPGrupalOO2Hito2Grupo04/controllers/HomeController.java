@@ -14,20 +14,23 @@ import org.springframework.web.servlet.view.RedirectView;
 import TPGrupalOO2Hito2Grupo04.entities.Festival;
 import TPGrupalOO2Hito2Grupo04.helpers.ViewRouteHelper;
 import TPGrupalOO2Hito2Grupo04.services.IFestivalService;
+import TPGrupalOO2Hito2Grupo04.services.IUnidadVentaService;
 
 @Controller
 public class HomeController {
 
     private final IFestivalService festivalService;
+    private final IUnidadVentaService unidadVentaService;
 
-    public HomeController(IFestivalService festivalService) {
+    public HomeController(IFestivalService festivalService, IUnidadVentaService unidadVentaService) {
         this.festivalService = festivalService;
+        this.unidadVentaService = unidadVentaService;
     }
 
     //GET Example: SERVER/index
     // Página de inicio pública: festivales precargados y las acciones de registrarse e iniciar sesión.
     // Sin sesión: solo los festivales en curso. Con sesión: también los próximos.
-    // Los finalizados solo los ven el administrador y el responsable.
+    // El responsable ve solo el festival de su unidad. Los finalizados solo los ve el administrador.
     @GetMapping("/index")
     public ModelAndView index(Authentication authentication) {
         ModelAndView mAV = new ModelAndView(ViewRouteHelper.INDEX);
@@ -37,7 +40,14 @@ public class HomeController {
         boolean verFinalizados = puedeVerFinalizados(authentication);
 
         List<Festival> festivales = festivalService.getAllWithUnidades();
-        if (!conSesion) {
+        if (tieneRol(authentication, "RESPONSABLE")) {
+            Long idFestival = unidadVentaService.findByResponsable(authentication.getName())
+                    .map(u -> u.getFestival().getIdFestival())
+                    .orElse(null);
+            festivales = festivales.stream()
+                    .filter(f -> idFestival != null && f.getIdFestival() == idFestival)
+                    .toList();
+        } else if (!conSesion) {
             festivales = festivales.stream()
                     .filter(f -> !f.getFechaInicio().isAfter(hoy) && !f.getFechaFin().isBefore(hoy))
                     .toList();
@@ -60,12 +70,16 @@ public class HomeController {
 
     // Los roles se guardan sin prefijo (ADMIN, RESPONSABLE); se acepta también con ROLE_
     private boolean puedeVerFinalizados(Authentication authentication) {
+        return tieneRol(authentication, "ADMIN");
+    }
+
+    private boolean tieneRol(Authentication authentication, String rolBuscado) {
         if (authentication == null) {
             return false;
         }
         for (GrantedAuthority authority : authentication.getAuthorities()) {
             String rol = authority.getAuthority().replace("ROLE_", "");
-            if (rol.equals("ADMIN") || rol.equals("RESPONSABLE")) {
+            if (rol.equals(rolBuscado)) {
                 return true;
             }
         }
