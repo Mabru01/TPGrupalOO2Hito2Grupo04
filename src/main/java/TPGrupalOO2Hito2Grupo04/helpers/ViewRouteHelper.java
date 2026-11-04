@@ -24,6 +24,11 @@ public class ViewRouteHelper {
     // Liquidacion
     public final static String LIQUIDACION_INDEX = "liquidacion/index";
 
+    // Cierre de Caja
+    public final static String CIERRE_CAJA_INDEX = "cierreCaja/index";
+    public final static String CIERRE_CAJA_NUEVO = "cierreCaja/nuevo";
+    public final static String CIERRE_CAJA_RESULTADO = "cierreCaja/resultado";
+
     //STAFF
     public final static String STAFF_INDEX = "staff/index";
     public final static String STAFF_NEW_COCINERO = "staff/new-cocinero";

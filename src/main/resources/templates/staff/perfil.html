@@ -34,12 +34,12 @@
                     <p class="mb-0 text-muted" th:text="${#temporals.format(staff.fechaIngreso, 'dd/MM/yyyy')}">01/01/2024</p>
                 </div>
                 <div class="col-md-6 mb-3">
-                    <label class="col-form-label fw-bold">Sueldo base</label>
-                    <p class="mb-0 text-muted" th:text="'$' + ${#numbers.formatDecimal(staff.sueldoBase, 1, 2)}">$0.00</p>
-                </div>
-                <div class="col-md-6 mb-3">
                     <label class="col-form-label fw-bold">Unidad de venta</label>
                     <p class="mb-0 text-muted" th:text="${staff.unidadVenta != null ? staff.unidadVenta.nombreComercial : 'No asignada'}">Nombre del food truck</p>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="col-form-label fw-bold">Festival</label>
+                    <p class="mb-0 text-muted" th:text="${staff.unidadVenta != null ? staff.unidadVenta.festival.nombre : 'No asignado'}">Nombre del festival</p>
                 </div>
                 <div class="col-md-6 mb-3">
                     <label class="col-form-label fw-bold">Puesto</label>

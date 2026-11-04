@@ -46,6 +46,9 @@
                   <li class="nav-item" sec:authorize="hasAnyAuthority('EMPLEADO', 'ROLE_EMPLEADO')">
                       <a class="nav-link" th:href="@{/liquidacion}">Mi sueldo</a>
                   </li>
+                  <li class="nav-item" sec:authorize="hasAnyAuthority('EMPLEADO', 'ROLE_EMPLEADO')" th:if="${puestoUsuario == 'Cajero'}">
+                      <a class="nav-link" th:href="@{/cierreCaja}">Cerrar Caja</a>
+                  </li>
                   <li class="nav-item" sec:authorize="hasAnyAuthority('RESPONSABLE')">
                       <a class="nav-link" th:href="@{/plato}">Platos</a>
                   </li>
