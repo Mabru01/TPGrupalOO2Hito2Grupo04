@@ -13,10 +13,11 @@ public class ViewRouteHelper {
     public final static String UnidadVenta_SET_PUESTO = "unidadventa/modificar-puesto-desarmable";
     public final static String UnidadVenta_SET_FOOD_TRUCK = "unidadventa/modificar-food-truck";
     public final static String UnidadVenta_MINE = "/unidadVenta/mi-unidad";
+    public static final String UnidadVenta_RANKING_RECAUDACION = "unidadVenta/ranking-recaudacion"; 
+
 
     // Reportes
     public final static String REPORTE_RECAUDACION = "reporte/recaudacion";
-    //Reporte
     public final static String reporte_MAYOR_CANON = "reporte/mayorCanon";
     public final static String reporte_PDF_MAYOR_CANON = "reporte-mayores-canon-";
 

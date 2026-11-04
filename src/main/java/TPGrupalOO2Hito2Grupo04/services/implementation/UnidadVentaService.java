@@ -317,4 +317,32 @@ public class UnidadVentaService implements IUnidadVentaService {
         return salida.toByteArray();
     }
 
+
+    @Override
+    public List<RankingRecaudacionUnidadDTO> obtenerRankingRecaudacion(Long idFestival) {
+        // las unidades del festival con los pedidos y sus ítems cargados
+        List<UnidadVenta> unidades = unidadVentaRepository.findByFestivalWithPedidosAndItems(idFestival);
+
+        //  cada unidad sumando el precio total de cada pedido
+        return unidades.stream().map(u -> {
+                    double totalRecaudacion = 0.0;
+                    if (u.getPedidos() != null) {
+                        totalRecaudacion = u.getPedidos().stream()
+                                .mapToDouble(Pedido::getPrecioTotal)
+                                .sum();
+                    }
+
+                    return new RankingRecaudacionUnidadDTO(
+                            u.getNombreComercial(),
+                            u.getCodigoUnico(),
+                            totalRecaudacion
+                    );
+                })
+                // mayor a menor
+                .sorted(Comparator.comparing(RankingRecaudacionUnidadDTO::getRecaudacionTotal).reversed())
+                .collect(Collectors.toList());
+    }
+
+
+
 }

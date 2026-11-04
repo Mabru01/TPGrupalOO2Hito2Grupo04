@@ -21,4 +21,7 @@ public interface IUnidadVentaRepository extends JpaRepository<UnidadVenta, Long>
     Optional<UnidadVenta> findByCodigoUnicoAndActivaTrue(String codigoUnico);
     Optional<UnidadVenta> findByResponsable_Mail(String mail);
     List<UnidadVenta> findByFestivalIdFestivalAndActivaTrue(long idFestival);
+
+    @Query("SELECT DISTINCT u FROM UnidadVenta u LEFT JOIN FETCH u.pedidos p LEFT JOIN FETCH p.items i LEFT JOIN FETCH i.plato WHERE u.festival.id = :idFestival and u.activa = true")
+    List<UnidadVenta> findByFestivalWithPedidosAndItems(@Param("idFestival") Long idFestival);
 }

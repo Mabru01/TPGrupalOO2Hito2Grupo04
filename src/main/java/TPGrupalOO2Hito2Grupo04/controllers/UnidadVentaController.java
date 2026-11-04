@@ -2,6 +2,7 @@ package TPGrupalOO2Hito2Grupo04.controllers;
 
 import TPGrupalOO2Hito2Grupo04.dtos.FoodTruckDTO;
 import TPGrupalOO2Hito2Grupo04.dtos.PuestoDesarmableDTO;
+import TPGrupalOO2Hito2Grupo04.dtos.RankingRecaudacionUnidadDTO;
 import TPGrupalOO2Hito2Grupo04.dtos.ReporteMayoresCanonDTO;
 import TPGrupalOO2Hito2Grupo04.entities.FoodTruck;
 import TPGrupalOO2Hito2Grupo04.entities.PuestoDesarmable;
@@ -209,6 +210,22 @@ public class UnidadVentaController {
     }
 
 
+    @GetMapping("/ranking")
+    @PreAuthorize("hasAnyAuthority('ADMIN','ROLE_ADMIN')")
+    public ModelAndView verRankingRecaudacion(@RequestParam(required = false) Long idFestival) {
+        ModelAndView mav = new ModelAndView(ViewRouteHelper.UnidadVenta_RANKING_RECAUDACION);
 
+        // Pasamos la lista de festivales para el selector del formulario
+        mav.addObject("festivales", festivalService.getAll());
+        mav.addObject("idFestivalSeleccionado", idFestival);
+
+        // Si eligió un festival, calculamos y pasamos el ranking a la vista
+        if (idFestival != null) {
+            List<RankingRecaudacionUnidadDTO> ranking = unidadVentaService.obtenerRankingRecaudacion(idFestival);
+            mav.addObject("rankingList", ranking);
+        }
+
+        return mav;
+    }
 
 }
