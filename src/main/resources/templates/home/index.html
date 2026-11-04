@@ -45,6 +45,7 @@
                             <th class="text-center">Duración</th>
                             <th>Unidades de venta</th>
                             <th class="text-center">Estado</th>
+                            <th sec:authorize="hasAnyAuthority('ADMIN', 'ROLE_ADMIN')"></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -68,6 +69,10 @@
                                 <span th:if="${f.fechaInicio.isAfter(hoy)}" class="estado estado-proximo">Próximo</span>
                                 <span th:if="${f.fechaFin.isBefore(hoy)}" class="estado estado-finalizado">Finalizado</span>
                                 <span th:unless="${f.fechaInicio.isAfter(hoy) or f.fechaFin.isBefore(hoy)}" class="estado estado-curso">En curso</span>
+                            </td>
+                            <!-- El administrador puede ver el detalle completo del festival -->
+                            <td class="text-center" sec:authorize="hasAnyAuthority('ADMIN', 'ROLE_ADMIN')">
+                                <a th:href="@{/festival/{id}(id=${f.idFestival})}" class="btn btn-sm btn-outline-secondary text-nowrap">Ver detalle</a>
                             </td>
                         </tr>
                     </tbody>

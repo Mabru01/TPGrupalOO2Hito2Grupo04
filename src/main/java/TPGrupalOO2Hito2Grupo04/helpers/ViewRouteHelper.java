@@ -21,6 +21,9 @@ public class ViewRouteHelper {
     public final static String reporte_MAYOR_CANON = "reporte/mayorCanon";
     public final static String reporte_PDF_MAYOR_CANON = "reporte-mayores-canon-";
 
+    // Festival
+    public final static String FESTIVAL_DETAIL = "festival/detail";
+
     // Liquidacion
     public final static String LIQUIDACION_INDEX = "liquidacion/index";
 

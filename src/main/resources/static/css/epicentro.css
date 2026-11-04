@@ -106,6 +106,14 @@
     font-size: 0.85rem;
 }
 
+/* Datos destacados en el detalle de un festival */
+.dato-festival {
+    border: 0;
+    border-left: 4px solid var(--eg-acento);
+    border-radius: 10px;
+    background-color: var(--eg-crema);
+}
+
 /* Reporte de recaudación */
 .dato-reporte {
     border: 0;
