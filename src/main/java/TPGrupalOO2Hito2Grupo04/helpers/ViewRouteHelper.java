@@ -18,6 +18,7 @@ public class ViewRouteHelper {
 
     // Reportes
     public final static String REPORTE_RECAUDACION = "reporte/recaudacion";
+    public final static String REPORTE_RENTABILIDAD = "reporte/rentabilidad";
     public final static String reporte_MAYOR_CANON = "reporte/mayorCanon";
     public final static String reporte_PDF_MAYOR_CANON = "reporte-mayores-canon-";
 
