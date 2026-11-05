@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{layout :: head}"></head>
+<body>
+    <nav th:replace="~{layout :: navbar}"></nav>
+
+    <main class="container py-4">
+        <h1 class="mb-4">Cerrar Caja</h1>
+        <p class="lead">
+            Bienvenido/a, <strong th:text="${cajero.nombre + ' ' + cajero.apellido}">Cajero</strong>.
+            Desde aquí podés consultar el resumen de ventas de tu unidad de venta.
+        </p>
+        <hr/>
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i>
+            Seleccioná una fecha para ver el resumen de ventas de ese día.
+        </div>
+        <a th:href="@{/cierreCaja/nuevo}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Ver resumen del día
+        </a>
+    </main>
+
+    <footer th:replace="~{layout :: footer}"></footer>
+    <div th:replace="~{layout :: scripts}"></div>
+</body>
+</html>

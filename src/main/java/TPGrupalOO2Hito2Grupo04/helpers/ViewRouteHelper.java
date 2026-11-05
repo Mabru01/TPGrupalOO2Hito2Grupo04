@@ -27,6 +27,11 @@ public class ViewRouteHelper {
     // Liquidacion
     public final static String LIQUIDACION_INDEX = "liquidacion/index";
 
+    // Cierre de Caja
+    public final static String CIERRE_CAJA_INDEX = "cierreCaja/index";
+    public final static String CIERRE_CAJA_NUEVO = "cierreCaja/nuevo";
+    public final static String CIERRE_CAJA_RESULTADO = "cierreCaja/resultado";
+
     //STAFF
     public final static String STAFF_INDEX = "staff/index";
     public final static String STAFF_NEW_COCINERO = "staff/new-cocinero";
@@ -35,6 +40,9 @@ public class ViewRouteHelper {
     public final static String STAFF_DROP= "staff/drop-staff";
     public final static String STAFF_REACTIVATE = "staff/reactivate-staff";
     public final static String STAFF_PARTIAL_VIEW = "staff/partialPersonView";
+    public final static String STAFF_CAMBIAR_CONTRASENA = "staff/cambiar-contrasenia";
+    public final static String STAFF_PERFIL = "staff/perfil";
+    public final static String STAFF_CALENDARIO = "staff/calendario";
 
     //USER
     public final static String USER_LOGIN = "user/login";

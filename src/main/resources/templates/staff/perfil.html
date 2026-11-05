@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{layout :: head}"></head>
+<body>
+<nav th:replace="~{layout :: navbar}"></nav>
+
+<main class="container py-4">
+    <div class="page-header mb-4">
+        <h2>Mi Perfil</h2>
+    </div>
+
+    <div class="card form-card">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="col-form-label fw-bold">Nombre completo</label>
+                    <p class="mb-0 text-muted" th:text="${staff.nombre + ' ' + staff.apellido}">Nombre Apellido</p>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="col-form-label fw-bold">DNI</label>
+                    <p class="mb-0 text-muted" th:text="${staff.dni}">12345678</p>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="col-form-label fw-bold">Email</label>
+                    <p class="mb-0 text-muted" th:text="${staff.usuario.mail}">email@ejemplo.com</p>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="col-form-label fw-bold">Fecha de nacimiento</label>
+                    <p class="mb-0 text-muted" th:text="${#temporals.format(staff.fechaNacimiento, 'dd/MM/yyyy')}">01/01/2000</p>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="col-form-label fw-bold">Fecha de ingreso</label>
+                    <p class="mb-0 text-muted" th:text="${#temporals.format(staff.fechaIngreso, 'dd/MM/yyyy')}">01/01/2024</p>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="col-form-label fw-bold">Unidad de venta</label>
+                    <p class="mb-0 text-muted" th:text="${staff.unidadVenta != null ? staff.unidadVenta.nombreComercial : 'No asignada'}">Nombre del food truck</p>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="col-form-label fw-bold">Festival</label>
+                    <p class="mb-0 text-muted" th:text="${staff.unidadVenta != null ? staff.unidadVenta.festival.nombre : 'No asignado'}">Nombre del festival</p>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="col-form-label fw-bold">Puesto</label>
+                    <p class="mb-0 text-muted">
+                        <span th:if="${staff instanceof T(TPGrupalOO2Hito2Grupo04.entities.Cajero)}">Cajero</span>
+                        <span th:unless="${staff instanceof T(TPGrupalOO2Hito2Grupo04.entities.Cajero)}">Cocinero</span>
+                    </p>
+                </div>
+                <div class="col-md-6 mb-3" th:if="${staff instanceof T(TPGrupalOO2Hito2Grupo04.entities.Cajero)}">
+                    <label class="col-form-label fw-bold">Turno</label>
+                    <p class="mb-0 text-muted" th:text="${staff.turno}">Turno</p>
+                </div>
+                <div class="col-md-6 mb-3" th:if="${staff instanceof T(TPGrupalOO2Hito2Grupo04.entities.Cocinero)}">
+                    <label class="col-form-label fw-bold">Especialidad</label>
+                    <p class="mb-0 text-muted" th:text="${staff.especialidad}">Especialidad</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{layout :: footer}"></footer>
+<div th:replace="~{layout :: scripts}"></div>
+</body>
+</html>

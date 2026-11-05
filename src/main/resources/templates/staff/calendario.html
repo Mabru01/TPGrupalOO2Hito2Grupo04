@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{layout :: head}"></head>
+<style>
+    #calendar {
+        max-width: 100%;
+        margin: 0 auto;
+        height: 700px;
+    }
+
+    .fc-event {
+        cursor: pointer;
+    }
+
+    .legend {
+        display: flex;
+        gap: 20px;
+        justify-content: center;
+        flex-wrap: wrap;
+        margin-bottom: 20px;
+    }
+
+    .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.9rem;
+    }
+
+    .legend-color {
+        width: 16px;
+        height: 16px;
+        border-radius: 3px;
+    }
+
+    .legend-color.en-curso {
+        background-color: #28a745;
+    }
+
+    .legend-color.futuro {
+        background-color: #007bff;
+    }
+
+    .legend-color.pasado {
+        background-color: #6c757d;
+    }
+</style>
+<body>
+<nav th:replace="~{layout :: navbar}"></nav>
+
+<main class="container py-4">
+    <div class="page-header mb-4">
+        <h2>Calendario de Festivales</h2>
+    </div>
+
+    <!-- Mensaje cuando no hay festivales -->
+    <div th:if="${#lists.isEmpty(festivales)}" class="alert alert-info text-center mb-4">
+        <i class="bi bi-info-circle"></i> No hay festivales registrados. El calendario se mostrará vacío.
+    </div>
+
+    <!-- Leyenda de colores -->
+    <div class="legend">
+        <div class="legend-item">
+            <div class="legend-color en-curso"></div>
+            <span>En curso</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color futuro"></div>
+            <span>Próximo</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color pasado"></div>
+            <span>Finalizado</span>
+        </div>
+    </div>
+
+    <div id="calendar"></div>
+</main>
+
+<footer th:replace="~{layout :: footer}"></footer>
+<div th:replace="~{layout :: scripts}"></div>
+
+<!-- FullCalendar CSS y JS -->
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.9/index.global.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.9/index.global.min.js"></script>
+<!-- Plugin para vista anual -->
+<script src="https://cdn.jsdelivr.net/npm/@fullcalendar/yearly@6.1.9/main.min.js"></script>
+<!-- Plugin de idioma español -->
+<script src="https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.9/locales/es.js"></script>
+
+<script th:inline="javascript">
+    document.addEventListener('DOMContentLoaded', function() {
+        var calendarEl = document.getElementById('calendar');
+
+        // Si no hay elemento de calendario, salir
+        if (!calendarEl) {
+            console.error('No se encontró el elemento #calendar');
+            return;
+        }
+
+        var hoy = /*[[${hoy}]]*/ '2026-11-04';
+
+        var festivales = /*[[${festivales}]]*/ [];
+
+        // Construir eventos para FullCalendar
+        var eventos = festivales.map(function(festival) {
+            var fechaInicio = festival.fechaInicio;
+            var fechaFin = festival.fechaFin;
+
+            // Determinar el estado del festival comparando con hoy
+            var esPasado = false;
+            var esEnCurso = false;
+
+            // Thymeleaf ya evaluó las fechas; usamos JavaScript para comparar
+            var inicio = new Date(fechaInicio + 'T00:00:00');
+            var fin = new Date(fechaFin + 'T23:59:59');
+            var hoyParts = hoy.split('-');
+            var hoyDate = new Date(parseInt(hoyParts[0]), parseInt(hoyParts[1]) - 1, parseInt(hoyParts[2]));
+
+            if (fin < hoyDate) {
+                // Festival ya terminó
+                esPasado = true;
+            } else if (inicio <= hoyDate && fin >= hoyDate) {
+                // Festival en curso
+                esEnCurso = true;
+            }
+
+            var colorBg = '#6c757d'; // pasado (gris)
+            var borderColor = '#6c757d';
+
+            if (esEnCurso) {
+                colorBg = '#28a745'; // en curso (verde)
+                borderColor = '#28a745';
+            } else if (!esPasado) {
+                colorBg = '#007bff'; // futuro (azul)
+                borderColor = '#007bff';
+            }
+
+            // Calcular la fecha de fin + 1 día para FullCalendar
+            var endParts = fechaFin.split('-');
+            var endDate = new Date(parseInt(endParts[0]), parseInt(endParts[1]) - 1, parseInt(endParts[2]) + 1);
+            var endDateString = endDate.toISOString().split('T')[0];
+
+            return {
+                title: festival.nombre + (festival.temporada ? ' (' + festival.temporada + ')' : ''),
+                start: fechaInicio,
+                end: endDateString,
+                backgroundColor: colorBg,
+                borderColor: borderColor,
+                extendedProps: {
+                    estado: esEnCurso ? 'En curso' : (esPasado ? 'Finalizado' : 'Próximo'),
+                    temporada: festival.temporada || 'Sin temporada'
+                }
+            };
+        });
+
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            locale: 'es',
+            buttonText: {
+                today: 'Hoy',
+                month: 'Mes',
+                week: 'Semana',
+                day: 'Día',
+                prev: '‹',
+                next: '›'
+            },
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,dayGridWeek'
+            },
+            events: eventos,
+            eventClick: function(info) {
+                var event = info.event;
+                var estado = event.extendedProps.estado;
+                var temporada = event.extendedProps.temporada;
+                alert(
+                    'Festival: ' + event.title.replace(/ \(.*\)$/, '') + '\n' +
+                    'Temporada: ' + temporada + '\n' +
+                    'Estado: ' + estado + '\n' +
+                    'Inicio: ' + event.start.toLocaleDateString('es-AR') + '\n' +
+                    'Fin: ' + new Date(event.end.getTime() - 86400000).toLocaleDateString('es-AR')
+                );
+            },
+            eventDisplay: 'block'
+        });
+
+        calendar.render();
+    });
+</script>
+</body>
+
+</html>

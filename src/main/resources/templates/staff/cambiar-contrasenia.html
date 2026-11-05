@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{layout :: head}"></head>
+<body>
+<nav th:replace="~{layout :: navbar}"></nav>
+
+<main class="container py-4">
+    <div class="page-header mb-4">
+        <h2>Cambiar Contraseña</h2>
+    </div>
+
+    <div class="card form-card">
+        <div class="card-body">
+            <form th:action="@{/staff/cambiar/contrasenia}" th:object="${contraseniaDTO}" method="post">
+
+                <!-- Alerta de error -->
+                <div class="alert alert-danger alert-dismissible fade show" role="alert" th:if="${error}">
+                    <span th:text="${error}"></span>
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Cerrar">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <!-- Mensaje de éxito desde logout -->
+                <div class="alert alert-success alert-dismissible fade show" role="alert" th:if="${param.success}">
+                    Tu contraseña fue cambiada correctamente. Ingresá con tu nueva contraseña.
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Cerrar">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <div class="mb-3">
+                    <label for="contraseniaActual" class="col-form-label">Contraseña actual</label>
+                    <input type="password" class="form-control" id="contraseniaActual" th:field="*{contraseniaActual}" required/>
+                </div>
+
+                <div class="mb-3">
+                    <label for="nuevaContrasenia" class="col-form-label">Nueva contraseña</label>
+                    <input type="password" class="form-control" id="nuevaContrasenia" th:field="*{nuevaContrasenia}" required/>
+                    <small class="form-text text-muted">
+                        Debe tener al menos 8 caracteres, una mayúscula, una minúscula y un número.
+                    </small>
+                </div>
+
+                <div class="mb-3">
+                    <label for="confirmarContrasenia" class="col-form-label">Confirmar nueva contraseña</label>
+                    <input type="password" class="form-control" id="confirmarContrasenia" th:field="*{confirmarContrasenia}" required/>
+                </div>
+
+                <div class="d-flex justify-content-between mt-4">
+                    <button type="submit" class="btn btn-epicentro">Cambiar contraseña</button>
+                    <a th:href="@{/}" class="btn btn-outline-secondary px-4">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{layout :: footer}"></footer>
+<div th:replace="~{layout :: scripts}"></div>
+</body>
+</html>
