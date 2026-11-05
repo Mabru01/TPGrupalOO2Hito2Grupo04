@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: head}"></head>
+<body>
+<nav th:replace="~{layout :: navbar}"></nav>
+
+<main class="container py-4">
+    <div class="page-header mb-4">
+        <h2>Rentabilidad neta</h2>
+        <p class="text-muted mb-0" th:if="${reporte}">
+            <strong th:text="${reporte.unidad}">Unidad</strong> en
+            <span th:text="${reporte.festival}">Festival</span>
+            (<span th:text="${#temporals.format(reporte.desde, 'dd/MM/yyyy') + ' al ' + #temporals.format(reporte.hasta, 'dd/MM/yyyy')}"></span>,
+            <span th:text="${reporte.festivalCompleto ? 'festival completo' : reporte.diasPeriodo + ' de ' + reporte.diasFestival + ' días'}"></span>)
+        </p>
+    </div>
+
+    <!-- Período: sin fechas se calcula el festival completo -->
+    <form class="card mb-4" th:if="${festival}" th:action="@{/reporte/rentabilidad}" method="get">
+        <div class="card-body">
+            <div class="form-row align-items-end">
+                <div class="col-sm-4 mb-2">
+                    <label for="desde" class="small text-muted mb-1">Desde</label>
+                    <input type="date" id="desde" name="desde" class="form-control" required
+                           th:min="${festival.fechaInicio}" th:max="${festival.fechaFin}"
+                           th:value="${reporte != null ? reporte.desde : desde}"/>
+                </div>
+                <div class="col-sm-4 mb-2">
+                    <label for="hasta" class="small text-muted mb-1">Hasta</label>
+                    <input type="date" id="hasta" name="hasta" class="form-control" required
+                           th:min="${festival.fechaInicio}" th:max="${festival.fechaFin}"
+                           th:value="${reporte != null ? reporte.hasta : hasta}"/>
+                </div>
+                <div class="col-sm-4 mb-2">
+                    <button type="submit" class="btn btn-epicentro">Calcular</button>
+                    <a th:href="@{/reporte/rentabilidad}" class="btn btn-outline-secondary">Festival completo</a>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <div class="alert alert-warning" th:if="${error}" th:text="${error}"></div>
+
+    <div th:if="${reporte}">
+        <!-- Resultado principal -->
+        <div class="row mb-4">
+            <div class="col-md-6 col-lg-4 mb-3">
+                <div class="card dato-reporte h-100"
+                     th:classappend="${reporte.rentabilidadNeta.signum() < 0 ? 'bg-danger text-white' : 'dato-principal'}">
+                    <div class="card-body">
+                        <div class="small">Rentabilidad neta</div>
+                        <div class="h3 mb-0" th:text="${'$ ' + #numbers.formatDecimal(reporte.rentabilidadNeta, 1, 'POINT', 2, 'COMMA')}">$ 0</div>
+                        <div class="small" th:text="${#numbers.formatDecimal(reporte.margen, 1, 'POINT', 1, 'COMMA') + ' % de las ventas'}">0 %</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-lg-4 mb-3">
+                <div class="card dato-reporte h-100"><div class="card-body">
+                    <div class="small text-muted">Ventas</div>
+                    <div class="h4 mb-0" th:text="${'$ ' + #numbers.formatDecimal(reporte.ventas, 1, 'POINT', 2, 'COMMA')}">$ 0</div>
+                    <div class="small text-muted" th:text="${reporte.cantidadPedidos + ' pedidos'}">0 pedidos</div>
+                </div></div>
+            </div>
+            <div class="col-6 col-lg-4 mb-3">
+                <div class="card dato-reporte h-100"><div class="card-body">
+                    <div class="small text-muted">Ganancia bruta</div>
+                    <div class="h4 mb-0" th:text="${'$ ' + #numbers.formatDecimal(reporte.gananciaBruta, 1, 'POINT', 2, 'COMMA')}">$ 0</div>
+                    <div class="small text-muted">Ventas menos costo de los platos</div>
+                </div></div>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Cómo se llega al resultado -->
+            <div class="col-lg-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">Cálculo</h5>
+                        <table class="table mb-0">
+                            <tbody>
+                            <tr>
+                                <td>Ventas</td>
+                                <td class="text-right text-nowrap" th:text="${'$ ' + #numbers.formatDecimal(reporte.ventas, 1, 'POINT', 2, 'COMMA')}"></td>
+                            </tr>
+                            <tr>
+                                <td>− Costo de los platos</td>
+                                <td class="text-right text-nowrap" th:text="${'$ ' + #numbers.formatDecimal(reporte.costoPlatos, 1, 'POINT', 2, 'COMMA')}"></td>
+                            </tr>
+                            <tr class="font-weight-bold">
+                                <td>Ganancia bruta</td>
+                                <td class="text-right text-nowrap" th:text="${'$ ' + #numbers.formatDecimal(reporte.gananciaBruta, 1, 'POINT', 2, 'COMMA')}"></td>
+                            </tr>
+                            <tr>
+                                <td>− Sueldos</td>
+                                <td class="text-right text-nowrap" th:text="${'$ ' + #numbers.formatDecimal(reporte.sueldos, 1, 'POINT', 2, 'COMMA')}"></td>
+                            </tr>
+                            <tr>
+                                <td>− Canon</td>
+                                <td class="text-right text-nowrap" th:text="${'$ ' + #numbers.formatDecimal(reporte.canon, 1, 'POINT', 2, 'COMMA')}"></td>
+                            </tr>
+                            <tr class="font-weight-bold" th:classappend="${reporte.rentabilidadNeta.signum() < 0 ? 'text-danger' : ''}">
+                                <td>Rentabilidad neta</td>
+                                <td class="text-right text-nowrap" th:text="${'$ ' + #numbers.formatDecimal(reporte.rentabilidadNeta, 1, 'POINT', 2, 'COMMA')}"></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sueldos de los empleados de la unidad -->
+            <div class="col-lg-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">Sueldos</h5>
+                        <p class="text-muted mb-0" th:if="${reporte.sueldosPorEmpleado.isEmpty()}">La unidad no tiene empleados en este festival.</p>
+                        <div class="table-responsive" th:unless="${reporte.sueldosPorEmpleado.isEmpty()}">
+                            <table class="table table-sm mb-0">
+                                <thead>
+                                <tr>
+                                    <th>Empleado</th>
+                                    <th>Puesto</th>
+                                    <th class="text-right" th:text="${reporte.festivalCompleto ? 'Sueldo' : 'Del período'}">Sueldo</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr th:each="s : ${reporte.sueldosPorEmpleado}">
+                                    <td th:text="${s.empleado}"></td>
+                                    <td class="small" th:text="${s.puesto}"></td>
+                                    <td class="text-right text-nowrap">
+                                        <span th:text="${'$ ' + #numbers.formatDecimal(s.sueldoPeriodo, 1, 'POINT', 2, 'COMMA')}"></span>
+                                        <div class="small text-muted" th:unless="${reporte.festivalCompleto}"
+                                             th:text="${'de $ ' + #numbers.formatDecimal(s.sueldoFestival, 1, 'POINT', 2, 'COMMA')}"></div>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <p class="small text-muted">
+            Rentabilidad neta = (ventas − costo de los platos) − sueldos − canon. Las ventas y el costo de los platos son los
+            de los pedidos hechos en el período. Los sueldos y el canon se pagan por todo el festival: en un período se
+            toma la parte proporcional a sus días.
+        </p>
+    </div>
+</main>
+
+<footer th:replace="~{layout :: footer}"></footer>
+<div th:replace="~{layout :: scripts}"></div>
+</body>
+</html>
