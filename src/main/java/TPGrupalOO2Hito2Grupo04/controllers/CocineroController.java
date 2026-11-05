@@ -5,6 +5,7 @@ import TPGrupalOO2Hito2Grupo04.entities.Festival;
 import TPGrupalOO2Hito2Grupo04.entities.Pedido;
 import TPGrupalOO2Hito2Grupo04.entities.Plato;
 import TPGrupalOO2Hito2Grupo04.entities.UnidadVenta;
+import TPGrupalOO2Hito2Grupo04.helpers.ViewRouteHelper;
 import TPGrupalOO2Hito2Grupo04.repositories.ICocineroRepository;
 import TPGrupalOO2Hito2Grupo04.services.IPedidoService;
 import TPGrupalOO2Hito2Grupo04.services.IPlatoService;
@@ -55,7 +56,6 @@ public class CocineroController {
         UnidadVenta unidadVenta = cocinero.getUnidadVenta();
         Festival festival = unidadVenta != null ? unidadVenta.getFestival() : null;
 
-        // Filtramos correctamente por la unidad del cocinero Y que el plato esté activo
         List<Plato> platosUnidad = platoService.traerTodos().stream()
                 .filter(p -> p.getUnidadVenta() != null && unidadVenta != null && p.getUnidadVenta().getIdUnidadVenta() == unidadVenta.getIdUnidadVenta())
                 .filter(p -> p.getActivo() == null || p.getActivo() == true)
@@ -66,7 +66,7 @@ public class CocineroController {
         model.addAttribute("festival", festival);
         model.addAttribute("cajero", cocinero);
 
-        return "cocinero/platos";
+        return ViewRouteHelper.COCINERO_PLATOS;
     }
 
     @GetMapping("/pedidos")
@@ -84,7 +84,7 @@ public class CocineroController {
         model.addAttribute("festival", festival);
         model.addAttribute("cajero", cocinero);
 
-        return "cocinero/pedidos";
+        return ViewRouteHelper.COCINERO_PEDIDOS;
     }
 
     @GetMapping("/pedidos/cambiar-estado/{id}")
@@ -95,6 +95,7 @@ public class CocineroController {
         } catch (Exception e) {
             redirect.addFlashAttribute("error", "No se pudo actualizar el estado del pedido.");
         }
-        return "redirect:/cocinero/pedidos";
+
+        return ViewRouteHelper.COCINERO_PEDIDOS_REDIRECT;
     }
 }

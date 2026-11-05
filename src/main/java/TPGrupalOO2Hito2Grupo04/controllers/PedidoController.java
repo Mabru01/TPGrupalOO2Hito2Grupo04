@@ -7,6 +7,7 @@ import TPGrupalOO2Hito2Grupo04.entities.Pedido;
 import TPGrupalOO2Hito2Grupo04.entities.Staff;
 import TPGrupalOO2Hito2Grupo04.entities.UnidadVenta;
 import TPGrupalOO2Hito2Grupo04.entities.Plato;
+import TPGrupalOO2Hito2Grupo04.helpers.ViewRouteHelper; // Import del helper de rutas
 import TPGrupalOO2Hito2Grupo04.repositories.IStaffRepository;
 import TPGrupalOO2Hito2Grupo04.services.IPedidoService;
 import TPGrupalOO2Hito2Grupo04.services.IPlatoService;
@@ -57,7 +58,7 @@ public class PedidoController {
         model.addAttribute("unidadVenta", unidadVenta);
         model.addAttribute("festival", festival);
 
-        return "pedido/index";
+        return ViewRouteHelper.PEDIDO_INDEX;
     }
 
     // Mostrar el formulario para dar de alta un nuevo pedido
@@ -82,7 +83,7 @@ public class PedidoController {
         model.addAttribute("festival", festival);
         model.addAttribute("platos", platosUnidad);
 
-        return "pedido/new";
+        return ViewRouteHelper.PEDIDO_NEW;
     }
 
     @PostMapping("/guardar")
@@ -90,16 +91,16 @@ public class PedidoController {
         try {
             pedidoDTO.setIdUnidadVenta(unidadDelUsuario().getIdUnidadVenta());
             pedidoService.insertarPedido(pedidoDTO);
-            return "redirect:/pedido"; // Si sale bien, redirige
+            return "redirect:/pedido"; // Redirecciones a URLs se mantienen igual
         } catch (Exception e) {
-            // Si hay error, nos quedamos en la misma vista sin redirigir
+            // Si hay error, nos quedamos en la misma vista usando el helper
             UnidadVenta unidadVenta = unidadDelUsuario();
             model.addAttribute("unidadVenta", unidadVenta);
             model.addAttribute("festival", unidadVenta != null ? unidadVenta.getFestival() : null);
             model.addAttribute("platos", platoService.traerTodos());
             model.addAttribute("error", "No se pudo registrar el pedido: " + e.getMessage());
 
-            return "pedido/new"; // Te devuelve al formulario con tus datos y el error
+            return ViewRouteHelper.PEDIDO_NEW;
         }
     }
 
@@ -140,7 +141,7 @@ public class PedidoController {
                 .map(item -> item.getPlato().getIdPlato())
                 .collect(Collectors.toList());
 
-    // Permitimos platos activos o viejos (!Boolean.FALSE.equals) O los que ya están guardados en este pedido histórico
+        // Permitimos platos activos o viejos (!Boolean.FALSE.equals) O los que ya están guardados en este pedido histórico
         List<Plato> platosUnidad = platoService.traerTodos().stream()
                 .filter(p -> p.getUnidadVenta() != null && unidadVenta != null && p.getUnidadVenta().getIdUnidadVenta() == unidadVenta.getIdUnidadVenta())
                 .filter(p -> !Boolean.FALSE.equals(p.getActivo()) || idsPlatosEnPedido.contains(p.getIdPlato()))
@@ -151,7 +152,7 @@ public class PedidoController {
         model.addAttribute("festival", festival);
         model.addAttribute("platos", platosUnidad);
 
-        return "pedido/new";
+        return ViewRouteHelper.PEDIDO_NEW;
     }
 
     // Proceso de actualización.
@@ -170,7 +171,6 @@ public class PedidoController {
             return "redirect:/pedido";
 
         } catch (Exception e) {
-            // Guardamos el mensaje de error en los atributos flash y redirigimos al formulario de edición
             redirectAttributes.addFlashAttribute("error", "No se pudo actualizar el pedido: " + e.getMessage());
             return "redirect:/pedido/editar/" + id;
         }
