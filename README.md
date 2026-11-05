@@ -86,6 +86,9 @@ Los datos incluyen tres festivales: uno **en curso**, uno **próximo** y uno **f
 | Modificación y baja de unidad de venta | [PR #24](https://github.com/Mabru01/TPGrupalOO2Hito2Grupo04/pull/24) |
 | Reporte de unidades con mayor canon (`ReporteMayoresCanonDTO`) | [PR #26](https://github.com/Mabru01/TPGrupalOO2Hito2Grupo04/pull/26) |
 | Ranking de unidades por recaudación | [PR #29](https://github.com/Mabru01/TPGrupalOO2Hito2Grupo04/pull/29) |
+| Gestion de unidades de venta | [PR #31](https://github.com/Mabru01/TPGrupalOO2Hito2Grupo04/pull/31) |
+| Simulacion de canon desde index | [PR #34](https://github.com/Mabru01/TPGrupalOO2Hito2Grupo04/pull/34) |
+
 
 ### Maximiliano Omar Bruni
 
@@ -138,6 +141,7 @@ Los datos incluyen tres festivales: uno **en curso**, uno **próximo** y uno **f
 |---|---|---|
 | Inicio | Ver festivales | Nicolás |
 | Inicio | Registrar unidad de venta con responsable | Ignacio |
+| Inicio | Simulacion de canon | Ignacio |
 | Inicio | Login de administrador, responsable y empleado | Maximiliano |
 | Admin | Ver festivales y unidades de un festival | Nicolás · Ignacio |
 | Admin | Alta, modificación y detalle de festival | Nicolás |
@@ -145,6 +149,7 @@ Los datos incluyen tres festivales: uno **en curso**, uno **próximo** y uno **f
 | Admin | Unidades con mayor canon | Ignacio |
 | Responsable | ABM de empleados con mail y baja lógica | Maximiliano |
 | Responsable | Cálculo de canon | Ignacio |
+| Responsable | Modificacion y baja logica unidad de venta | Ignacio |
 | Responsable | Liquidación de haberes | Nicolás |
 | Responsable | Reporte de recaudación | Nicolás |
 | Responsable | Plato estrella | Rodrigo |
