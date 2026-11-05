@@ -10,109 +10,118 @@
 </head>
 <body>
 
-    <!-- Navbar: muestra opciones distintas según haya sesión y según el rol -->
-    <nav class="navbar navbar-expand-lg navbar-dark navbar-epicentro fixed-top" th:fragment="navbar">
-        <div class="container">
-            <a class="navbar-brand" th:href="@{/index}">Epicentro Gourmet</a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#menuPrincipal">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="menuPrincipal">
-              <ul class="navbar-nav mr-auto">
-                  <li class="nav-item">
-                      <a class="nav-link" th:href="@{/index}">Inicio</a>
-                  </li>
-                  <!-- Los roles se guardan sin prefijo (ADMIN); se acepta también ROLE_ADMIN -->
-                  <!-- El Administrador ve todas las unidades de venta -->
-                  <li class="nav-item" sec:authorize="hasAnyAuthority('ADMIN', 'ROLE_ADMIN')">
-                      <a class="nav-link" th:href="@{/unidadVenta}">Unidades de venta</a>
-                  </li>
-                  <li class="nav-item" sec:authorize="hasAnyAuthority('ADMIN', 'ROLE_ADMIN')">
-                      <a class="nav-link" th:href="@{/unidadVenta/reporte}">Canon</a>
-                  </li>
-                  <li class="nav-item" sec:authorize="hasAnyAuthority('ADMIN', 'ROLE_ADMIN')">
-                      <a class="nav-link" th:href="@{/unidadVenta/ranking}">Recaudacion</a>
-                  </li>
-                  <!-- El Responsable ve solo su unidad asignada -->
-                  <li class="nav-item" sec:authorize="hasAnyAuthority('RESPONSABLE')">
-                      <a class="nav-link" th:href="@{/unidadVenta/mi-unidad}">Mi unidad</a>
-                  </li>
-                  <li class="nav-item" sec:authorize="hasAnyAuthority('RESPONSABLE')">
-                      <a class="nav-link" th:href="@{/liquidacion}">Liquidaciónes</a>
-                  </li>
-                  <li class="nav-item" sec:authorize="hasAnyAuthority('RESPONSABLE')">
-                      <a class="nav-link" th:href="@{/reporte/recaudacion}">Recaudación</a>
-                  </li>
-                  <li class="nav-item" sec:authorize="hasAnyAuthority('EMPLEADO', 'ROLE_EMPLEADO')">
-                      <a class="nav-link" th:href="@{/liquidacion}">Mi sueldo</a>
-                  </li>
-                  <li class="nav-item" sec:authorize="hasAnyAuthority('EMPLEADO', 'ROLE_EMPLEADO')" th:if="${puestoUsuario == 'Cajero'}">
-                      <a class="nav-link" th:href="@{/cierreCaja}">Cerrar Caja</a>
-                  </li>
-                  <li class="nav-item" sec:authorize="hasAnyAuthority('RESPONSABLE')">
-                      <a class="nav-link" th:href="@{/plato}">Platos</a>
-                  </li>
-                  <li class="nav-item" sec:authorize="hasAnyAuthority('RESPONSABLE', 'EMPLEADO')">
-                      <a class="nav-link" th:href="@{/pedido}">Pedidos</a>
-                  </li>
-                  <li class="nav-item dropdown" sec:authorize="hasAnyAuthority('RESPONSABLE')">
-                      <a class="nav-link dropdown-toggle" href="#" id="empleadoDropdown" role="button"
-                         data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                          Empleado
-                      </a>
-                      <div class="dropdown-menu" aria-labelledby="empleadoDropdown">
-                          <a class="dropdown-item" th:href="@{/staff}">Alta De Empleado</a>
-                          <a class="dropdown-item" th:href="@{/staff/modificar}">Modificación De Empleado</a>
-                          <a class="dropdown-item" th:href="@{/staff/baja}">Baja De Empleado</a>
-                          <a class="dropdown-item" th:href="@{/staff/reactivar}">Reactivar Empleado</a>
-                      </div>
-                  </li>
-              </ul>
+<!-- Navbar: muestra opciones distintas según haya sesión y según el rol -->
+<nav class="navbar navbar-expand-lg navbar-dark navbar-epicentro fixed-top" th:fragment="navbar">
+    <div class="container">
+        <a class="navbar-brand" th:href="@{/index}">Epicentro Gourmet</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#menuPrincipal">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="menuPrincipal">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/index}">Inicio</a>
+                </li>
+                <!-- El Administrador ve todas las unidades de venta -->
+                <li class="nav-item" sec:authorize="hasAnyAuthority('ADMIN', 'ROLE_ADMIN')">
+                    <a class="nav-link" th:href="@{/unidadVenta}">Unidades de venta</a>
+                </li>
+                <li class="nav-item" sec:authorize="hasAnyAuthority('ADMIN', 'ROLE_ADMIN')">
+                    <a class="nav-link" th:href="@{/unidadVenta/reporte}">Canon</a>
+                </li>
+                <li class="nav-item" sec:authorize="hasAnyAuthority('ADMIN', 'ROLE_ADMIN')">
+                    <a class="nav-link" th:href="@{/unidadVenta/ranking}">Recaudacion</a>
+                </li>
+                <!-- El Responsable ve solo su unidad asignada -->
+                <li class="nav-item" sec:authorize="hasAnyAuthority('RESPONSABLE')">
+                    <a class="nav-link" th:href="@{/unidadVenta/mi-unidad}">Mi unidad</a>
+                </li>
+                <li class="nav-item" sec:authorize="hasAnyAuthority('RESPONSABLE')">
+                    <a class="nav-link" th:href="@{/liquidacion}">Liquidaciónes</a>
+                </li>
+                <li class="nav-item" sec:authorize="hasAnyAuthority('RESPONSABLE')">
+                    <a class="nav-link" th:href="@{/reporte/recaudacion}">Recaudación</a>
+                </li>
+                <li class="nav-item" sec:authorize="hasAnyAuthority('EMPLEADO', 'ROLE_EMPLEADO')">
+                    <a class="nav-link" th:href="@{/liquidacion}">Mi sueldo</a>
+                </li>
+                <li class="nav-item" sec:authorize="hasAnyAuthority('EMPLEADO', 'ROLE_EMPLEADO')" th:if="${puestoUsuario == 'Cajero'}">
+                    <a class="nav-link" th:href="@{/cierreCaja}">Cerrar Caja</a>
+                </li>
+                <li class="nav-item" sec:authorize="hasAnyAuthority('RESPONSABLE')">
+                    <a class="nav-link" th:href="@{/plato}">Platos</a>
+                </li>
+                <li class="nav-item" sec:authorize="hasAnyAuthority('RESPONSABLE', 'EMPLEADO')" th:unless="${puestoUsuario == 'Cocinero'}">
+                    <a class="nav-link" th:href="@{/pedido}">Pedidos</a>
+                </li>
 
-                <!-- Sin sesión: iniciar sesión (el registro está en la página de inicio) -->
-                <div class="form-inline" sec:authorize="isAnonymous()">
-                    <a class="btn btn-epicentro" th:href="@{/login}">Iniciar sesión</a>
-                </div>
+                <!-- Opciones exclusivas para Cocinero -->
+                <li class="nav-item" sec:authorize="hasAnyAuthority('EMPLEADO', 'ROLE_EMPLEADO')" th:if="${puestoUsuario == 'Cocinero'}">
+                    <a class="nav-link" th:href="@{/cocinero/platos}">Ver Platos</a>
+                </li>
+                <li class="nav-item" sec:authorize="hasAnyAuthority('EMPLEADO', 'ROLE_EMPLEADO')" th:if="${puestoUsuario == 'Cocinero'}">
+                    <a class="nav-link" th:href="@{/cocinero/pedidos}">Ver Pedidos</a>
+                </li>
 
-                <!-- Con sesión: usuario y cerrar sesión -->
-                <ul class="navbar-nav" sec:authorize="isAuthenticated()">
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown">
-                            <span class="badge badge-puesto mr-1" th:if="${puestoUsuario}" th:text="${puestoUsuario}">Puesto</span>
-                            <span sec:authentication="name">usuario</span>
-                        </a>
-                        <div class="dropdown-menu dropdown-menu-right">
-                            <div class="dropdown-item-text small" th:if="${nombreUsuario != null or unidadUsuario != null}">
-                                <div class="font-weight-bold" th:if="${nombreUsuario}" th:text="${nombreUsuario}">Nombre</div>
-                                <div class="text-muted" th:if="${unidadUsuario}" th:text="${unidadUsuario}">Unidad</div>
-                            </div>
-                            <div class="dropdown-divider" th:if="${nombreUsuario != null or unidadUsuario != null}"></div>
-                            <a class="dropdown-item" th:href="@{/staff/perfil}" sec:authorize="hasAnyAuthority('EMPLEADO', 'ROLE_EMPLEADO')">Mi perfil</a>
-                            <a class="dropdown-item" th:href="@{/staff/cambiar/contrasenia}" sec:authorize="hasAnyAuthority('EMPLEADO', 'ROLE_EMPLEADO')">Cambiar contraseña</a>
-                            <a class="dropdown-item" th:href="@{/staff/calendario}" sec:authorize="isAuthenticated()">Calendario</a>
-                            <form th:action="@{/logout}" method="post">
-                                <button type="submit" class="dropdown-item">Cerrar sesión</button>
-                            </form>
-                        </div>
-                    </li>
-                </ul>
+                <li class="nav-item dropdown" sec:authorize="hasAnyAuthority('RESPONSABLE')">
+                    <a class="nav-link dropdown-toggle" href="#" id="empleadoDropdown" role="button"
+                       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Empleado
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="empleadoDropdown">
+                        <a class="dropdown-item" th:href="@{/staff}">Alta De Empleado</a>
+                        <a class="dropdown-item" th:href="@{/staff/modificar}">Modificación De Empleado</a>
+                        <a class="dropdown-item" th:href="@{/staff/baja}">Baja De Empleado</a>
+                        <a class="dropdown-item" th:href="@{/staff/reactivar}">Reactivar Empleado</a>
+                    </div>
+                </li>
+            </ul>
+
+            <!-- Sin sesión: iniciar sesión -->
+            <div class="form-inline" sec:authorize="isAnonymous()">
+                <a class="btn btn-epicentro" th:href="@{/login}">Iniciar sesión</a>
             </div>
-        </div>
-    </nav>
 
-    <!-- Footer -->
-    <footer class="footer-epicentro text-white py-4" th:fragment="footer">
-        <div class="container text-center">
-            <p class="mb-0">&copy; 2026 Epicentro Gourmet - OO2 UNLa - Grupo 04</p>
-        </div>
-    </footer>
+            <!-- Con sesión: usuario y cerrar sesión -->
+            <ul class="navbar-nav" sec:authorize="isAuthenticated()">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown">
+                        <span class="badge badge-puesto mr-1" th:if="${puestoUsuario}" th:text="${puestoUsuario}">Puesto</span>
+                        <span sec:authentication="name">usuario</span>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right">
+                        <div class="dropdown-item-text small" th:if="${nombreUsuario != null or unidadUsuario != null}">
+                            <div class="font-weight-bold" th:if="${nombreUsuario}" th:text="${nombreUsuario}">Nombre</div>
+                            <div class="text-muted" th:if="${unidadUsuario}" th:text="${unidadUsuario}">Unidad</div>
+                        </div>
+                        <div class="dropdown-divider" th:if="${nombreUsuario != null or unidadUsuario != null}"></div>
+                        <a class="dropdown-item" th:href="@{/staff/perfil}" sec:authorize="hasAnyAuthority('EMPLEADO', 'ROLE_EMPLEADO')">Mi perfil</a>
+                        <a class="dropdown-item" th:href="@{/staff/cambiar/contrasenia}" sec:authorize="hasAnyAuthority('EMPLEADO', 'ROLE_EMPLEADO')">Cambiar contraseña</a>
+                        <a class="dropdown-item" th:href="@{/staff/calendario}" sec:authorize="isAuthenticated()">Calendario</a>
+                        <form th:action="@{/logout}" method="post">
+                            <button type="submit" class="dropdown-item">Cerrar sesión</button>
+                        </form>
+                    </div>
+                </li>
+            </ul>
 
-    <!-- Scripts -->
-    <div th:fragment="scripts">
-        <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
-        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+        </div>
     </div>
+</nav>
+
+<!-- Footer -->
+<footer class="footer-epicentro text-white py-4" th:fragment="footer">
+    <div class="container text-center">
+        <p class="mb-0">&copy; 2026 Epicentro Gourmet - OO2 UNLa - Grupo 04</p>
+    </div>
+</footer>
+
+<!-- Scripts -->
+<div th:fragment="scripts">
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</div>
 
 </body>
 </html>

@@ -71,7 +71,7 @@
                                         <input type="number" class="form-control" th:name="items[__${iterStat.index}__].cantidad" th:value="${item.cantidad}" min="1" required />
                                     </div>
                                     <div class="form-group col-md-2 mb-0 text-center">
-                                        <button type="button" class="btn btn-danger btn-sm" onclick="eliminarFila(this)">Eliminar</button>
+                                        <button type="button" class="btn btn-danger btn-sm btn-eliminar" onclick="eliminarFila(this)">Eliminar</button>
                                     </div>
                                 </div>
                             </th:block>
@@ -93,7 +93,7 @@
                                         <input type="number" class="form-control" name="items[0].cantidad" min="1" value="1" required />
                                     </div>
                                     <div class="form-group col-md-2 mb-0 text-center">
-                                        <button type="button" class="btn btn-danger btn-sm" onclick="eliminarFila(this)">Eliminar</button>
+                                        <button type="button" class="btn btn-danger btn-sm btn-eliminar" onclick="eliminarFila(this)">Eliminar</button>
                                     </div>
                                 </div>
                             </th:block>
@@ -125,7 +125,7 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-        actualizarIndices();
+        actualizarIndicesYBotones();
     });
 
     function agregarFilaItem() {
@@ -144,7 +144,7 @@
                 <input type="number" class="form-control" min="1" value="1" required />
             </div>
             <div class="form-group col-md-2 mb-0 text-center">
-                <button type="button" class="btn btn-danger btn-sm" onclick="eliminarFila(this)">Eliminar</button>
+                <button type="button" class="btn btn-danger btn-sm btn-eliminar" onclick="eliminarFila(this)">Eliminar</button>
             </div>
         `;
 
@@ -158,17 +158,25 @@
             nuevoSelect.appendChild(opt.cloneNode(true));
         });
 
-        actualizarIndices();
+        actualizarIndicesYBotones();
     }
 
     function eliminarFila(boton) {
-        const fila = boton.closest('.item-row');
-        fila.remove();
-        actualizarIndices();
+        const contenedor = document.getElementById('contenedor-items');
+        const filas = contenedor.querySelectorAll('.item-row');
+
+        // Solo elimina si hay más de una fila
+        if (filas.length > 1) {
+            const fila = boton.closest('.item-row');
+            fila.remove();
+            actualizarIndicesYBotones();
+        }
     }
 
-    function actualizarIndices() {
+    function actualizarIndicesYBotones() {
         const filas = document.querySelectorAll('#contenedor-items .item-row');
+        const botonesEliminar = document.querySelectorAll('.btn-eliminar');
+
         filas.forEach((fila, index) => {
             const selectPlato = fila.querySelector('.select-plato');
             const inputCantidad = fila.querySelector('input[type="number"]');
@@ -180,6 +188,19 @@
                 inputCantidad.name = `items[${index}].cantidad`;
             }
         });
+
+        // Si solo queda 1 fila, desactivamos su botón eliminar para que no se pueda borrar
+        if (filas.length === 1) {
+            botonesEliminar.forEach(btn => {
+                btn.disabled = true;
+                btn.classList.add('disabled');
+            });
+        } else {
+            botonesEliminar.forEach(btn => {
+                btn.disabled = false;
+                btn.classList.remove('disabled');
+            });
+        }
     }
 </script>
 
