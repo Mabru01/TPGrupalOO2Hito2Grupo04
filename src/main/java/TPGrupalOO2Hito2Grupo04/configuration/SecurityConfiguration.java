@@ -14,6 +14,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.http.HttpMethod;
 
 @Configuration
 @EnableWebSecurity
@@ -35,7 +36,13 @@ public class SecurityConfiguration {
 					auth.requestMatchers("/css/*", "/imgs/*", "/js/*", "/vendor/bootstrap/css/*",
 							"/vendor/jquery/*", "/vendor/bootstrap/js/*", "/api/v1/**").permitAll();
 					// Página de inicio pública (el enunciado pide verla sin iniciar sesión)
-					auth.requestMatchers("/", "/index", "/unidadVenta/nuevo/food-truck", "/unidadVenta/nuevo/puesto-desarmable").permitAll();
+					auth.requestMatchers(
+							HttpMethod.GET,
+							"/", "/index",
+							"/unidadVenta/simular-canon",
+							"/unidadVenta/nuevo/food-truck",
+							"/unidadVenta/nuevo/puesto-desarmable"
+					).permitAll();
 					auth.requestMatchers(org.springframework.http.HttpMethod.POST, "/unidadVenta/guardar/food-truck", "/unidadVenta/guardar/puesto-desarmable").permitAll();
 					auth.anyRequest().authenticated();
 				})

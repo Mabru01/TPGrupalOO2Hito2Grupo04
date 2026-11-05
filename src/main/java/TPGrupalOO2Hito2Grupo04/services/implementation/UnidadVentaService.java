@@ -70,6 +70,11 @@ public class UnidadVentaService implements IUnidadVentaService {
     }
 
     @Override
+    public List<UnidadVenta> getAllActivas() {
+        return unidadVentaRepository.findByActivaTrue();
+    }
+
+    @Override
     public Optional<UnidadVenta> findById(long id) {
         return unidadVentaRepository.findById(id);
     }
@@ -113,7 +118,7 @@ public class UnidadVentaService implements IUnidadVentaService {
         Festival festival = festivalRepository.findFestivalActivo(hoy)
                 .orElseThrow(() -> new RuntimeException("No hay ningún festival activo."));
 
-        // 3. Obtener (o crear) el rol RESPONSABLE
+        // 3. Obtener o crear el rol RESPONSABLE
         Rol rolResponsable = rolRepository.findByRol("RESPONSABLE")
                 .orElseGet(() -> {
                     Rol r = new Rol();
@@ -121,7 +126,7 @@ public class UnidadVentaService implements IUnidadVentaService {
                     return rolRepository.save(r);
                 });
 
-        // 4. Crear el usuario con ese rol y la contraseña hasheada
+        // usuario con ese rol y la contraseña hasheada
         Usuario nuevoUsuario = new Usuario();
         nuevoUsuario.setMail(dto.getEmailResponsable());
         nuevoUsuario.setPassword(passwordEncoder.encode(dto.getPasswordResponsable()));
@@ -130,7 +135,7 @@ public class UnidadVentaService implements IUnidadVentaService {
 
         Usuario usuarioGuardado = usuarioRepository.save(nuevoUsuario);
 
-        // 5. Instanciar y mapear la entidad hija
+        // 5. Instanciar y mapear
         UnidadVenta unidadVenta;
 
         if (dto instanceof FoodTruckDTO ftDto) {
@@ -155,10 +160,8 @@ public class UnidadVentaService implements IUnidadVentaService {
             // Genera un código aleatorio de 8 caracteres (por ejemplo, usando UUID o Random)
             codigo = UUID.randomUUID().toString().substring(0, 5).toUpperCase();
 
-            // Validar si ya existe
-
             existe = unidadVentaRepository.existsByCodigoUnico(codigo);
-        } while (existe); // Si ya existe, repite el ciclo; si es único, sale.
+        } while (existe); // Si ya existe, repite el ciclo;
 
         return codigo;
     }
@@ -181,8 +184,8 @@ public class UnidadVentaService implements IUnidadVentaService {
         UnidadVenta unidad = unidadVentaRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Unidad de venta no encontrada"));
 
-        unidad.setActiva(false); // Cambiamos el estado
-        unidadVentaRepository.save(unidad); // Guardamos la actualización
+        unidad.setActiva(false);
+        unidadVentaRepository.save(unidad);
     }
 
     @Override
@@ -190,8 +193,8 @@ public class UnidadVentaService implements IUnidadVentaService {
         UnidadVenta unidad = unidadVentaRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Unidad de venta no encontrada"));
 
-        unidad.setActiva(true); // Cambiamos el estado
-        unidadVentaRepository.save(unidad); // Guardamos la actualización
+        unidad.setActiva(true);
+        unidadVentaRepository.save(unidad);
     }
 
 
@@ -199,8 +202,6 @@ public class UnidadVentaService implements IUnidadVentaService {
     public void modificarFoodTruck(Long id, FoodTruckDTO dto) {
         FoodTruck ft = (FoodTruck) unidadVentaRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("FoodTruck no encontrado"));
-
-        // Actualizás los campos comunes y los propios de FoodTruck
 
         ft.setNombreComercial(dto.getNombreComercial());
         ft.setSuperficie(dto.getSuperficie());

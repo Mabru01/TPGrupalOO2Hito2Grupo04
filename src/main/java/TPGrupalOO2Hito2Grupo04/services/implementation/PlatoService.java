@@ -40,21 +40,25 @@ public class PlatoService implements IPlatoService {
         this.modelMapper = modelMapper;
     }
 
+    // Se traen todos los platos ordenados por el nombre comercial de la unidad
     @Override
     public List<Plato> traerTodos() {
         return platoRepository.findAllByOrderByUnidadVentaNombreComercialAsc();
     }
 
+    // Se busca un plato por su ID
     @Override
     public Optional<Plato> traerPorId(Long id) {
         return platoRepository.findById(id);
     }
 
+    // Metodo para insertar o actualizar
     @Override
     public Plato insertarOActualizar(Plato plato) {
         return platoRepository.save(plato);
     }
 
+    // Baja logica cambiando el estado true a false
     @Override
     public boolean eliminar(Long id) {
         try {
@@ -76,11 +80,12 @@ public class PlatoService implements IPlatoService {
         }
     }
 
+    // Logica para registrar o actualizar un plato validando nombres repetidos y reactivaciones
     @Override
     public Plato registrarPlato(PlatoDTO dto) {
         UnidadVenta unidadVenta;
 
-        // Si el DTO trae un idUnidadVenta (lo usa el Administrador desde el selector)
+        // Si el DTO trae un idUnidadVenta se usa desde el selector
         if (dto.getIdUnidadVenta() != null) {
             unidadVenta = unidadVentaRepository.findById(dto.getIdUnidadVenta())
                     .orElseThrow(() -> new IllegalArgumentException("ERROR: Unidad de venta no encontrada"));
@@ -102,32 +107,40 @@ public class PlatoService implements IPlatoService {
         if (mismoNombre.isPresent()) {
             Plato platoExistente = mismoNombre.get();
 
-            // Si el nombre pertenece a OTRO registro distinto al que estamos editando
+            // Si el nombre pertenece a otro registro distinto.
             if (dto.getIdPlato() == null || !platoExistente.getIdPlato().equals(dto.getIdPlato())) {
 
-                // Si el plato existente está inactivo, lo reactivamos en lugar de tirar error
+                // Si el plato existente está inactivo, se reactiva
                 if (Boolean.FALSE.equals(platoExistente.getActivo())) {
                     plato = platoExistente;
-                    plato.setActivo(true); // ¡Lo reactivamos!
+                    plato.setActivo(true);
+
+                    // Si se edita otro plato se trae el ID original, y se da de baja para reemplazarlo.
+                    if (dto.getIdPlato() != null) {
+                        Plato platoOriginalAEditar = platoRepository.findById(dto.getIdPlato()).orElse(null);
+                        if (platoOriginalAEditar != null) {
+                            platoOriginalAEditar.setActivo(false);
+                            platoRepository.save(platoOriginalAEditar);
+                        }
+                    }
+
                 } else {
-                    // Si ya existe y está activo, prohibido duplicar
                     throw new IllegalArgumentException("Ya existe un plato activo registrado con ese nombre.");
                 }
             } else {
-                // Es el mismo plato que estamos actualizando
                 plato = platoExistente;
             }
         } else {
-            // Si no existe ninguno con ese nombre, creamos uno nuevo o usamos el ID si viene en el DTO
+            // Si no existe ningun plato con ese nombre, se crea uno nuevo.
             if (dto.getIdPlato() != null) {
                 plato = platoRepository.findById(dto.getIdPlato()).orElse(new Plato());
             } else {
                 plato = new Plato();
-                plato.setActivo(true); // Aseguramos que nace activo
+                plato.setActivo(true);
             }
         }
 
-        // Actualizamos los campos
+        // Se actualizan los campos
         plato.setNombre(dto.getNombre());
         plato.setPrecio(dto.getPrecio());
         plato.setCosto(dto.getCosto());

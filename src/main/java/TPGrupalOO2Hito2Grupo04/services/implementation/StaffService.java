@@ -52,7 +52,9 @@ public class StaffService implements IStaffService {
     }
 
     public List<Staff> getAllByRolEmpleado() {
-        return staffRepository.findByUsuarioRolRol("EMPLEADO");
+        return staffRepository.findByUsuarioRolRol("EMPLEADO").stream()
+                .filter(s -> s.getFechaEgreso() == null)
+                .toList();
     }
 
     @Override
@@ -270,23 +272,30 @@ public class StaffService implements IStaffService {
     }
 
     @Override
-    public void obtenerDTOPorId(int idStaff, StaffDTO staffDTO) {
+    public StaffDTO obtenerDTOPorId(int idStaff) {
         Staff staff = staffRepository.findById(idStaff)
                 .orElseThrow(() -> new IllegalArgumentException("ERROR: Empleado no encontrado"));
 
-        modelMapper.map(staff, staffDTO);
-        if (staff.getUnidadVenta() != null) {
-            staffDTO.setIdUnidadVenta(staff.getUnidadVenta().getIdUnidadVenta());
-        }
-
-        if (staff instanceof Cajero cajero && staffDTO instanceof CajeroDTO cajeroDTO) {
+        StaffDTO staffDTO;
+        if (staff instanceof Cajero cajero) {
+            CajeroDTO cajeroDTO = modelMapper.map(staff, CajeroDTO.class);
+            if (staff.getUnidadVenta() != null) {
+                cajeroDTO.setIdUnidadVenta(staff.getUnidadVenta().getIdUnidadVenta());
+            }
             cajeroDTO.setTurno(cajero.getTurno());
-        } else if (staff instanceof Cocinero cocinero && staffDTO instanceof CocineroDTO cocineroDTO) {
+            staffDTO = cajeroDTO;
+        } else if (staff instanceof Cocinero cocinero) {
+            CocineroDTO cocineroDTO = modelMapper.map(staff, CocineroDTO.class);
+            if (staff.getUnidadVenta() != null) {
+                cocineroDTO.setIdUnidadVenta(staff.getUnidadVenta().getIdUnidadVenta());
+            }
             cocineroDTO.setCategoria(cocinero.getCategoria());
             cocineroDTO.setEspecialidad(cocinero.getEspecialidad());
+            staffDTO = cocineroDTO;
         } else {
-            throw new IllegalArgumentException("Tipo de empleado desconocido o DTO incompatible");
+            throw new IllegalArgumentException("Tipo de empleado desconocido");
         }
+        return staffDTO;
     }
 
     @Override

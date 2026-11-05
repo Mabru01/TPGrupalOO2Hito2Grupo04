@@ -18,6 +18,7 @@ public class ViewRouteHelper {
 
     // Reportes
     public final static String REPORTE_RECAUDACION = "reporte/recaudacion";
+    public final static String REPORTE_RENTABILIDAD = "reporte/rentabilidad";
     public final static String reporte_MAYOR_CANON = "reporte/mayorCanon";
     public final static String reporte_PDF_MAYOR_CANON = "reporte-mayores-canon-";
 
@@ -56,4 +57,19 @@ public class ViewRouteHelper {
     public final static String STAFF_ROOT = "/staff";
     public final static String FESTIVAL_ROOT = "/festival";
 
+    // COCINERO
+    public static final String COCINERO_PLATOS = "cocinero/platos";
+    public static final String COCINERO_PEDIDOS = "cocinero/pedidos";
+    public static final String COCINERO_PEDIDOS_REDIRECT = "redirect:/cocinero/pedidos";
+
+    // PEDIDO
+    public static final String PEDIDO_INDEX = "pedido/index";
+    public static final String PEDIDO_NEW = "pedido/new";
+
+    // PLATO
+    public static final String PLATO_INDEX = "plato/index";
+    public static final String PLATO_NEW = "plato/new";
+    public static final String PLATO_EDIT = "plato/edit";
+    public static final String PLATO_SUCCESS = "plato/success";
+    public static final String PLATO_SUCCESS_UPDATE = "plato/success-update";
 }

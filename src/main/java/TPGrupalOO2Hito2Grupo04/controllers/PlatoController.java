@@ -4,6 +4,7 @@ import TPGrupalOO2Hito2Grupo04.dtos.PlatoDTO;
 import TPGrupalOO2Hito2Grupo04.entities.Festival;
 import TPGrupalOO2Hito2Grupo04.entities.Plato;
 import TPGrupalOO2Hito2Grupo04.entities.UnidadVenta;
+import TPGrupalOO2Hito2Grupo04.helpers.ViewRouteHelper;
 import TPGrupalOO2Hito2Grupo04.services.IPlatoService;
 import TPGrupalOO2Hito2Grupo04.services.IUnidadVentaService;
 import TPGrupalOO2Hito2Grupo04.services.IFestivalService;
@@ -44,18 +45,17 @@ public class PlatoController {
         this.pedidoService = pedidoService;
     }
 
-    // Mostrar la tabla con los platos (filtrando los activos y permitiendo registros previos con activo nulo)
+    // Lista de platos filtrando por la unidad del responsable y calculando el plato estrella.
     @GetMapping({"", "/"})
     public ModelAndView index(
             @RequestParam(value = "idFestival", required = false) Long idFestival,
             @RequestParam(value = "idUnidadVenta", required = false) Long idUnidadVenta) {
 
-        ModelAndView mAV = new ModelAndView("plato/index");
+        ModelAndView mAV = new ModelAndView(ViewRouteHelper.PLATO_INDEX);
 
         UnidadVenta unidadVentaStaff = unidadDelResponsable();
         Festival festivalStaff = unidadVentaStaff.getFestival();
 
-        // Filtro de los platos: de la unidad y que NO estén dados de baja lógicamente (admite true o null para viejos registros)
         List<Plato> platos = platoService.traerTodos().stream()
                 .filter(p -> p.getUnidadVenta() != null && p.getUnidadVenta().getIdUnidadVenta() == unidadVentaStaff.getIdUnidadVenta())
                 .filter(p -> !Boolean.FALSE.equals(p.getActivo()))
@@ -68,7 +68,7 @@ public class PlatoController {
         mAV.addObject("festivales", festivalService.getAll());
         mAV.addObject("unidadesVenta", unidadVentaService.getAll());
 
-        // Logica de Plato Estrella
+        // Logica para calcular el plato estrella tomando parametros de festival y unidad venta
         if (idFestival != null && idUnidadVenta != null) {
             PlatoDTO platoEstrella = pedidoService.encontrarPlatoEstrella(idUnidadVenta, idFestival);
             mAV.addObject("platoEstrella", platoEstrella);
@@ -90,10 +90,10 @@ public class PlatoController {
         return mAV;
     }
 
-    // Formulario alta plato
+    // Formulario para crear un plato nuevo
     @GetMapping("/nuevo")
     public ModelAndView nuevoPlato() {
-        ModelAndView mAV = new ModelAndView("plato/new");
+        ModelAndView mAV = new ModelAndView(ViewRouteHelper.PLATO_NEW);
 
         UnidadVenta unidadVenta = unidadDelResponsable();
 
@@ -104,19 +104,29 @@ public class PlatoController {
         return mAV;
     }
 
-    // Guardar o registrar plato
+    // Se guarda el plato nuevo validando que no tenga valores negativos.
     @PostMapping("/guardar")
     public ModelAndView guardarPlato(@ModelAttribute(PLATO_ATTR) PlatoDTO platoDTO) {
-        ModelAndView mAV = new ModelAndView();
         UnidadVenta unidadVenta = unidadDelResponsable();
-        // El plato siempre se guarda en la unidad del responsable logueado
+
+        // Validacion para que el precio o el costo no sean negativos
+        if ((platoDTO.getPrecio() < 0) || (platoDTO.getCosto() < 0)) {
+            ModelAndView mAV = new ModelAndView(ViewRouteHelper.PLATO_NEW);
+            mAV.addObject(PLATO_ATTR, platoDTO);
+            mAV.addObject("unidadVenta", unidadVenta);
+            mAV.addObject("festival", unidadVenta.getFestival());
+            mAV.addObject("error", "No se pueden poner valores menores a 0");
+            return mAV;
+        }
+
+        ModelAndView mAV = new ModelAndView();
         platoDTO.setIdUnidadVenta(unidadVenta.getIdUnidadVenta());
         try {
             Plato platoRegistrado = platoService.registrarPlato(platoDTO);
-            mAV.setViewName("plato/success");
+            mAV.setViewName(ViewRouteHelper.PLATO_SUCCESS);
             mAV.addObject("plato", platoRegistrado);
         } catch (IllegalArgumentException e) {
-            mAV.setViewName("plato/new");
+            mAV.setViewName(ViewRouteHelper.PLATO_NEW);
             mAV.addObject(PLATO_ATTR, platoDTO);
             mAV.addObject("unidadVenta", unidadVenta);
             mAV.addObject("festival", unidadVenta.getFestival());
@@ -125,7 +135,7 @@ public class PlatoController {
         return mAV;
     }
 
-    // Eliminar plato por ID (Baja lógica)
+    // Baja logica del plato por id
     @GetMapping("/eliminar/{id}")
     public String eliminarPlato(@PathVariable("id") Long id, RedirectAttributes redirect) {
         if (!esDeMiUnidad(id)) {
@@ -140,13 +150,13 @@ public class PlatoController {
         return "redirect:/plato";
     }
 
-    // Carga de datos para modificar.
+    // Carga de los datos del plato para editarlos
     @GetMapping("/editar/{id}")
     public ModelAndView editarPlato(@PathVariable("id") Long id) {
         if (!esDeMiUnidad(id)) {
             return new ModelAndView("redirect:/plato");
         }
-        ModelAndView mAV = new ModelAndView("plato/edit");
+        ModelAndView mAV = new ModelAndView(ViewRouteHelper.PLATO_EDIT);
 
         Optional<Plato> platoOpt = platoService.traerPorId(id);
         if (platoOpt.isPresent()) {
@@ -166,20 +176,31 @@ public class PlatoController {
         return mAV;
     }
 
-    // Modificar un plato existente.
+    // Acualizacion de el plato validando tambien que no pongan numeros negativos
     @PostMapping("/actualizar")
     public ModelAndView actualizarPlato(@ModelAttribute(PLATO_ATTR) PlatoDTO platoDTO) {
         if (!esDeMiUnidad(platoDTO.getIdPlato())) {
             return new ModelAndView("redirect:/plato");
         }
+
+        if ((platoDTO.getPrecio() < 0) || (platoDTO.getCosto() < 0)) {
+            ModelAndView mAV = new ModelAndView(ViewRouteHelper.PLATO_EDIT);
+            mAV.addObject(PLATO_ATTR, platoDTO);
+            UnidadVenta unidadVenta = unidadDelResponsable();
+            mAV.addObject("unidadVenta", unidadVenta);
+            mAV.addObject("festival", unidadVenta.getFestival());
+            mAV.addObject("error", "No se pueden poner valores menores a 0");
+            return mAV;
+        }
+
         platoDTO.setIdUnidadVenta(unidadDelResponsable().getIdUnidadVenta());
         ModelAndView mAV = new ModelAndView();
         try {
             Plato platoActualizado = platoService.registrarPlato(platoDTO);
-            mAV.setViewName("plato/success-update");
+            mAV.setViewName(ViewRouteHelper.PLATO_SUCCESS_UPDATE);
             mAV.addObject("plato", platoActualizado);
         } catch (IllegalArgumentException e) {
-            mAV.setViewName("plato/edit");
+            mAV.setViewName(ViewRouteHelper.PLATO_EDIT);
             mAV.addObject(PLATO_ATTR, platoDTO);
 
             Optional<Plato> platoOpt = platoService.traerPorId(platoDTO.getIdPlato());
@@ -193,14 +214,14 @@ public class PlatoController {
         return mAV;
     }
 
-    // Unidad de venta a cargo del responsable logueado
+    // Buscar la unidad que maneja el responsable logueado
     private UnidadVenta unidadDelResponsable() {
         String emailUsuario = SecurityContextHolder.getContext().getAuthentication().getName();
         return unidadVentaService.findByResponsable(emailUsuario)
                 .orElseThrow(() -> new RuntimeException("El responsable no tiene una unidad de venta a su cargo"));
     }
 
-    // Verifica que el plato exista y sea de la unidad del responsable logueado
+    // Validacion para que que el plato pertenezca a la unidad de el usuario logueado
     private boolean esDeMiUnidad(Long idPlato) {
         if (idPlato == null) {
             return false;

@@ -5,156 +5,165 @@
 <nav th:replace="~{layout :: navbar}"></nav>
 
 <main class="container py-4">
-    <div class="page-header mb-4 d-flex justify-content-between align-items-center" >
-        <h2 sec:authorize="hasAnyAuthority('ADMIN', 'ROLE_ADMIN')" >Unidades de Venta</h2>
+    <div class="page-header mb-4 d-flex justify-content-between align-items-center mt-5" >
+        <h2 sec:authorize="hasAnyAuthority('ADMIN', 'ROLE_ADMIN')" >Panel de Administración - Unidades de Venta</h2>
         <h2 sec:authorize="hasAnyAuthority('RESPONSABLE')" >Unidad a cargo</h2>
     </div>
+
+    <!-- ================= FILTROS ================= -->
+    <div class="card shadow-sm mb-4" sec:authorize="hasAnyAuthority('ADMIN', 'ROLE_ADMIN')">
+        <div class="card-body py-3">
+            <form th:action="@{/unidadVenta}" method="get" class="row g-3 align-items-center">
+
+                <!-- Filtro por Tipo -->
+                <div class="col-auto">
+                    <label for="tipoFiltro" class="col-form-label fw-bold">Tipo:</label>
+                </div>
+                <div class="col-auto">
+                    <select name="tipo" id="tipoFiltro" class="form-select" onchange="this.form.submit()">
+                        <option value="TODOS" th:selected="${tipoSeleccionado == null || tipoSeleccionado == 'TODOS'}">Todos los tipos</option>
+                        <option value="FoodTruck" th:selected="${tipoSeleccionado == 'FoodTruck'}">Food Truck</option>
+                        <option value="PuestoDesarmable" th:selected="${tipoSeleccionado == 'PuestoDesarmable'}">Puesto Desarmable</option>
+                    </select>
+                </div>
+
+                <!-- Filtro por Estado -->
+                <div class="col-auto">
+                    <label for="estadoFiltro" class="col-form-label fw-bold">Estado:</label>
+                </div>
+                <div class="col-auto">
+                    <select name="estado" id="estadoFiltro" class="form-select" onchange="this.form.submit()">
+                        <option value="TODOS" th:selected="${estadoSeleccionado == null || estadoSeleccionado == 'TODOS'}">Todos los estados</option>
+                        <option value="true" th:selected="${estadoSeleccionado == 'true'}">Activa</option>
+                        <option value="false" th:selected="${estadoSeleccionado == 'false'}">Inactiva</option>
+                    </select>
+                </div>
+
+                <!-- Botón para limpiar filtros -->
+                <div class="col-auto" th:if="${param.tipo != null or param.estado != null}">
+                    <a th:href="@{/unidadVenta}" class="btn btn-outline-secondary btn-sm">Limpiar Filtros</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ================= ESTADÍSTICAS Admin ================= -->
+    <div class="row text-center mb-4" sec:authorize="hasAnyAuthority('ADMIN', 'ROLE_ADMIN')">
+        <div class="col-md-4">
+            <div class="card shadow-sm border-primary">
+                <div class="card-body">
+                    <h5 class="card-title text-muted">Total de Unidades</h5>
+                    <p class="card-text fs-3 fw-bold text-primary" th:text="${totalUnidades}">0</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm border-success">
+                <div class="card-body">
+                    <h5 class="card-title text-muted">Food Trucks</h5>
+                    <p class="card-text fs-3 fw-bold text-success" th:text="${totalFoodTrucks}">0</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm border-warning">
+                <div class="card-body">
+                    <h5 class="card-title text-muted">Puestos Desarmables</h5>
+                    <p class="card-text fs-3 fw-bold text-warning" th:text="${totalPuestos}">0</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Alerta por si viene un mensaje de error en la URL -->
     <div class="alert alert-danger alert-dismissible fade show" role="alert" th:if="${param.error}">
         <span th:text="${param.error}"></span>
     </div>
-    <table class="table table-striped">
+
+    <table class="table table-striped align-middle">
         <thead>
         <tr>
-            <th>Nombre comercial</th>
+            <th>Unidad</th>
+            <th>Tipo</th>
             <th>Código único</th>
             <th>Superficie</th>
             <th>Estado</th>
-            <th class="text-center" sec:authorize="hasAnyAuthority('RESPONSABLE')" >Acciones</th>
+            <!-- columna de acciones RESPONSABLE -->
+            <th class="text-center" sec:authorize="hasAnyAuthority('RESPONSABLE')">Acciones</th>
         </tr>
         </thead>
         <tbody>
         <tr th:each="u : ${unidadVentas}">
             <td th:text="${u.nombreComercial}"></td>
+            <td>
+                <span th:if="${u.class.simpleName == 'FoodTruck'}" class="badge bg-info text-dark">Food Truck</span>
+                <span th:unless="${u.class.simpleName == 'FoodTruck'}" class="badge bg-secondary">Puesto Desarmable</span>
+            </td>
             <td th:text="${u.codigoUnico}"></td>
             <td th:text="${u.superficie}"></td>
             <td>
                 <span th:if="${u.activa}" class="badge bg-success">Activa</span>
                 <span th:unless="${u.activa}" class="badge bg-danger">Inactiva</span>
             </td>
-            <td class="text-center" sec:authorize="hasAnyAuthority('RESPONSABLE')" >
-
-                <!-- ================= ACCIONES CUANDO ESTÁ ACTIVA ================= -->
+            <td class="text-center" sec:authorize="hasAnyAuthority('RESPONSABLE')">
                 <th:block th:if="${u.activa}">
-                    <!-- Botón para abrir el modal de Ver Canon -->
-                    <button type="button"
-                            class="btn btn-info btn-sm text-white"
-                            data-toggle="modal"
-                            th:data-target="${'#canonModal-' + u.idUnidadVenta}">
-                        Ver Canon
-                    </button>
-
-                    <!-- Botón para Modificar -->
-                    <a th:href="@{/unidadVenta/modificar}" class="btn btn-info btn-sm text-white">
-                        Modificar
-                    </a>
-
-                    <!-- Botón para abrir el Modal de Confirmación de Baja -->
-                    <button type="button"
-                            class="btn btn-danger btn-sm"
-                            data-toggle="modal"
-                            th:data-target="${'#bajaModal-' + u.idUnidadVenta}">
-                        Baja
-                    </button>
+                    <button type="button" class="btn btn-info btn-sm text-white" data-toggle="modal" th:data-target="${'#canonModal-' + u.idUnidadVenta}">Ver Canon</button>
+                    <a th:href="@{/unidadVenta/modificar}" class="btn btn-info btn-sm text-white">Modificar</a>
+                    <button type="button" class="btn btn-danger btn-sm" data-toggle="modal" th:data-target="${'#bajaModal-' + u.idUnidadVenta}">Baja</button>
                 </th:block>
-
-                <!-- ================= ACCIONES CUANDO ESTÁ INACTIVA ================= -->
                 <th:block th:unless="${u.activa}">
-                    <!-- Botón para abrir el Modal de Reactivación -->
-                    <button type="button"
-                            class="btn btn-success btn-sm"
-                            data-toggle="modal"
-                            th:data-target="${'#reactivarModal-' + u.idUnidadVenta}">
-                        Reactivar
-                    </button>
+                    <button type="button" class="btn btn-success btn-sm" data-toggle="modal" th:data-target="${'#reactivarModal-' + u.idUnidadVenta}">Reactivar</button>
                 </th:block>
 
-
-                <!-- ================= MODALES ================= -->
-
-                <!-- Modal exclusivo de Ver Canon -->
+                <!-- MODAL-->
                 <div class="modal fade" th:id="${'canonModal-' + u.idUnidadVenta}" tabindex="-1" aria-hidden="true">
                     <div class="modal-dialog">
                         <div class="modal-content">
                             <div class="modal-header">
                                 <h5 class="modal-title">Cálculo de Canon</h5>
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                             </div>
                             <div class="modal-body text-start">
                                 <p><strong>Unidad:</strong> <span th:text="${u.nombreComercial}"></span></p>
                                 <p><strong>Código:</strong> <span th:text="${u.codigoUnico}"></span></p>
                                 <hr>
-                                <h4 class="text-success">
-                                    Total Canon: $<span th:text="${u.calcularCanon()}"></span>
-                                </h4>
+                                <h4 class="text-success">Total Canon: $<span th:text="${u.calcularCanon()}"></span></h4>
                             </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Cerrar</button>
-                            </div>
+                            <div class="modal-footer"><button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Cerrar</button></div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Modal exclusivo de Confirmación de Baja -->
                 <div class="modal fade" th:id="${'bajaModal-' + u.idUnidadVenta}" tabindex="-1" aria-hidden="true">
                     <div class="modal-dialog">
                         <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title text-danger">Confirmar Baja Lógica</h5>
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
-                            <div class="modal-body text-start">
-                                <p>¿Estás seguro de que deseas dar de baja la unidad <strong><span th:text="${u.nombreComercial}"></span></strong>?</p>
-                                <p class="text-muted small">Esta acción marcará la unidad como inactiva en el sistema.</p>
-                            </div>
+                            <div class="modal-header"><h5 class="modal-title text-danger">Confirmar Baja Lógica</h5><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>
+                            <div class="modal-body text-start"><p>¿Estás seguro de dar de baja la unidad <strong><span th:text="${u.nombreComercial}"></span></strong>?</p></div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Cancelar</button>
-
-                                <!-- Formulario POST que se ejecuta al confirmar -->
-                                <form th:action="@{/unidadVenta/baja/{id}(id=${u.idUnidadVenta})}" method="post" style="display:inline;">
-                                    <button type="submit" class="btn btn-danger btn-sm">Sí, dar de baja</button>
-                                </form>
+                                <form th:action="@{/unidadVenta/baja/{id}(id=${u.idUnidadVenta})}" method="post" style="display:inline;"><button type="submit" class="btn btn-danger btn-sm">Sí, dar de baja</button></form>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Modal exclusivo de Confirmación de Reactivación -->
                 <div class="modal fade" th:id="${'reactivarModal-' + u.idUnidadVenta}" tabindex="-1" aria-hidden="true">
                     <div class="modal-dialog">
                         <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title text-success">Confirmar Reactivación</h5>
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
-                            <div class="modal-body text-start">
-                                <p>¿Deseas volver a activar la unidad <strong><span th:text="${u.nombreComercial}"></span></strong>?</p>
-                                <p class="text-muted small">La unidad volverá a estar operativa.</p>
-                            </div>
+                            <div class="modal-header"><h5 class="modal-title text-success">Confirmar Reactivación</h5><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>
+                            <div class="modal-body text-start"><p>¿Deseas volver a activar la unidad <strong><span th:text="${u.nombreComercial}"></span></strong>?</p></div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Cancelar</button>
-
-                                <!-- Formulario POST que se ejecuta al reactivar -->
-                                <form th:action="@{/unidadVenta/reactivar/{id}(id=${u.idUnidadVenta})}" method="post" style="display:inline;">
-                                    <button type="submit" class="btn btn-success btn-sm">Sí, reactivar</button>
-                                </form>
+                                <form th:action="@{/unidadVenta/reactivar/{id}(id=${u.idUnidadVenta})}" method="post" style="display:inline;"><button type="submit" class="btn btn-success btn-sm">Sí, reactivar</button></form>
                             </div>
                         </div>
                     </div>
                 </div>
-
             </td>
         </tr>
         </tbody>
     </table>
 </main>
-
 <footer th:replace="~{layout :: footer}"></footer>
 <div th:replace="~{layout :: scripts}"></div>
 </body>
