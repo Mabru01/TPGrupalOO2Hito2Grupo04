@@ -85,19 +85,22 @@ public class PedidoController {
         return "pedido/new";
     }
 
-    // Procesar el guardado del pedido
     @PostMapping("/guardar")
-    public String guardarPedido(@ModelAttribute("pedidoDTO") PedidoDTO pedidoDTO,
-                                RedirectAttributes redirectAttributes) {
+    public String guardarPedido(@ModelAttribute("pedidoDTO") PedidoDTO pedidoDTO, Model model) {
         try {
             pedidoDTO.setIdUnidadVenta(unidadDelUsuario().getIdUnidadVenta());
-
             pedidoService.insertarPedido(pedidoDTO);
-            redirectAttributes.addFlashAttribute("exito", "Pedido registrado correctamente");
+            return "redirect:/pedido"; // Si sale bien, redirige
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "No se pudo registrar el pedido: " + e.getMessage());
+            // Si hay error, nos quedamos en la misma vista sin redirigir
+            UnidadVenta unidadVenta = unidadDelUsuario();
+            model.addAttribute("unidadVenta", unidadVenta);
+            model.addAttribute("festival", unidadVenta != null ? unidadVenta.getFestival() : null);
+            model.addAttribute("platos", platoService.traerTodos());
+            model.addAttribute("error", "No se pudo registrar el pedido: " + e.getMessage());
+
+            return "pedido/new"; // Te devuelve al formulario con tus datos y el error
         }
-        return "redirect:/pedido";
     }
 
     // Mostrar formulario de modificación cargando el pedido existente

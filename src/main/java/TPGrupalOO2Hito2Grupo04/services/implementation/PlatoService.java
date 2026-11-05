@@ -105,10 +105,20 @@ public class PlatoService implements IPlatoService {
             // Si el nombre pertenece a OTRO registro distinto al que estamos editando
             if (dto.getIdPlato() == null || !platoExistente.getIdPlato().equals(dto.getIdPlato())) {
 
-                // Si el plato existente está inactivo, lo reactivamos en lugar de tirar error
+                // Si el plato existente está inactivo, lo reactivamos
                 if (Boolean.FALSE.equals(platoExistente.getActivo())) {
                     plato = platoExistente;
                     plato.setActivo(true); // ¡Lo reactivamos!
+
+                    // Si estábamos editando otro plato (viene un ID original), lo damos de baja lógica para hacer el reemplazo limpio.
+                    if (dto.getIdPlato() != null) {
+                        Plato platoOriginalAEditar = platoRepository.findById(dto.getIdPlato()).orElse(null);
+                        if (platoOriginalAEditar != null) {
+                            platoOriginalAEditar.setActivo(false);
+                            platoRepository.save(platoOriginalAEditar);
+                        }
+                    }
+
                 } else {
                     // Si ya existe y está activo, prohibido duplicar
                     throw new IllegalArgumentException("Ya existe un plato activo registrado con ese nombre.");
