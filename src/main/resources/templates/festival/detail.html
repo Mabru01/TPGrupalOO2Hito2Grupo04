@@ -17,8 +17,14 @@
             <span th:if="${proximo}" class="estado estado-proximo">Próximo</span>
             <span th:if="${finalizado}" class="estado estado-finalizado">Finalizado</span>
             <span th:unless="${proximo or finalizado}" class="estado estado-curso">En curso</span>
+            <!-- Solo se modifican los festivales que no terminaron -->
+            <div class="mt-2" th:if="${puedeModificar}">
+                <a th:href="@{/festival/{id}/modificar(id=${festival.idFestival})}" class="btn btn-epicentro btn-agregar">Modificar</a>
+            </div>
         </div>
     </div>
+
+    <div class="alert alert-success" th:if="${mensaje}" th:text="${mensaje}"></div>
 
     <!-- Datos generales -->
     <div class="row mb-4">

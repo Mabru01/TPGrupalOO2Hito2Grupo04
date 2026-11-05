@@ -27,7 +27,15 @@
             </div>
         </div>
 
-        <h2 class="h4 mb-3">Festivales</h2>
+        <!-- Mensaje después de crear un festival -->
+        <div class="alert alert-success" th:if="${mensaje}" th:text="${mensaje}"></div>
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 class="h4 mb-0">Festivales</h2>
+            <!-- Solo el administrador da de alta festivales -->
+            <a sec:authorize="hasAnyAuthority('ADMIN', 'ROLE_ADMIN')" th:href="@{/festival/nuevo}"
+               class="btn btn-epicentro btn-agregar">+ Agregar festival</a>
+        </div>
 
         <div th:if="${#lists.isEmpty(festivales)}" class="alert alert-info"
              th:text="${verFinalizados ? 'Todavía no hay festivales cargados.' : 'No hay festivales activos en este momento.'}">

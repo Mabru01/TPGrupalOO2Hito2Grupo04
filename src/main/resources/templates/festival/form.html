@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: head}"></head>
+<body>
+<nav th:replace="~{layout :: navbar}"></nav>
+
+<main class="container py-4">
+    <div class="page-header mb-4">
+        <!-- El mismo formulario sirve para el alta y para la modificación (cuando viene idFestival) -->
+        <h2 th:text="${idFestival == null ? 'Nuevo festival' : 'Modificar festival'}">Nuevo festival</h2>
+    </div>
+
+    <div class="card form-card">
+        <div class="card-body">
+            <form th:action="${idFestival == null} ? @{/festival/guardar} : @{/festival/{id}/modificar(id=${idFestival})}"
+                  th:object="${festivalDTO}" method="post">
+
+                <div class="alert alert-danger" th:if="${error}" th:text="${error}"></div>
+
+                <h5 class="text-secondary border-bottom pb-2 mb-3">Datos del festival</h5>
+                <div class="form-row">
+                    <div class="col-md-8 mb-3">
+                        <label for="nombre" class="col-form-label">Nombre</label>
+                        <input type="text" class="form-control" id="nombre" th:field="*{nombre}" maxlength="100" required
+                               placeholder="Ej: Festival de la Cerveza Artesanal"/>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="temporada" class="col-form-label">Temporada</label>
+                        <select class="form-control" id="temporada" th:field="*{temporada}" required>
+                            <option value="">Seleccioná</option>
+                            <option value="Verano">Verano</option>
+                            <option value="Otoño">Otoño</option>
+                            <option value="Invierno">Invierno</option>
+                            <option value="Primavera">Primavera</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="fechaInicio" class="col-form-label">Fecha de inicio</label>
+                        <input type="date" class="form-control" id="fechaInicio" th:field="*{fechaInicio}" required
+                               th:readonly="${inicioBloqueado != null and inicioBloqueado}"/>
+                        <small class="text-muted" th:if="${inicioBloqueado != null and inicioBloqueado}">El festival ya empezó: la fecha de inicio no se puede cambiar.</small>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="fechaFin" class="col-form-label">Fecha de fin</label>
+                        <input type="date" class="form-control" id="fechaFin" th:field="*{fechaFin}" required/>
+                    </div>
+                </div>
+
+                <h5 class="text-secondary border-bottom pb-2 mb-1">Costos</h5>
+                <p class="text-muted small" th:if="${idFestival == null}">Vienen cargados los del último festival: modificá los que cambien.</p>
+                <p class="text-muted small" th:unless="${idFestival == null}">Los cambios en los costos se usan en la liquidación de sueldos de este festival.</p>
+                <div class="form-row">
+                    <div class="col-md-4 mb-3">
+                        <label for="costoSuperficie" class="col-form-label">Costo por superficie ($)</label>
+                        <input type="number" class="form-control" id="costoSuperficie" th:field="*{costoSuperficie}" min="0" step="0.01" required/>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="costoMontaje" class="col-form-label">Costo por montaje ($)</label>
+                        <input type="number" class="form-control" id="costoMontaje" th:field="*{costoMontaje}" min="0" step="0.01" required/>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="plusElectricidad" class="col-form-label">Plus por electricidad ($)</label>
+                        <input type="number" class="form-control" id="plusElectricidad" th:field="*{plusElectricidad}" min="0" step="0.01" required/>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="sueldoBase" class="col-form-label">Sueldo base ($)</label>
+                        <input type="number" class="form-control" id="sueldoBase" th:field="*{sueldoBase}" min="0.01" step="0.01" required/>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="antiguedadPorAnio" class="col-form-label">Antigüedad por año, cajeros ($)</label>
+                        <input type="number" class="form-control" id="antiguedadPorAnio" th:field="*{antiguedadPorAnio}" min="0" step="0.01" required/>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="plusCocinero" class="col-form-label">Plus cocinero ($)</label>
+                        <input type="number" class="form-control" id="plusCocinero" th:field="*{plusCocinero}" min="0" step="0.01" required/>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="plusCocineroAyudante" class="col-form-label">Plus ayudante ($)</label>
+                        <input type="number" class="form-control" id="plusCocineroAyudante" th:field="*{plusCocineroAyudante}" min="0" step="0.01" required/>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="plusLavaplatos" class="col-form-label">Plus lavaplatos ($)</label>
+                        <input type="number" class="form-control" id="plusLavaplatos" th:field="*{plusLavaplatos}" min="0" step="0.01" required/>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end">
+                    <a class="btn btn-secondary mr-2" th:href="${idFestival == null} ? @{/index} : @{/festival/{id}(id=${idFestival})}">Cancelar</a>
+                    <button type="submit" class="btn btn-epicentro" th:text="${idFestival == null ? 'Guardar festival' : 'Guardar cambios'}">Guardar festival</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{layout :: footer}"></footer>
+<div th:replace="~{layout :: scripts}"></div>
+</body>
+</html>

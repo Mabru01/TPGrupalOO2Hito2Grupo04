@@ -64,6 +64,15 @@ public class Festival {
         return (int) ChronoUnit.DAYS.between(fechaInicio, fechaFin) + 1;
     }
 
+    // En curso o terminado: ya no se puede cambiar la fecha de inicio
+    public boolean yaEmpezo(LocalDate hoy) {
+        return !fechaInicio.isAfter(hoy);
+    }
+
+    public boolean yaTermino(LocalDate hoy) {
+        return fechaFin.isBefore(hoy);
+    }
+
     // Hasta 15 días: 50%. De 16 a 30: 100%. Más de 30: (int(dias / 15) + 1) * 50%
     public BigDecimal calcularPorcentajeSueldo() {
         int dias = getDuracionEnDias();
