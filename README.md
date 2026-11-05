@@ -42,8 +42,7 @@ La aplicación lee la conexión a la base y la cuenta de mail de variables de en
 | `MAIL_USERNAME` | `cuenta@gmail.com` | Cuenta de Gmail que envía los mails |
 | `MAIL_PASSWORD` | *(contraseña de aplicación de Gmail)* | Contraseña de aplicación de esa cuenta |
 
-> **Windows:** `USERNAME` ya existe en Windows y contiene el usuario del sistema. Hay que definirla con el usuario de MySQL en la configuración de ejecución (en IntelliJ: *Run → Edit Configurations → Environment variables*).
->
+
 > Las variables de mail son opcionales. Si no se cargan, la aplicación funciona igual, pero no se envía el mail con las credenciales al dar de alta un empleado.
 
 ### 3. Arrancar la aplicación una vez
