@@ -70,6 +70,11 @@ public class UnidadVentaService implements IUnidadVentaService {
     }
 
     @Override
+    public List<UnidadVenta> getAllActivas() {
+        return unidadVentaRepository.findByActivaTrue();
+    }
+
+    @Override
     public Optional<UnidadVenta> findById(long id) {
         return unidadVentaRepository.findById(id);
     }

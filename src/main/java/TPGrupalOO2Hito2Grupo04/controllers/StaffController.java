@@ -52,7 +52,7 @@ public class StaffController {
     @PreAuthorize("hasAnyAuthority('RESPONSABLE', 'ROLE_RESPONSABLE')")
     public ModelAndView nuevoCocinero() {
         ModelAndView mAV = new ModelAndView(ViewRouteHelper.STAFF_NEW_COCINERO);
-        mAV.addObject("unidadesVenta", unidadVentaService.getAll()); // Para el desplegable (select)
+        mAV.addObject("unidadesVenta", unidadVentaService.getAllActivas()); // Para el desplegable (select)
         mAV.addObject(STAFF_ATTR, new CocineroDTO());
         return mAV;
     }
@@ -62,7 +62,7 @@ public class StaffController {
     public ModelAndView nuevoCajero() {
         ModelAndView mAV = new ModelAndView(ViewRouteHelper.STAFF_NEW_CAJERO);
         mAV.addObject(STAFF_ATTR, new CajeroDTO());
-        mAV.addObject("unidadesVenta", unidadVentaService.getAll()); // Para el desplegable (select)
+        mAV.addObject("unidadesVenta", unidadVentaService.getAllActivas()); // Para el desplegable (select)
         return mAV;
     }
 
@@ -75,7 +75,7 @@ public class StaffController {
             return new ModelAndView(new RedirectView(ViewRouteHelper.STAFF_ROOT));
         } catch (IllegalArgumentException e) {
             ModelAndView mAV = new ModelAndView(ViewRouteHelper.STAFF_NEW_COCINERO);
-            mAV.addObject("unidadesVenta", unidadVentaService.getAll());
+            mAV.addObject("unidadesVenta", unidadVentaService.getAllActivas());
             mAV.addObject(STAFF_ATTR, new CocineroDTO());
             mAV.addObject("error", e.getMessage());
             return mAV;
@@ -92,7 +92,7 @@ public class StaffController {
         } catch (IllegalArgumentException e) {
             ModelAndView mAV = new ModelAndView(ViewRouteHelper.STAFF_NEW_CAJERO);
             mAV.addObject(STAFF_ATTR, new CajeroDTO());
-            mAV.addObject("unidadesVenta", unidadVentaService.getAll());
+            mAV.addObject("unidadesVenta", unidadVentaService.getAllActivas());
             mAV.addObject("error", e.getMessage());
             return mAV;
         }
@@ -103,11 +103,10 @@ public class StaffController {
     public ModelAndView modificar(@RequestParam(required = false) Integer idStaff) {
         ModelAndView mAV = new ModelAndView(ViewRouteHelper.STAFF_UPDATE);
         mAV.addObject("staffs", staffService.getAllByRolEmpleado());
-        mAV.addObject("unidadesVenta", unidadVentaService.getAll());
+        mAV.addObject("unidadesVenta", unidadVentaService.getAllActivas());
         if (idStaff != null) {
             try {
-                StaffDTO staffDTO = new StaffDTO();
-                staffService.obtenerDTOPorId(idStaff, staffDTO);
+                StaffDTO staffDTO = staffService.obtenerDTOPorId(idStaff);
                 mAV.addObject(STAFF_ATTR, staffDTO);
             } catch (IllegalArgumentException e) {
                 mAV.addObject("error", e.getMessage());
@@ -125,7 +124,7 @@ public class StaffController {
         } catch (IllegalArgumentException e) {
             ModelAndView mAV = new ModelAndView(ViewRouteHelper.STAFF_UPDATE);
             mAV.addObject("staffs", staffService.getAllByRolEmpleado());
-            mAV.addObject("unidadesVenta", unidadVentaService.getAll());
+            mAV.addObject("unidadesVenta", unidadVentaService.getAllActivas());
             mAV.addObject(STAFF_ATTR, staffDTO);
             mAV.addObject("error", e.getMessage());
             return mAV;

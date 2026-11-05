@@ -20,7 +20,6 @@
             <th>DNI</th>
             <th>Sueldo</th>
             <th>Tipo</th>
-            <th>Activo</th>
         </tr>
         </thead>
         <tbody>
@@ -29,10 +28,6 @@
             <td th:text="${s.dni}"></td>
             <td th:text="${s.sueldoBase}"></td>
             <td th:text="${s.class.simpleName}"></td>
-            <td>
-                <span th:if="${s.fechaEgreso == null}" class="badge bg-success">Activo</span>
-                <span th:unless="${s.fechaEgreso == null}" class="badge bg-danger">Inactivo</span>
-            </td>
         </tr>
         </tbody>
     </table>

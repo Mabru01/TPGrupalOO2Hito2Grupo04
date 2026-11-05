@@ -19,6 +19,8 @@ public interface IUnidadVentaService {
 
     List<UnidadVenta> getAll();
 
+    List<UnidadVenta> getAllActivas();
+
     Optional<UnidadVenta> findById(long id);
 
     UnidadVenta findByCodigoUnico(String codigoUnico);
