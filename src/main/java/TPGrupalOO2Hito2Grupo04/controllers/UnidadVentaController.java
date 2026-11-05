@@ -10,7 +10,7 @@ import TPGrupalOO2Hito2Grupo04.entities.UnidadVenta;
 import TPGrupalOO2Hito2Grupo04.services.IUnidadVentaService;
 import TPGrupalOO2Hito2Grupo04.helpers.ViewRouteHelper;
 import TPGrupalOO2Hito2Grupo04.repositories.IUnidadVentaRepository;
-
+import org.springframework.web.bind.annotation.ResponseBody;
 import TPGrupalOO2Hito2Grupo04.services.implementation.FestivalService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -121,6 +121,31 @@ public class UnidadVentaController {
         ModelAndView mAV = new ModelAndView(ViewRouteHelper.UnidadVenta_NEW_PUESTO);
         mAV.addObject(UNIDAD_VENTA_ATTR, new PuestoDesarmableDTO());
         return mAV;
+    }
+
+    @GetMapping("/simular-canon")
+    @ResponseBody
+    public double simularCanon(@RequestParam double superficie,
+                               @RequestParam String tipo,
+                               @RequestParam(required = false, defaultValue = "false") boolean usaLuz,
+                               @RequestParam(required = false, defaultValue = "0") int tiempoMontaje) {
+
+        double canonCalculado;
+
+        if ("FoodTruck".equalsIgnoreCase(tipo)) {
+            FoodTruck ft = new FoodTruck();
+            ft.setSuperficie(superficie);
+            ft.setUsaLuz(usaLuz);
+            canonCalculado = ft.calcularCanon();
+
+        } else {
+            PuestoDesarmable puesto = new PuestoDesarmable();
+            puesto.setSuperficie(superficie);
+            puesto.setTiempoMontaje(tiempoMontaje);
+            canonCalculado = puesto.calcularCanon();
+        }
+
+        return canonCalculado;
     }
 
     @PostMapping("/guardar/food-truck")

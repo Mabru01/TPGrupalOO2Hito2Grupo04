@@ -1,99 +1,205 @@
+
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head th:replace="~{layout :: head}"></head>
 <body>
-    <nav th:replace="~{layout :: navbar}"></nav>
+<nav th:replace="~{layout :: navbar}"></nav>
 
-    <main class="container py-4">
-        <section class="bienvenida">
-            <h1>Epicentro Gourmet</h1>
-            <p class="text-muted mb-0">Sistema de gestión de festivales</p>
-            <p sec:authorize="isAuthenticated()" class="mt-2 mb-0">
-                Sesión iniciada como <strong sec:authentication="name">usuario</strong>.
-            </p>
-        </section>
+<main class="container py-4">
+    <section class="bienvenida">
+        <h1>Epicentro Gourmet</h1>
+        <p class="text-muted mb-0">Sistema de gestión de festivales</p>
+        <p sec:authorize="isAuthenticated()" class="mt-2 mb-0">
+            Sesión iniciada como <strong sec:authentication="name">usuario</strong>.
+        </p>
+    </section>
 
-        <!-- Registro de unidad de venta (solo sin sesión; iniciar sesión está en el navbar) -->
-        <div class="card accion mb-4" sec:authorize="isAnonymous()">
-            <div class="card-body d-md-flex justify-content-between align-items-center">
-                <div class="mb-3 mb-md-0">
-                    <h5 class="card-title mb-1">¿Tenés una unidad de venta?</h5>
-                    <p class="card-text text-muted mb-0">Registrá tu food truck o puesto desarmable.</p>
+    <div class="card accion mb-4" sec:authorize="isAnonymous()">
+        <div class="card-body d-md-flex justify-content-between align-items-center">
+            <div class="mb-3 mb-md-0">
+                <h5 class="card-title mb-1">¿Tenés una unidad de venta?</h5>
+                <p class="card-text text-muted mb-0">Registrá tu food truck o puesto desarmable.</p>
+            </div>
+            <div>
+                <a class="btn btn-epicentro mr-2 mb-1" th:href="@{/unidadVenta/nuevo/food-truck}">Registrar food truck</a>
+                <a class="btn btn-outline-secondary mb-1" th:href="@{/unidadVenta/nuevo/puesto-desarmable}">Registrar puesto</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="card accion mb-4 bg-light shadow-sm" sec:authorize="isAnonymous()">
+        <div class="card-body py-3">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h6 class="text-primary mb-0 fw-bold">💡 Simulador Rápido de Canon</h6>
+                <small class="text-muted">Calculá el costo estimado sin registrarte</small>
+            </div>
+
+            <form id="formSimuladorCanon" th:action="@{/unidadVenta/simular-canon}" method="get" class="row g-2 align-items-center">
+                <div class="col-md-3">
+                    <label for="tipo" class="form-label small fw-bold mb-1">Tipo de Unidad</label>
+                    <select name="tipo" id="tipo" class="form-select form-select-sm" onchange="cambiarCamposSimulador()">
+                        <option value="FoodTruck" th:selected="${tipo == 'FoodTruck' or tipo == null}">Food Truck</option>
+                        <option value="PuestoDesarmable" th:selected="${tipo == 'PuestoDesarmable'}">Puesto Desarmable</option>
+                    </select>
                 </div>
-                <div>
-                    <a class="btn btn-epicentro mr-2 mb-1" th:href="@{/unidadVenta/nuevo/food-truck}">Registrar food truck</a>
-                    <a class="btn btn-outline-secondary mb-1" th:href="@{/unidadVenta/nuevo/puesto-desarmable}">Registrar puesto</a>
+
+                <div class="col-md-3">
+                    <label for="superficie" class="form-label small fw-bold mb-1">Superficie (m²)</label>
+                    <input type="number" step="0.01" min="0.01" name="superficie" id="superficie" class="form-control form-control-sm" placeholder="Ej: 15" required th:value="${superficie}">
+                </div>
+
+                <div class="col-md-3">
+                    <div id="bloqueFoodTruck">
+                        <label class="form-label small fw-bold mb-1 d-block">Conexión Eléctrica</label>
+                        <div class="form-check mt-1">
+                            <input type="checkbox" name="usaLuz" id="usaLuz" class="form-check-input" th:checked="${usaLuz}">
+                            <label class="form-check-label small" for="usaLuz">Requiere luz (+$2.000)</label>
+                        </div>
+                    </div>
+
+                    <div id="bloquePuesto" style="display: none;">
+                        <label for="tiempoMontaje" class="form-label small fw-bold mb-1">Tiempo de Montaje</label>
+                        <input type="number" min="0" name="tiempoMontaje" id="tiempoMontaje" class="form-control form-control-sm" placeholder="Minutos" th:value="${tiempoMontaje != null ? tiempoMontaje : 0}">
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label small fw-bold mb-1 d-none d-md-block">&nbsp;</label>
+                    <button type="submit" class="btn btn-primary btn-sm w-100">Calcular</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalCanon" tabindex="-1" aria-labelledby="modalCanonLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-light">
+                    <h5 class="modal-title text-primary" id="modalCanonLabel">💡 Canon Estimado</h5>
+                </div>
+                <div class="modal-body text-center py-4">
+                    <p class="text-muted mb-2">El costo estimado para tu unidad es:</p>
+                    <h3 id="resultadoCanon" class="text-success fw-bold mb-0">$0,00</h3>
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Mensaje después de crear un festival -->
-        <div class="alert alert-success" th:if="${mensaje}" th:text="${mensaje}"></div>
+    <script>
+        function cambiarCamposSimulador() {
+            var tipo = document.getElementById("tipo").value;
+            var bft = document.getElementById("bloqueFoodTruck");
+            var bpuesto = document.getElementById("bloquePuesto");
 
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h2 class="h4 mb-0">Festivales</h2>
-            <!-- Solo el administrador da de alta festivales -->
-            <a sec:authorize="hasAnyAuthority('ADMIN', 'ROLE_ADMIN')" th:href="@{/festival/nuevo}"
-               class="btn btn-epicentro btn-agregar">+ Agregar festival</a>
+            if (tipo === "FoodTruck") {
+                bft.style.display = "block";
+                bpuesto.style.display = "none";
+            } else {
+                bft.style.display = "none";
+                bpuesto.style.display = "block";
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            cambiarCamposSimulador();
+        });
+
+        document.getElementById("formSimuladorCanon").addEventListener("submit", async function(event) {
+            event.preventDefault();
+
+            const formulario = this;
+            const datos = new URLSearchParams(new FormData(formulario));
+
+            try {
+                const respuesta = await fetch(formulario.action + "?" + datos.toString());
+
+                if (!respuesta.ok) {
+                    throw new Error("Error al calcular el canon");
+                }
+
+                const canon = await respuesta.json();
+
+                document.getElementById("resultadoCanon").textContent =
+                    "$" + canon.toLocaleString("es-AR", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    });
+
+                // Disparar el modal de Bootstrap de forma segura
+                var myModal = new bootstrap.Modal(document.getElementById('modalCanon'));
+                myModal.show();
+
+            } catch (error) {
+                alert("No se pudo calcular el canon. Intentá nuevamente.");
+                console.error(error);
+            }
+        });
+    </script>
+
+    <div class="alert alert-success" th:if="${mensaje}" th:text="${mensaje}"></div>
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="h4 mb-0">Festivales</h2>
+        <a sec:authorize="hasAnyAuthority('ADMIN', 'ROLE_ADMIN')" th:href="@{/festival/nuevo}"
+           class="btn btn-epicentro btn-agregar">+ Agregar festival</a>
+    </div>
+
+    <div th:if="${#lists.isEmpty(festivales)}" class="alert alert-info"
+         th:text="${verFinalizados ? 'Todavía no hay festivales cargados.' : 'No hay festivales activos en este momento.'}">
+        No hay festivales activos en este momento.
+    </div>
+
+    <div class="card tabla-festivales" th:unless="${#lists.isEmpty(festivales)}">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                <tr>
+                    <th>Festival</th>
+                    <th>Temporada</th>
+                    <th>Fechas</th>
+                    <th class="text-center">Duración</th>
+                    <th>Unidades de venta</th>
+                    <th class="text-center">Estado</th>
+                    <th sec:authorize="hasAnyAuthority('ADMIN', 'ROLE_ADMIN')"></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="f : ${festivales}">
+                    <td class="font-weight-bold" th:text="${f.nombre}">Festival</td>
+                    <td th:text="${f.temporada}">Primavera</td>
+                    <td>
+                        <span th:text="${#temporals.format(f.fechaInicio, 'dd/MM/yyyy')}">01/10/2026</span>
+                        <span class="text-muted">al</span>
+                        <span th:text="${#temporals.format(f.fechaFin, 'dd/MM/yyyy')}">15/11/2026</span>
+                    </td>
+                    <td class="text-center" th:text="${f.duracionEnDias + ' días'}">46 días</td>
+                    <td>
+                        <span th:if="${f.unidadesVenta.isEmpty()}" class="text-muted">Sin unidades</span>
+                        <span th:each="u : ${f.unidadesVenta}"
+                              th:class="${u.class.simpleName.startsWith('FoodTruck') ? 'unidad unidad-ft' : 'unidad unidad-pd'}"
+                              th:title="${u.class.simpleName.startsWith('FoodTruck') ? 'Food truck' : 'Puesto desarmable'}"
+                              th:text="${u.nombreComercial}">Unidad</span>
+                    </td>
+                    <td class="text-center">
+                        <span th:if="${f.fechaInicio.isAfter(hoy)}" class="estado estado-proximo">Próximo</span>
+                        <span th:if="${f.fechaFin.isBefore(hoy)}" class="estado estado-finalizado">Finalizado</span>
+                        <span th:unless="${f.fechaInicio.isAfter(hoy) or f.fechaFin.isBefore(hoy)}" class="estado estado-curso">En curso</span>
+                    </td>
+                    <td class="text-center" sec:authorize="hasAnyAuthority('ADMIN', 'ROLE_ADMIN')">
+                        <a th:href="@{/festival/{id}(id=${f.idFestival})}" class="btn btn-sm btn-outline-secondary text-nowrap">Ver detalle</a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
         </div>
-
-        <div th:if="${#lists.isEmpty(festivales)}" class="alert alert-info"
-             th:text="${verFinalizados ? 'Todavía no hay festivales cargados.' : 'No hay festivales activos en este momento.'}">
-            No hay festivales activos en este momento.
+        <div class="card-footer referencias">
+            <span class="unidad unidad-ft">Food truck</span>
+            <span class="unidad unidad-pd">Puesto desarmable</span>
         </div>
+    </div>
+</main>
 
-        <div class="card tabla-festivales" th:unless="${#lists.isEmpty(festivales)}">
-            <div class="table-responsive">
-                <table class="table table-hover mb-0">
-                    <thead>
-                        <tr>
-                            <th>Festival</th>
-                            <th>Temporada</th>
-                            <th>Fechas</th>
-                            <th class="text-center">Duración</th>
-                            <th>Unidades de venta</th>
-                            <th class="text-center">Estado</th>
-                            <th sec:authorize="hasAnyAuthority('ADMIN', 'ROLE_ADMIN')"></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr th:each="f : ${festivales}">
-                            <td class="font-weight-bold" th:text="${f.nombre}">Festival</td>
-                            <td th:text="${f.temporada}">Primavera</td>
-                            <td>
-                                <span th:text="${#temporals.format(f.fechaInicio, 'dd/MM/yyyy')}">01/10/2026</span>
-                                <span class="text-muted">al</span>
-                                <span th:text="${#temporals.format(f.fechaFin, 'dd/MM/yyyy')}">15/11/2026</span>
-                            </td>
-                            <td class="text-center" th:text="${f.duracionEnDias + ' días'}">46 días</td>
-                            <td>
-                                <span th:if="${f.unidadesVenta.isEmpty()}" class="text-muted">Sin unidades</span>
-                                <span th:each="u : ${f.unidadesVenta}"
-                                      th:class="${u.class.simpleName.startsWith('FoodTruck') ? 'unidad unidad-ft' : 'unidad unidad-pd'}"
-                                      th:title="${u.class.simpleName.startsWith('FoodTruck') ? 'Food truck' : 'Puesto desarmable'}"
-                                      th:text="${u.nombreComercial}">Unidad</span>
-                            </td>
-                            <td class="text-center">
-                                <span th:if="${f.fechaInicio.isAfter(hoy)}" class="estado estado-proximo">Próximo</span>
-                                <span th:if="${f.fechaFin.isBefore(hoy)}" class="estado estado-finalizado">Finalizado</span>
-                                <span th:unless="${f.fechaInicio.isAfter(hoy) or f.fechaFin.isBefore(hoy)}" class="estado estado-curso">En curso</span>
-                            </td>
-                            <!-- El administrador puede ver el detalle completo del festival -->
-                            <td class="text-center" sec:authorize="hasAnyAuthority('ADMIN', 'ROLE_ADMIN')">
-                                <a th:href="@{/festival/{id}(id=${f.idFestival})}" class="btn btn-sm btn-outline-secondary text-nowrap">Ver detalle</a>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            <div class="card-footer referencias">
-                <span class="unidad unidad-ft">Food truck</span>
-                <span class="unidad unidad-pd">Puesto desarmable</span>
-            </div>
-        </div>
-    </main>
-
-    <footer th:replace="~{layout :: footer}"></footer>
-    <div th:replace="~{layout :: scripts}"></div>
+<footer th:replace="~{layout :: footer}"></footer>
+<div th:replace="~{layout :: scripts}"></div>
 </body>
 </html>
