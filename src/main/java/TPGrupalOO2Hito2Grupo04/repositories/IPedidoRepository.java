@@ -13,6 +13,7 @@ import java.util.List;
 @Repository
 public interface IPedidoRepository extends JpaRepository<Pedido, Long> {
 
+    // Metodos encontrar plato estrella por festival y unidad venta
     @Query("SELECT p, SUM(d.cantidad) FROM Pedido pe " +
             "JOIN pe.items d " +
             "JOIN d.plato p " +

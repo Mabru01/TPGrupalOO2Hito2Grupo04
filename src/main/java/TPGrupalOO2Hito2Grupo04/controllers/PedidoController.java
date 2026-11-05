@@ -44,7 +44,7 @@ public class PedidoController {
         this.unidadVentaService = unidadVentaService;
     }
 
-    // Listado principal de pedidos.
+    // Listado de pedidos filtrando solo los que corresponden a la unidad del usuario logueado
     @GetMapping("")
     public String listarPedidos(Model model) {
         UnidadVenta unidadVenta = unidadDelUsuario();
@@ -61,7 +61,7 @@ public class PedidoController {
         return ViewRouteHelper.PEDIDO_INDEX;
     }
 
-    // Mostrar el formulario para dar de alta un nuevo pedido
+    // Formulario para registrar un nuevo pedido trayendo los platos activos
     @GetMapping("/nuevo")
     public String mostrarFormularioNuevo(Model model) {
         UnidadVenta unidadVenta = unidadDelUsuario();
@@ -72,7 +72,7 @@ public class PedidoController {
             pedidoDTO.setIdUnidadVenta(unidadVenta.getIdUnidadVenta());
         }
 
-        // Permitimos platos activos (true) y registros previos antiguos (null), ocultando solo los dados de baja (false)
+        // Se toman los platos activos con true y registros previos antiguos con null, se ocultan solo los que estan en false
         List<Plato> platosUnidad = platoService.traerTodos().stream()
                 .filter(p -> p.getUnidadVenta() != null && unidadVenta != null && p.getUnidadVenta().getIdUnidadVenta() == unidadVenta.getIdUnidadVenta())
                 .filter(p -> !Boolean.FALSE.equals(p.getActivo()))
@@ -86,14 +86,14 @@ public class PedidoController {
         return ViewRouteHelper.PEDIDO_NEW;
     }
 
+    // Se guarda el nuevo pedido y se hacen validaciones
     @PostMapping("/guardar")
     public String guardarPedido(@ModelAttribute("pedidoDTO") PedidoDTO pedidoDTO, Model model) {
         try {
             pedidoDTO.setIdUnidadVenta(unidadDelUsuario().getIdUnidadVenta());
             pedidoService.insertarPedido(pedidoDTO);
-            return "redirect:/pedido"; // Redirecciones a URLs se mantienen igual
+            return "redirect:/pedido";
         } catch (Exception e) {
-            // Si hay error, nos quedamos en la misma vista usando el helper
             UnidadVenta unidadVenta = unidadDelUsuario();
             model.addAttribute("unidadVenta", unidadVenta);
             model.addAttribute("festival", unidadVenta != null ? unidadVenta.getFestival() : null);
@@ -104,7 +104,7 @@ public class PedidoController {
         }
     }
 
-    // Mostrar formulario de modificación cargando el pedido existente
+    // Se carga el pedido existente para poder editarlo
     @GetMapping("/editar/{id}")
     public String mostrarFormularioEditar(@PathVariable("id") Long id, Model model) {
         if (!esDeMiUnidad(id)) {
@@ -136,12 +136,12 @@ public class PedidoController {
 
         pedidoDTO.setItems(itemDTOs);
 
-        // Obtenemos los IDs de los platos que ya forman parte de este pedido (por si están inactivos)
+        // Se verifica si esta activo tomando el id
         List<Long> idsPlatosEnPedido = pedido.getItems().stream()
                 .map(item -> item.getPlato().getIdPlato())
                 .collect(Collectors.toList());
 
-        // Permitimos platos activos o viejos (!Boolean.FALSE.equals) O los que ya están guardados en este pedido histórico
+        // Se muestran los platos activos y los que ya estaban guardados.
         List<Plato> platosUnidad = platoService.traerTodos().stream()
                 .filter(p -> p.getUnidadVenta() != null && unidadVenta != null && p.getUnidadVenta().getIdUnidadVenta() == unidadVenta.getIdUnidadVenta())
                 .filter(p -> !Boolean.FALSE.equals(p.getActivo()) || idsPlatosEnPedido.contains(p.getIdPlato()))
@@ -155,7 +155,7 @@ public class PedidoController {
         return ViewRouteHelper.PEDIDO_NEW;
     }
 
-    // Proceso de actualización.
+    // Se actualiza el pedido validando los permisos
     @PostMapping("/actualizar/{id}")
     public String actualizarPedido(@PathVariable("id") Long id,
                                    @ModelAttribute("pedidoDTO") PedidoDTO pedidoDTO,
@@ -176,7 +176,7 @@ public class PedidoController {
         }
     }
 
-    // Eliminacion.
+    // Se elimina el pedido si pertenece a la unidad del usuario
     @GetMapping("/eliminar/{id}")
     public String eliminarPedido(@PathVariable("id") Long id, RedirectAttributes redirectAttributes) {
         if (!esDeMiUnidad(id)) {
@@ -195,7 +195,7 @@ public class PedidoController {
         return "redirect:/pedido";
     }
 
-    // Cambiar el estado
+    // Se cambia el estado del pedido entre pendiente y terminado
     @GetMapping("/cambiar-estado/{id}")
     public String cambiarEstado(@PathVariable("id") Long id, RedirectAttributes redirect) {
         if (!esDeMiUnidad(id)) {

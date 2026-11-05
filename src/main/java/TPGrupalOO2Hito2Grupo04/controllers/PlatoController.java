@@ -45,6 +45,7 @@ public class PlatoController {
         this.pedidoService = pedidoService;
     }
 
+    // Lista de platos filtrando por la unidad del responsable y calculando el plato estrella.
     @GetMapping({"", "/"})
     public ModelAndView index(
             @RequestParam(value = "idFestival", required = false) Long idFestival,
@@ -67,6 +68,7 @@ public class PlatoController {
         mAV.addObject("festivales", festivalService.getAll());
         mAV.addObject("unidadesVenta", unidadVentaService.getAll());
 
+        // Logica para calcular el plato estrella tomando parametros de festival y unidad venta
         if (idFestival != null && idUnidadVenta != null) {
             PlatoDTO platoEstrella = pedidoService.encontrarPlatoEstrella(idUnidadVenta, idFestival);
             mAV.addObject("platoEstrella", platoEstrella);
@@ -88,6 +90,7 @@ public class PlatoController {
         return mAV;
     }
 
+    // Formulario para crear un plato nuevo
     @GetMapping("/nuevo")
     public ModelAndView nuevoPlato() {
         ModelAndView mAV = new ModelAndView(ViewRouteHelper.PLATO_NEW);
@@ -101,10 +104,12 @@ public class PlatoController {
         return mAV;
     }
 
+    // Se guarda el plato nuevo validando que no tenga valores negativos.
     @PostMapping("/guardar")
     public ModelAndView guardarPlato(@ModelAttribute(PLATO_ATTR) PlatoDTO platoDTO) {
         UnidadVenta unidadVenta = unidadDelResponsable();
 
+        // Validacion para que el precio o el costo no sean negativos
         if ((platoDTO.getPrecio() < 0) || (platoDTO.getCosto() < 0)) {
             ModelAndView mAV = new ModelAndView(ViewRouteHelper.PLATO_NEW);
             mAV.addObject(PLATO_ATTR, platoDTO);
@@ -130,6 +135,7 @@ public class PlatoController {
         return mAV;
     }
 
+    // Baja logica del plato por id
     @GetMapping("/eliminar/{id}")
     public String eliminarPlato(@PathVariable("id") Long id, RedirectAttributes redirect) {
         if (!esDeMiUnidad(id)) {
@@ -144,6 +150,7 @@ public class PlatoController {
         return "redirect:/plato";
     }
 
+    // Carga de los datos del plato para editarlos
     @GetMapping("/editar/{id}")
     public ModelAndView editarPlato(@PathVariable("id") Long id) {
         if (!esDeMiUnidad(id)) {
@@ -169,6 +176,7 @@ public class PlatoController {
         return mAV;
     }
 
+    // Acualizacion de el plato validando tambien que no pongan numeros negativos
     @PostMapping("/actualizar")
     public ModelAndView actualizarPlato(@ModelAttribute(PLATO_ATTR) PlatoDTO platoDTO) {
         if (!esDeMiUnidad(platoDTO.getIdPlato())) {
@@ -206,12 +214,14 @@ public class PlatoController {
         return mAV;
     }
 
+    // Buscar la unidad que maneja el responsable logueado
     private UnidadVenta unidadDelResponsable() {
         String emailUsuario = SecurityContextHolder.getContext().getAuthentication().getName();
         return unidadVentaService.findByResponsable(emailUsuario)
                 .orElseThrow(() -> new RuntimeException("El responsable no tiene una unidad de venta a su cargo"));
     }
 
+    // Validacion para que que el plato pertenezca a la unidad de el usuario logueado
     private boolean esDeMiUnidad(Long idPlato) {
         if (idPlato == null) {
             return false;

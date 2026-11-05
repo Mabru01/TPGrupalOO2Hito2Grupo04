@@ -22,7 +22,6 @@
                 </div>
             </div>
 
-            <!-- Alertas de éxito o error que vienen del backend -->
             <div th:if="${exito}" class="alert alert-success text-center" role="alert" th:text="${exito}"></div>
             <div th:if="${error}" class="alert alert-danger text-center" role="alert" th:text="${error}"></div>
 
@@ -128,6 +127,7 @@
         actualizarIndicesYBotones();
     });
 
+    // Script para poder agregar los platos a los pedidos
     function agregarFilaItem() {
         const contenedor = document.getElementById('contenedor-items');
 
@@ -165,7 +165,7 @@
         const contenedor = document.getElementById('contenedor-items');
         const filas = contenedor.querySelectorAll('.item-row');
 
-        // Solo elimina si hay más de una fila
+        // Eliminar si hay más de una fila
         if (filas.length > 1) {
             const fila = boton.closest('.item-row');
             fila.remove();
@@ -189,7 +189,7 @@
             }
         });
 
-        // Si solo queda 1 fila, desactivamos su botón eliminar para que no se pueda borrar
+        // Si hay una fila se desactiva el boton de eliminar
         if (filas.length === 1) {
             botonesEliminar.forEach(btn => {
                 btn.disabled = true;

@@ -11,6 +11,7 @@ import java.util.Optional;
 @Repository
 public interface ICocineroRepository extends JpaRepository<Cocinero, Integer> {
 
+    // Metodo encotrar usuario por mail.
     @Query("SELECT c FROM Cocinero c JOIN FETCH c.usuario u JOIN FETCH c.unidadVenta WHERE u.mail = :mail")
     Optional<Cocinero> findByUsuarioMailWithUnidadVenta(@Param("mail") String mail);
 }

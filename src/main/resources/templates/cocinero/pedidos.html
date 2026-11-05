@@ -13,9 +13,8 @@
         </div>
     </div>
 
-    <!-- CARTEL DE ADVERTENCIA: UNIDAD DE VENTA DADA DE BAJA -->
     <div th:if="${unidadVenta != null and unidadVenta.activa != null and !unidadVenta.activa}" class="alert alert-danger text-center shadow-sm mb-4" role="alert">
-        <i class="bi bi-exclamation-triangle-fill"></i> <strong>Atención:</strong> La unidad de venta está dada de baja, por lo que no se puede modificar el estado de los pedidos.
+        <i class="bi bi-exclamation-triangle-fill"></i> <strong>Atención:</strong> La unidad de venta está dada de baja, no se puede modificar el estado de los pedidos.
     </div>
 
     <div th:if="${exito}" class="alert alert-success text-center" role="alert" th:text="${exito}"></div>
@@ -37,7 +36,7 @@
                     </thead>
                     <tbody>
                     <tr th:if="${#lists.isEmpty(pedidos)}">
-                        <td colspan="4" class="text-center py-4 text-muted">No hay pedidos registrados actualmente.</td>
+                        <td colspan="4" class="text-center py-4 text-muted">Actualmente no hay pedidos registrados.</td>
                     </tr>
                     <tr th:each="pedido : ${pedidos}">
                         <td class="font-weight-bold" th:text="${'#' + pedido.idPedido}"></td>
@@ -47,14 +46,13 @@
                             <span th:unless="${pedido.terminado}" class="badge badge-warning px-2 py-1 text-dark">En curso</span>
                         </td>
                         <td class="text-center">
-                            <!-- Botón Ver Detalles -->
+
                             <button type="button"
                                     class="btn btn-info btn-sm text-white"
                                     th:onclick="'abrirModalDetalle(' + ${pedido.idPedido} + ')'">
                                 <i class="bi bi-eye"></i> Ver Detalles
                             </button>
 
-                            <!-- Botón Cambiar Estado (Solo se muestra si la unidad está activa o es null) -->
                             <a th:href="@{/cocinero/pedidos/cambiar-estado/{id}(id=${pedido.idPedido})}"
                                class="btn btn-sm"
                                th:classappend="${pedido.terminado} ? 'btn-secondary' : 'btn-success'"

@@ -37,6 +37,7 @@ public class CocineroController {
     @Autowired
     private IPlatoService platoService;
 
+    // Se trae el cocinero logueado mediante su mail de la sesion-
     private Cocinero cocineroLogueado() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String mail = auth.getName();
@@ -50,6 +51,7 @@ public class CocineroController {
         return cocinero;
     }
 
+    // Se muestra la vista con los platos de la unidad del cocinero
     @GetMapping("/platos")
     public String listarPlatosCocinero(Model model) {
         Cocinero cocinero = cocineroLogueado();
@@ -69,6 +71,7 @@ public class CocineroController {
         return ViewRouteHelper.COCINERO_PLATOS;
     }
 
+    // Listado de pedidos que le corresponden a la cocina de la unidad
     @GetMapping("/pedidos")
     public String listarPedidosCocinero(Model model) {
         Cocinero cocinero = cocineroLogueado();
@@ -87,6 +90,7 @@ public class CocineroController {
         return ViewRouteHelper.COCINERO_PEDIDOS;
     }
 
+    // Se cambia el estado del pedido.
     @GetMapping("/pedidos/cambiar-estado/{id}")
     public String cambiarEstadoPedido(@PathVariable("id") Long id, RedirectAttributes redirect) {
         try {

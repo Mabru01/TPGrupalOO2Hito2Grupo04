@@ -9,7 +9,6 @@ public interface IPlatoRepository extends JpaRepository<Plato, Long> {
 
     // Metodos especificos
     Optional<Plato> findByNombre(String nombre);
-
     List<Plato> findAllByOrderByUnidadVentaNombreComercialAsc();
     List<Plato> findByActivoTrue();
 
