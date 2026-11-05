@@ -114,6 +114,11 @@ public class StaffService implements IStaffService {
             throw new IllegalArgumentException("Ya existe un empleado registrado con ese dni.");
         }
 
+        // Verifico que el mail no esté usado por otro usuario
+        if (usuarioRepository.findByMail(staffDTO.getEmailStaff()).isPresent()) {
+            throw new IllegalArgumentException("Ya existe un usuario registrado con ese mail.");
+        }
+
         // Verifico que el empleado sea mayor de edad
         Period edad = Period.between(staffDTO.getFechaNacimiento(), LocalDate.now());
         if (edad.getYears() < 18) {

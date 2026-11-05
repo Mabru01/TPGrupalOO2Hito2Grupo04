@@ -10,6 +10,7 @@ import TPGrupalOO2Hito2Grupo04.repositories.ICocineroRepository;
 import TPGrupalOO2Hito2Grupo04.services.IPedidoService;
 import TPGrupalOO2Hito2Grupo04.services.IPlatoService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -42,7 +43,7 @@ public class CocineroController {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String mail = auth.getName();
         Cocinero cocinero = cocineroRepository.findByUsuarioMailWithUnidadVenta(mail)
-                .orElseThrow(() -> new RuntimeException("No se encontró el cocinero asociado a este usuario"));
+                .orElseThrow(() -> new AccessDeniedException("Solo los cocineros pueden acceder a esta sección"));
 
         if (!(cocinero instanceof Cocinero)) {
             throw new RuntimeException("Solo los cocineros pueden acceder a esta sección");
@@ -93,6 +94,16 @@ public class CocineroController {
     // Se cambia el estado del pedido.
     @GetMapping("/pedidos/cambiar-estado/{id}")
     public String cambiarEstadoPedido(@PathVariable("id") Long id, RedirectAttributes redirect) {
+        // Solo puede cambiar el estado de los pedidos de su propia unidad
+        UnidadVenta unidadVenta = cocineroLogueado().getUnidadVenta();
+        boolean esDeSuUnidad = pedidoService.traerPorId(id)
+                .map(p -> p.getUnidadVenta() != null && unidadVenta != null
+                        && p.getUnidadVenta().getIdUnidadVenta() == unidadVenta.getIdUnidadVenta())
+                .orElse(false);
+        if (!esDeSuUnidad) {
+            redirect.addFlashAttribute("error", "El pedido no pertenece a tu unidad de venta.");
+            return ViewRouteHelper.COCINERO_PEDIDOS_REDIRECT;
+        }
         try {
             pedidoService.cambiarEstado(id);
             redirect.addFlashAttribute("exito", "El estado del pedido fue actualizado exitosamente.");
