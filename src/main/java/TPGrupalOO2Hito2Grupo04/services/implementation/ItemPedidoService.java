@@ -27,21 +27,25 @@ public class ItemPedidoService implements IItemPedidoService {
         this.itemPedidoRepository = itemPedidoRepository;
     }
 
+    // Se traen todos los items de pedidos que estan registrados en el sistema
     @Override
     public List<ItemPedido> getAll() {
         return itemPedidoRepository.findAll();
     }
 
+    // Se busca un item de pedido por su id
     @Override
     public Optional<ItemPedido> findById(long id) {
         return itemPedidoRepository.findById(id);
     }
 
+    // Se guarda o actualiza un item de pedido
     @Override
     public ItemPedido insertOrUpdate(ItemPedido itemPedido) {
         return itemPedidoRepository.save(itemPedido);
     }
 
+    // Se elimina un item de pedido
     @Override
     public boolean remove(long id) {
         try {

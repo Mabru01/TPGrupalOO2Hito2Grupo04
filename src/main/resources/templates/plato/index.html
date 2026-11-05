@@ -14,9 +14,15 @@
         </div>
     </div>
 
+    <div th:if="${unidadVenta != null and unidadVenta.activa != null and !unidadVenta.activa}" class="alert alert-danger text-center shadow-sm mb-4" role="alert">
+        <i class="bi bi-exclamation-triangle-fill"></i> <strong>Atención:</strong> La unidad de venta no se encuentra disponible actualmente. No es posible dar de alta nuevos platos.
+    </div>
+
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2>Gestión de Platos</h2>
-        <a th:href="@{/plato/nuevo}" class="btn btn-success">
+
+        <a th:href="@{/plato/nuevo}" class="btn btn-success"
+           th:if="${unidadVenta == null or unidadVenta.activa == null or unidadVenta.activa}">
             <i class="bi bi-plus-circle"></i> Nuevo Plato
         </a>
     </div>
@@ -141,7 +147,7 @@
 
 </main>
 
-<!--  Modal de eliminación  -->
+<!--  Modal para eliminar  -->
 <div class="modal fade" id="confirmarEliminarModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -162,7 +168,7 @@
     </div>
 </div>
 
-<!-- Script para usar el ID y el nombre en el Modal -->
+<!-- Script para usar el ID y nombre del plato -->
 <script>
     function prepararEliminacion(button) {
         var id = button.getAttribute("data-id");

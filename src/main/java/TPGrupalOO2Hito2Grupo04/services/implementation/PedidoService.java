@@ -55,23 +55,27 @@ public class PedidoService implements IPedidoService {
         this.modelMapper = modelMapper;
     }
 
+    // Se traen todos los pedidos con sus items y platos asociados
     @Override
     @Transactional(readOnly = true)
     public List<Pedido> traerTodo() {
         return pedidoRepository.findAllWithItemsAndPlatos();
     }
 
+    // Se busca un pedido por id
     @Override
     @Transactional(readOnly = true)
     public Optional<Pedido> traerPorId(Long id) {
         return pedidoRepository.findById(id);
     }
 
+    // Se guarda o actualiza un pedido directamente
     @Override
     public Pedido insertarOActualizar(Pedido pedido) {
         return pedidoRepository.save(pedido);
     }
 
+    // Se elimina un pedido controlando excepciones
     @Override
     public boolean eliminar(long id) {
         try {
@@ -88,6 +92,7 @@ public class PedidoService implements IPedidoService {
         }
     }
 
+    // Se inserta un nuevo pedido validando fechas, festivales y que los platos esten activos
     @Override
     @Transactional
     public Pedido insertarPedido(PedidoDTO pedidoDTO) throws Exception {
@@ -117,7 +122,7 @@ public class PedidoService implements IPedidoService {
                 throw new Exception("No se pueden registrar pedidos con fechas anteriores al día de hoy.");
             }
 
-            // Validación de rango del festival
+            // Validación de rango de fecha del festival
             Festival festival = unidadVenta.getFestival();
             if (festival != null) {
                 if (fechaPedido.isBefore(festival.getFechaInicio()) || fechaPedido.isAfter(festival.getFechaFin())) {
@@ -138,7 +143,7 @@ public class PedidoService implements IPedidoService {
                     Plato plato = platoRepository.findById(itemDTO.getIdPlato())
                             .orElseThrow(() -> new Exception("Plato no encontrado con ID: " + itemDTO.getIdPlato()));
 
-                    // Para nuevo pedido, no se permiten platos dados de baja
+                    // Para un nuevo pedido no se permiten platos dados de baja
                     if (Boolean.FALSE.equals(plato.getActivo())) {
                         throw new Exception("El plato '" + plato.getNombre() + "' no esta disponible, debe seleccionar un plato activo.");
                     }
@@ -162,6 +167,7 @@ public class PedidoService implements IPedidoService {
         }
     }
 
+    // Se actualiza un pedido existente aplicando validaciones de fechas e items
     @Override
     @Transactional
     public Pedido actualizarPedido(Long id, PedidoDTO pedidoDTO) throws Exception {
@@ -198,7 +204,7 @@ public class PedidoService implements IPedidoService {
         pedidoExistente.setFechaTransaccion(fechaPedido);
         pedidoExistente.setUnidadVenta(unidadVenta);
 
-        // Actualizar los ítems utilizando orphanRemoval
+        // Se actualizan los ítems con orphanRemoval
         pedidoExistente.getItems().clear();
 
         if (pedidoDTO.getItems() != null && !pedidoDTO.getItems().isEmpty()) {
@@ -206,7 +212,7 @@ public class PedidoService implements IPedidoService {
                 Plato plato = platoRepository.findById(itemDTO.getIdPlato())
                         .orElseThrow(() -> new Exception("Plato no encontrado con ID: " + itemDTO.getIdPlato()));
 
-                // Validación estricta: si está dado de baja, no se permite aceptar la edición
+                // Se valida que si está dado de baja, se rechaza la edicion
                 if (Boolean.FALSE.equals(plato.getActivo())) {
                     throw new Exception("El plato '" + plato.getNombre() + "' no esta disponible, debe seleccionar un plato activo.");
                 }
@@ -222,6 +228,7 @@ public class PedidoService implements IPedidoService {
         return pedidoRepository.save(pedidoExistente);
     }
 
+    // Se busca el plato que mas vendido teniendo datos de festival y unidad venta
     @Override
     public PlatoDTO encontrarPlatoEstrella(Long idUnidadVenta, Long idFestival) {
         List<Object[]> resultados = pedidoRepository.encontrarPlatoEstrella(
@@ -252,6 +259,7 @@ public class PedidoService implements IPedidoService {
         return platoDto;
     }
 
+    // Se cambia el estado de terminado del pedido para el cocinero.
     @Override
     public void cambiarEstado(Long idPedido) {
         Pedido pedido = pedidoRepository.findById(idPedido)
