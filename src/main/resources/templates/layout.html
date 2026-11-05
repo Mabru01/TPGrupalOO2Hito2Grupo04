@@ -19,9 +19,6 @@
         </button>
         <div class="collapse navbar-collapse" id="menuPrincipal">
             <ul class="navbar-nav mr-auto">
-                <li class="nav-item">
-                    <a class="nav-link" th:href="@{/index}">Inicio</a>
-                </li>
                 <!-- El Administrador ve todas las unidades de venta -->
                 <li class="nav-item" sec:authorize="hasAnyAuthority('ADMIN', 'ROLE_ADMIN')">
                     <a class="nav-link" th:href="@{/unidadVenta}">Unidades de venta</a>
@@ -37,7 +34,7 @@
                     <a class="nav-link" th:href="@{/unidadVenta/mi-unidad}">Mi unidad</a>
                 </li>
                 <li class="nav-item" sec:authorize="hasAnyAuthority('RESPONSABLE')">
-                    <a class="nav-link" th:href="@{/liquidacion}">Liquidaciónes</a>
+                    <a class="nav-link" th:href="@{/liquidacion}">Liquidación</a>
                 </li>
                 <li class="nav-item" sec:authorize="hasAnyAuthority('RESPONSABLE')">
                     <a class="nav-link" th:href="@{/reporte/recaudacion}">Recaudación</a>
