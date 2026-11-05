@@ -28,6 +28,7 @@ import org.springframework.web.servlet.view.RedirectView;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/unidadVenta")
@@ -48,10 +49,45 @@ public class UnidadVentaController {
     }
 
     @GetMapping("")
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'ROLE_ADMIN')")
-    public ModelAndView index(Principal principal, Authentication authentication) {
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'ROLE_ADMIN', 'RESPONSABLE')")
+    public ModelAndView index(@RequestParam(value = "tipo", required = false) String tipo,
+                              @RequestParam(value = "estado", required = false) String estado,
+                              Principal principal, Authentication authentication) {
+
         ModelAndView mAV = new ModelAndView(ViewRouteHelper.UnidadVenta_INDEX);
-        mAV.addObject(LISTA_UNIDADES_ATTR, unidadVentaService.getAll());
+        List<UnidadVenta> todasLasUnidades = unidadVentaService.getAll();
+        List<UnidadVenta> unidadesFiltradas;
+
+        // Filtro rápido por tipo usando Streams (en memoria, sin tocar repositorios)
+        if (tipo != null && !tipo.isEmpty() && !tipo.equalsIgnoreCase("TODOS")) {
+            unidadesFiltradas = todasLasUnidades.stream()
+                    .filter(u -> u.getClass().getSimpleName().equalsIgnoreCase(tipo))
+                    .collect(Collectors.toList());
+        } else {
+            unidadesFiltradas = todasLasUnidades;
+        }
+
+        if (estado != null && !estado.isEmpty() && !estado.equalsIgnoreCase("TODOS")) {
+            boolean buscarActiva = Boolean.parseBoolean(estado); // "true" o "false"
+            unidadesFiltradas = unidadesFiltradas.stream()
+                    .filter(u -> u.isActiva() == buscarActiva)
+                    .collect(Collectors.toList());
+        }
+
+        // Cálculos para las Cards de Estadísticas (siempre sobre el total absoluto)
+        long totalUnidades = todasLasUnidades.size();
+        long totalFoodTrucks = todasLasUnidades.stream()
+                .filter(u -> u instanceof FoodTruck)
+                .count();
+        long totalPuestos = totalUnidades - totalFoodTrucks;
+
+        // Pasamos todo al modelo
+        mAV.addObject("unidadVentas", unidadesFiltradas);
+        mAV.addObject("tipoSeleccionado", tipo);
+        mAV.addObject("totalUnidades", totalUnidades);
+        mAV.addObject("totalFoodTrucks", totalFoodTrucks);
+        mAV.addObject("totalPuestos", totalPuestos);
+
         return mAV;
     }
 
