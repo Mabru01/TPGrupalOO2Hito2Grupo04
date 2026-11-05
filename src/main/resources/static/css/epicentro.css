@@ -106,6 +106,22 @@
     font-size: 0.85rem;
 }
 
+/* Botón del admin para agregar un festival */
+.btn-agregar {
+    border-radius: 999px;
+    padding: 0.4rem 1.1rem;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(192, 57, 43, 0.25);
+}
+
+/* Datos destacados en el detalle de un festival */
+.dato-festival {
+    border: 0;
+    border-left: 4px solid var(--eg-acento);
+    border-radius: 10px;
+    background-color: var(--eg-crema);
+}
+
 /* Reporte de recaudación */
 .dato-reporte {
     border: 0;

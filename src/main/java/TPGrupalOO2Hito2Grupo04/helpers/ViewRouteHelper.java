@@ -21,6 +21,10 @@ public class ViewRouteHelper {
     public final static String reporte_MAYOR_CANON = "reporte/mayorCanon";
     public final static String reporte_PDF_MAYOR_CANON = "reporte-mayores-canon-";
 
+    // Festival
+    public final static String FESTIVAL_FORM = "festival/form";
+    public final static String FESTIVAL_DETAIL = "festival/detail";
+
     // Liquidacion
     public final static String LIQUIDACION_INDEX = "liquidacion/index";
 
@@ -50,5 +54,6 @@ public class ViewRouteHelper {
   /**** Redirects ****/
     public final static String UnidadVenta_ROOT = "/unidadVenta";
     public final static String STAFF_ROOT = "/staff";
+    public final static String FESTIVAL_ROOT = "/festival";
 
 }

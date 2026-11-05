@@ -29,4 +29,21 @@ public interface IFestivalRepository extends JpaRepository<Festival, Serializabl
     // Festival activo fecha de hoy entre inicio y fin
     @Query("SELECT f FROM Festival f WHERE :hoy BETWEEN f.fechaInicio AND f.fechaFin")
     Optional<Festival> findFestivalActivo(@Param("hoy") LocalDate hoy);
+
+    public abstract boolean existsByNombreIgnoreCase(String nombre);
+
+    // Nombre repetido en otro festival (para la modificación)
+    public abstract boolean existsByNombreIgnoreCaseAndIdFestivalNot(String nombre, long idFestival);
+
+    // Algún festival que comparta al menos un día con el rango de fechas
+    @Query("SELECT COUNT(f) > 0 FROM Festival f WHERE f.fechaInicio <= :fin AND f.fechaFin >= :inicio")
+    public abstract boolean existeFestivalEntre(@Param("inicio") LocalDate inicio, @Param("fin") LocalDate fin);
+
+    // Igual que el anterior pero sin contar al festival que se está modificando
+    @Query("SELECT COUNT(f) > 0 FROM Festival f WHERE f.fechaInicio <= :fin AND f.fechaFin >= :inicio AND f.idFestival <> :id")
+    public abstract boolean existeOtroFestivalEntre(@Param("inicio") LocalDate inicio, @Param("fin") LocalDate fin,
+                                                    @Param("id") long idFestival);
+
+    // El último festival cargado, para sugerir sus costos en el alta
+    public abstract Optional<Festival> findFirstByOrderByFechaInicioDesc();
 }
