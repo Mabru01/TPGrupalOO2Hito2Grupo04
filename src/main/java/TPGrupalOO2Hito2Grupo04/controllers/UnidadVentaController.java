@@ -49,7 +49,8 @@ public class UnidadVentaController {
     }
 
     @GetMapping("")
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'ROLE_ADMIN', 'RESPONSABLE')")
+    // Listado de todas las unidades: solo el administrador (el responsable tiene "Mi unidad")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'ROLE_ADMIN')")
     public ModelAndView index(@RequestParam(value = "tipo", required = false) String tipo,
                               @RequestParam(value = "estado", required = false) String estado,
                               Principal principal, Authentication authentication) {

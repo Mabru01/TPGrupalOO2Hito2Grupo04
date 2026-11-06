@@ -5,11 +5,13 @@ import TPGrupalOO2Hito2Grupo04.entities.Cajero;
 import TPGrupalOO2Hito2Grupo04.entities.Cocinero;
 import TPGrupalOO2Hito2Grupo04.entities.Festival;
 import TPGrupalOO2Hito2Grupo04.entities.Staff;
+import TPGrupalOO2Hito2Grupo04.entities.UnidadVenta;
 import TPGrupalOO2Hito2Grupo04.services.IFestivalService;
 import TPGrupalOO2Hito2Grupo04.services.IStaffService;
 import TPGrupalOO2Hito2Grupo04.helpers.ViewRouteHelper;
 import TPGrupalOO2Hito2Grupo04.services.IUnidadVentaService;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -42,40 +44,42 @@ public class StaffController {
 
     @GetMapping("")
     @PreAuthorize("hasAnyAuthority('RESPONSABLE', 'ROLE_RESPONSABLE')")
-    public ModelAndView index() {
+    public ModelAndView index(Authentication auth) {
         ModelAndView mAV = new ModelAndView(ViewRouteHelper.STAFF_INDEX);
-        mAV.addObject("staffs", staffService.getAllByRolEmpleado());
+        mAV.addObject("staffs", empleadosDeMiUnidad(auth, staffService.getAllByRolEmpleado()));
         return mAV;
     }
 
     @GetMapping("/nuevo/cocinero")
     @PreAuthorize("hasAnyAuthority('RESPONSABLE', 'ROLE_RESPONSABLE')")
-    public ModelAndView nuevoCocinero() {
+    public ModelAndView nuevoCocinero(Authentication auth) {
         ModelAndView mAV = new ModelAndView(ViewRouteHelper.STAFF_NEW_COCINERO);
-        mAV.addObject("unidadesVenta", unidadVentaService.getAllActivas()); // Para el desplegable (select)
+        mAV.addObject("unidadesVenta", List.of(unidadDelResponsable(auth))); // Para el desplegable (select)
         mAV.addObject(STAFF_ATTR, new CocineroDTO());
         return mAV;
     }
 
     @GetMapping("/nuevo/cajero")
     @PreAuthorize("hasAnyAuthority('RESPONSABLE', 'ROLE_RESPONSABLE')")
-    public ModelAndView nuevoCajero() {
+    public ModelAndView nuevoCajero(Authentication auth) {
         ModelAndView mAV = new ModelAndView(ViewRouteHelper.STAFF_NEW_CAJERO);
         mAV.addObject(STAFF_ATTR, new CajeroDTO());
-        mAV.addObject("unidadesVenta", unidadVentaService.getAllActivas()); // Para el desplegable (select)
+        mAV.addObject("unidadesVenta", List.of(unidadDelResponsable(auth))); // Para el desplegable (select)
         return mAV;
     }
 
     @PostMapping("/guardar/cocinero")
     @PreAuthorize("hasAnyAuthority('RESPONSABLE', 'ROLE_RESPONSABLE')")
     public ModelAndView guardarCocinero(
-            @ModelAttribute("staffDTO") CocineroDTO staffDTO) {
+            @ModelAttribute("staffDTO") CocineroDTO staffDTO, Authentication auth) {
         try {
+            // El empleado siempre queda en la unidad del responsable
+            staffDTO.setIdUnidadVenta(unidadDelResponsable(auth).getIdUnidadVenta());
             staffService.registrarStaff(staffDTO);
             return new ModelAndView(new RedirectView(ViewRouteHelper.STAFF_ROOT));
         } catch (IllegalArgumentException e) {
             ModelAndView mAV = new ModelAndView(ViewRouteHelper.STAFF_NEW_COCINERO);
-            mAV.addObject("unidadesVenta", unidadVentaService.getAllActivas());
+            mAV.addObject("unidadesVenta", List.of(unidadDelResponsable(auth)));
             mAV.addObject(STAFF_ATTR, new CocineroDTO());
             mAV.addObject("error", e.getMessage());
             return mAV;
@@ -85,14 +89,16 @@ public class StaffController {
     @PostMapping("/guardar/cajero")
     @PreAuthorize("hasAnyAuthority('RESPONSABLE', 'ROLE_RESPONSABLE')")
     public ModelAndView guardarCajero(
-            @ModelAttribute("staffDTO") CajeroDTO staffDTO) {
+            @ModelAttribute("staffDTO") CajeroDTO staffDTO, Authentication auth) {
         try {
+            // El empleado siempre queda en la unidad del responsable
+            staffDTO.setIdUnidadVenta(unidadDelResponsable(auth).getIdUnidadVenta());
             staffService.registrarStaff(staffDTO);
             return new ModelAndView(new RedirectView(ViewRouteHelper.STAFF_ROOT));
         } catch (IllegalArgumentException e) {
             ModelAndView mAV = new ModelAndView(ViewRouteHelper.STAFF_NEW_CAJERO);
             mAV.addObject(STAFF_ATTR, new CajeroDTO());
-            mAV.addObject("unidadesVenta", unidadVentaService.getAllActivas());
+            mAV.addObject("unidadesVenta", List.of(unidadDelResponsable(auth)));
             mAV.addObject("error", e.getMessage());
             return mAV;
         }
@@ -100,12 +106,13 @@ public class StaffController {
 
     @GetMapping("/modificar")
     @PreAuthorize("hasAnyAuthority('RESPONSABLE', 'ROLE_RESPONSABLE')")
-    public ModelAndView modificar(@RequestParam(required = false) Integer idStaff) {
+    public ModelAndView modificar(@RequestParam(required = false) Integer idStaff, Authentication auth) {
         ModelAndView mAV = new ModelAndView(ViewRouteHelper.STAFF_UPDATE);
-        mAV.addObject("staffs", staffService.getAllByRolEmpleado());
-        mAV.addObject("unidadesVenta", unidadVentaService.getAllActivas());
+        mAV.addObject("staffs", empleadosDeMiUnidad(auth, staffService.getAllByRolEmpleado()));
+        mAV.addObject("unidadesVenta", List.of(unidadDelResponsable(auth)));
         if (idStaff != null) {
             try {
+                verificarQueSeaDeMiUnidad(auth, idStaff);
                 StaffDTO staffDTO = staffService.obtenerDTOPorId(idStaff);
                 mAV.addObject(STAFF_ATTR, staffDTO);
             } catch (IllegalArgumentException e) {
@@ -117,14 +124,16 @@ public class StaffController {
 
     @PostMapping("/modificar")
     @PreAuthorize("hasAnyAuthority('RESPONSABLE', 'ROLE_RESPONSABLE')")
-    public ModelAndView modificarStaff(@ModelAttribute("staffDTO") StaffDTO staffDTO) {
+    public ModelAndView modificarStaff(@ModelAttribute("staffDTO") StaffDTO staffDTO, Authentication auth) {
         try {
+            verificarQueSeaDeMiUnidad(auth, staffDTO.getIdStaff());
+            staffDTO.setIdUnidadVenta(unidadDelResponsable(auth).getIdUnidadVenta());
             staffService.modificarStaff(staffDTO);
             return new ModelAndView(new RedirectView(ViewRouteHelper.STAFF_ROOT));
         } catch (IllegalArgumentException e) {
             ModelAndView mAV = new ModelAndView(ViewRouteHelper.STAFF_UPDATE);
-            mAV.addObject("staffs", staffService.getAllByRolEmpleado());
-            mAV.addObject("unidadesVenta", unidadVentaService.getAllActivas());
+            mAV.addObject("staffs", empleadosDeMiUnidad(auth, staffService.getAllByRolEmpleado()));
+            mAV.addObject("unidadesVenta", List.of(unidadDelResponsable(auth)));
             mAV.addObject(STAFF_ATTR, staffDTO);
             mAV.addObject("error", e.getMessage());
             return mAV;
@@ -133,11 +142,12 @@ public class StaffController {
 
     @GetMapping("/baja")
     @PreAuthorize("hasAnyAuthority('RESPONSABLE', 'ROLE_RESPONSABLE')")
-    public ModelAndView baja(@RequestParam(required = false) Integer idStaff) {
+    public ModelAndView baja(@RequestParam(required = false) Integer idStaff, Authentication auth) {
         ModelAndView mAV = new ModelAndView(ViewRouteHelper.STAFF_DROP);
-        mAV.addObject("staffs", staffService.getAllByRolEmpleado());
+        mAV.addObject("staffs", empleadosDeMiUnidad(auth, staffService.getAllByRolEmpleado()));
         if (idStaff != null) {
             try {
+                verificarQueSeaDeMiUnidad(auth, idStaff);
                 Staff staff = staffService.findById(idStaff)
                         .orElseThrow(() -> new IllegalArgumentException("ERROR: Empleado no encontrado"));
                 mAV.addObject(STAFF_ATTR, modelMapper.map(staff, StaffDTO.class));
@@ -150,13 +160,14 @@ public class StaffController {
 
     @PostMapping("/baja")
     @PreAuthorize("hasAnyAuthority('RESPONSABLE', 'ROLE_RESPONSABLE')")
-    public ModelAndView eliminarStaff(@ModelAttribute("staffDTO") StaffDTO staffDTO) {
+    public ModelAndView eliminarStaff(@ModelAttribute("staffDTO") StaffDTO staffDTO, Authentication auth) {
         try {
+            verificarQueSeaDeMiUnidad(auth, staffDTO.getIdStaff());
             staffService.darBajaEmpleado(staffDTO);
             return new ModelAndView(new RedirectView(ViewRouteHelper.STAFF_ROOT));
         } catch (IllegalArgumentException e) {
             ModelAndView mAV = new ModelAndView(ViewRouteHelper.STAFF_DROP);
-            mAV.addObject("staffs", staffService.getAllByRolEmpleado());
+            mAV.addObject("staffs", empleadosDeMiUnidad(auth, staffService.getAllByRolEmpleado()));
             mAV.addObject(STAFF_ATTR, staffDTO);
             mAV.addObject("error", e.getMessage());
             return mAV;
@@ -165,11 +176,12 @@ public class StaffController {
 
     @GetMapping("/reactivar")
     @PreAuthorize("hasAnyAuthority('RESPONSABLE', 'ROLE_RESPONSABLE')")
-    public ModelAndView reactivar(@RequestParam(required = false) Integer idStaff) {
+    public ModelAndView reactivar(@RequestParam(required = false) Integer idStaff, Authentication auth) {
         ModelAndView mAV = new ModelAndView(ViewRouteHelper.STAFF_REACTIVATE);
-        mAV.addObject("staffs", staffService.getStaffsDadosDeBaja());
+        mAV.addObject("staffs", empleadosDeMiUnidad(auth, staffService.getStaffsDadosDeBaja()));
         if (idStaff != null) {
             try {
+                verificarQueSeaDeMiUnidad(auth, idStaff);
                 Staff staff = staffService.findById(idStaff)
                         .orElseThrow(() -> new IllegalArgumentException("ERROR: Empleado no encontrado"));
                 mAV.addObject(STAFF_ATTR, modelMapper.map(staff, StaffDTO.class));
@@ -182,8 +194,9 @@ public class StaffController {
 
     @PostMapping("/reactivar")
     @PreAuthorize("hasAnyAuthority('RESPONSABLE', 'ROLE_RESPONSABLE')")
-    public ModelAndView reactivarStaff(@ModelAttribute("staffDTO") StaffDTO staffDTO) {
+    public ModelAndView reactivarStaff(@ModelAttribute("staffDTO") StaffDTO staffDTO, Authentication auth) {
         try {
+            verificarQueSeaDeMiUnidad(auth, staffDTO.getIdStaff());
             boolean resultado = staffService.reactivar(staffDTO.getIdStaff());
             if (!resultado) {
                 throw new IllegalArgumentException("No se pudo reactivar el empleado. Verifique que esté dado de baja.");
@@ -191,7 +204,7 @@ public class StaffController {
             return new ModelAndView(new RedirectView(ViewRouteHelper.STAFF_ROOT));
         } catch (IllegalArgumentException e) {
             ModelAndView mAV = new ModelAndView(ViewRouteHelper.STAFF_REACTIVATE);
-            mAV.addObject("staffs", staffService.getAll());
+            mAV.addObject("staffs", empleadosDeMiUnidad(auth, staffService.getStaffsDadosDeBaja()));
             mAV.addObject(STAFF_ATTR, staffDTO);
             mAV.addObject("error", e.getMessage());
             return mAV;
@@ -264,6 +277,30 @@ public class StaffController {
             mAV.addObject("contraseniaDTO", dto);
             mAV.addObject("error", e.getMessage());
             return mAV;
+        }
+    }
+
+    // Unidad de venta del responsable logueado: solo administra a los empleados de esa unidad
+    private UnidadVenta unidadDelResponsable(Authentication auth) {
+        return unidadVentaService.findByResponsable(auth.getName())
+                .orElseThrow(() -> new AccessDeniedException("No tenés una unidad de venta a cargo"));
+    }
+
+    private List<Staff> empleadosDeMiUnidad(Authentication auth, List<Staff> staffs) {
+        long idUnidad = unidadDelResponsable(auth).getIdUnidadVenta();
+        return staffs.stream()
+                .filter(s -> s.getUnidadVenta() != null && s.getUnidadVenta().getIdUnidadVenta() == idUnidad)
+                .toList();
+    }
+
+    // Evita que se modifique, se dé de baja o se reactive a un empleado de otra unidad cambiando el id
+    private void verificarQueSeaDeMiUnidad(Authentication auth, int idStaff) {
+        long idUnidad = unidadDelResponsable(auth).getIdUnidadVenta();
+        boolean esDeMiUnidad = staffService.findById(idStaff)
+                .map(s -> s.getUnidadVenta() != null && s.getUnidadVenta().getIdUnidadVenta() == idUnidad)
+                .orElse(false);
+        if (!esDeMiUnidad) {
+            throw new IllegalArgumentException("El empleado no pertenece a tu unidad de venta.");
         }
     }
 }

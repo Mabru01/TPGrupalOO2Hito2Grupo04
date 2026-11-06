@@ -7,6 +7,7 @@ import TPGrupalOO2Hito2Grupo04.helpers.ViewRouteHelper;
 import TPGrupalOO2Hito2Grupo04.repositories.ICajeroRepository;
 import TPGrupalOO2Hito2Grupo04.repositories.IPedidoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -35,7 +36,7 @@ public class CierreCajaController {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String mail = auth.getName();
         Cajero cajero = cajeroRepository.findByUsuarioMailWithUnidadVenta(mail)
-                .orElseThrow(() -> new RuntimeException("No se encontró el cajero asociado a este usuario"));
+                .orElseThrow(() -> new AccessDeniedException("Solo los cajeros pueden cerrar caja"));
 
         if (!(cajero instanceof Cajero)) {
             throw new RuntimeException("Solo los cajeros pueden cerrar caja");
